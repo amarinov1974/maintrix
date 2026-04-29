@@ -36,8 +36,7 @@ Thumbs.db
 *~
 
 # Prisma
-packages/backend/prisma/migrations/*
-!packages/backend/prisma/migrations/.gitkeep
+# Prisma migrations are tracked in git
 
 # Database
 *.db
