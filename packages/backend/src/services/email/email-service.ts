@@ -50,7 +50,7 @@ export async function notifyNewOwner(params: {
       D: '/director',
       C2: '/director',
       BOD: '/director',
-      C3: '/c3',
+      ADMIN: '/admin',
     };
     dashboardUrl = APP_URL + (roleDashboards[user?.role ?? ''] ?? '/');
   } else {

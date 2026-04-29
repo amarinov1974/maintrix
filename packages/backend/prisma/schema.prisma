@@ -89,7 +89,7 @@ enum InternalRole {
   AMM // Area Maintenance Manager
   D   // Sales Director
   C2  // Maintenance Director
-  C3  // Maintenance Admin (Preventive Maintenance)
+  ADMIN // System Administrator
   BOD // Board of Directors
 }
 

@@ -1,6 +1,6 @@
 /**
  * Preventive Maintenance Routes
- * C3 role: parse Excel/CSV, preview, import plans
+ * ADMIN role: parse Excel/CSV, preview, import plans
  */
 
 import multer from 'multer';

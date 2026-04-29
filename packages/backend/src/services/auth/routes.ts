@@ -167,7 +167,7 @@ router.get('/session', async (req, res) => {
   });
 });
 
-const INTERNAL_ROLE_ORDER = ['SM', 'AM', 'AMM', 'D', 'C2', 'C3', 'BOD'];
+const INTERNAL_ROLE_ORDER = ['SM', 'AM', 'AMM', 'D', 'C2', 'ADMIN', 'BOD'];
 
 /**
  * GET /api/auth/users/internal

@@ -1,5 +1,5 @@
 /**
- * C3 Maintenance Admin Dashboard
+ * ADMIN Dashboard
  * Preventive Maintenance plan upload and management
  */
 
@@ -13,7 +13,7 @@ import {
 
 type Step = 'upload' | 'preview' | 'success';
 
-export function C3Dashboard() {
+export function AdminDashboard() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>('upload');
@@ -108,7 +108,7 @@ export function C3Dashboard() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Maintenance Admin (C3) Dashboard
+            System Administrator (ADMIN) Dashboard
           </h1>
           <p className="text-gray-600">
             Upload and manage preventive maintenance plans

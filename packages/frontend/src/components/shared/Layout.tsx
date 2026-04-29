@@ -42,7 +42,7 @@ export function Layout({
               )}
               {session != null && (
                 <p className="text-sm text-gray-600">
-                  {session.userName} • {session.role === 'S1' ? 'Service Admin' : session.role === 'S2' ? 'Technician' : session.role === 'S3' ? 'Finance / Backoffice' : session.role === 'AMM' ? 'Area Maintenance Manager' : session.role === 'C3' ? 'Maintenance Admin' : session.role}
+                  {session.userName} • {session.role === 'S1' ? 'Service Admin' : session.role === 'S2' ? 'Technician' : session.role === 'S3' ? 'Finance / Backoffice' : session.role === 'AMM' ? 'Area Maintenance Manager' : session.role === 'ADMIN' ? 'Maintenance Admin' : session.role}
                   {session.companyName != null ? ` • ${session.companyName}` : ''}
                   {session.servicedCompanyName != null ? ` • Serviced: ${session.servicedCompanyName}` : ''}
                   {session.storeName != null ? ` • Store: ${session.storeName}` : ''}

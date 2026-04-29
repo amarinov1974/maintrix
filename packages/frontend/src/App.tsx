@@ -23,7 +23,7 @@ import { S1Dashboard } from './pages/vendor/s1/S1Dashboard';
 import { S2Dashboard } from './pages/vendor/s2/S2Dashboard';
 import { S3Dashboard } from './pages/vendor/s3/S3Dashboard';
 import { S3MyWorkOrdersPage } from './pages/vendor/s3/S3MyWorkOrdersPage';
-import { C3Dashboard } from './pages/c3/C3Dashboard';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -175,10 +175,10 @@ function App() {
               }
             />
             <Route
-              path="/c3"
+              path="/admin"
               element={
-                <ProtectedRoute allowedRoles={['C3']}>
-                  <C3Dashboard />
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />

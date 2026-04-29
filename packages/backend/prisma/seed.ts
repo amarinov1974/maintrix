@@ -140,7 +140,7 @@ async function main() {
     data: { name: 'Zoran Tomašević', email: 'anthony.marinov@yahoo.com', role: 'BOD', companyId: retailA.id, active: true },
   });
   const c3 = await prisma.internalUser.create({
-    data: { name: 'Ante Jurić', email: 'anthony.marinov@yahoo.com', role: 'C3', companyId: retailA.id, active: true },
+    data: { name: 'Ante Jurić', email: 'anthony.marinov@yahoo.com', role: 'ADMIN', companyId: retailA.id, active: true },
   });
 
   console.log('Creating vendor companies and users...');
