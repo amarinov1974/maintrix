@@ -401,12 +401,19 @@ export function AdminDashboard() {
                         </td>
                         <td className="px-4 py-3 flex gap-2">
                           <button onClick={() => setEditingUser(user)} className="text-blue-600 hover:underline text-xs">Edit</button>
-                          {user.active && (
+                          {user.active ? (
                             <button
                               onClick={() => { if (confirm(`Deactivate ${user.name}?`)) deactivateInternalUser.mutate(user.id); }}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deactivate
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => updateInternalUser.mutate({ id: user.id, data: { active: true } })}
+                              className="text-green-600 hover:underline text-xs"
+                            >
+                              Activate
                             </button>
                           )}
                         </td>
@@ -544,12 +551,19 @@ export function AdminDashboard() {
                         </td>
                         <td className="px-4 py-3 flex gap-2">
                           <button onClick={() => setEditingVendor(user)} className="text-blue-600 hover:underline text-xs">Edit</button>
-                          {user.active && (
+                          {user.active ? (
                             <button
                               onClick={() => { if (confirm(`Deactivate ${user.name}?`)) deactivateVendorUser.mutate(user.id); }}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deactivate
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => updateVendorUser.mutate({ id: user.id, data: { active: true } })}
+                              className="text-green-600 hover:underline text-xs"
+                            >
+                              Activate
                             </button>
                           )}
                         </td>
@@ -662,12 +676,19 @@ export function AdminDashboard() {
                         </td>
                         <td className="px-4 py-3 flex gap-2">
                           <button onClick={() => setEditingStore(store)} className="text-blue-600 hover:underline text-xs">Edit</button>
-                          {store.active && (
+                          {store.active ? (
                             <button
                               onClick={() => { if (confirm(`Deactivate ${store.name}?`)) deactivateStore.mutate(store.id); }}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deactivate
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => updateStore.mutate({ id: store.id, data: { active: true } })}
+                              className="text-green-600 hover:underline text-xs"
+                            >
+                              Activate
                             </button>
                           )}
                         </td>
