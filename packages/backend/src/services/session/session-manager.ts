@@ -1,7 +1,16 @@
 import { Redis } from 'ioredis';
 import type { SessionData, SessionConfig } from './types.js';
 
-const redisClient = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
+const redisClient = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379', {
+  retryStrategy: (times) => {
+    if (times > 3) return null; // stop retrying after 3 attempts
+    return Math.min(times * 500, 2000); // wait 500ms, 1000ms, 2000ms
+  },
+  reconnectOnError: () => true,
+  enableReadyCheck: false,
+  maxRetriesPerRequest: 3,
+  lazyConnect: false,
+});
 redisClient.on('error', (err) => {
   console.error('[Redis] Connection error:', err);
 });
