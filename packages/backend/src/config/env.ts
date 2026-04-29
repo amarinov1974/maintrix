@@ -5,6 +5,9 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   DATABASE_URL: z.string().min(1),
   SESSION_SECRET: z.string().min(1),
+  REDIS_URL: z.string().min(1),
+  RESEND_API_KEY: z.string().optional(),
+  FRONTEND_URL: z.string().optional(),
   QR_EXPIRATION_MINUTES: z.coerce.number().default(5),
   /** Optional: if set, entry screen requires this username before demo login */
   GATE_USERNAME: z.string().optional(),

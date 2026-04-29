@@ -2,6 +2,9 @@ import { Redis } from 'ioredis';
 import type { SessionData, SessionConfig } from './types.js';
 
 const redisClient = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
+redisClient.on('error', (err) => {
+  console.error('[Redis] Connection error:', err);
+});
 
 export class SessionManager {
   private config: SessionConfig;
@@ -66,13 +69,19 @@ export class SessionManager {
   }
 
   async getActiveSessions(): Promise<number> {
-    const keys = await redisClient.keys('session:*');
-    return keys.length;
+    let count = 0;
+    let cursor = '0';
+    do {
+      const [nextCursor, keys] = await redisClient.scan(cursor, 'MATCH', 'session:*', 'COUNT', 100);
+      cursor = nextCursor;
+      count += keys.length;
+    } while (cursor !== '0');
+    return count;
   }
 }
 
 export const sessionManager = new SessionManager({
-  secret: process.env.SESSION_SECRET ?? 'dev-secret',
+  secret: process.env.SESSION_SECRET!,
   timeoutMinutes: parseInt(process.env.SESSION_TIMEOUT_MINUTES ?? '10', 10),
   cookieName: 'cmms_session',
 });

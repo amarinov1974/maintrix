@@ -20,7 +20,7 @@ export function csrfMiddleware(req: Request, res: Response, next: NextFunction):
   }
 
   // Skip for gate-login (needed before frontend is fully loaded)
-  if (req.path.startsWith('/api/auth/gate-login')) {
+  if (req.path === '/api/auth/gate-login') {
     next();
     return;
   }
