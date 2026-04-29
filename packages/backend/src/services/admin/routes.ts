@@ -304,4 +304,16 @@ router.get('/regions', async (req, res) => {
   }
 });
 
+router.get('/asset-categories', async (req, res) => {
+  try {
+    const categories = await prisma.assetCategory.findMany({
+      where: { companyId: req.session!.companyId, active: true },
+      orderBy: { name: 'asc' },
+    });
+    res.json({ categories });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch asset categories' });
+  }
+});
+
 export default router;

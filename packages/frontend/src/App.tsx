@@ -24,6 +24,7 @@ import { S2Dashboard } from './pages/vendor/s2/S2Dashboard';
 import { S3Dashboard } from './pages/vendor/s3/S3Dashboard';
 import { S3MyWorkOrdersPage } from './pages/vendor/s3/S3MyWorkOrdersPage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AssetListPage } from './pages/assets/AssetListPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -179,6 +180,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['ADMIN']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/assets"
+              element={
+                <ProtectedRoute allowedRoles={['AM', 'AMM', 'D', 'C2', 'BOD', 'ADMIN']}>
+                  <AssetListPage />
                 </ProtectedRoute>
               }
             />
