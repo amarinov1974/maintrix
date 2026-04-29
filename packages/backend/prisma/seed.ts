@@ -33,11 +33,12 @@ async function main() {
   await prisma.costEstimation.deleteMany();
   await prisma.ticketComment.deleteMany();
   await prisma.ticket.deleteMany();
-  await prisma.asset.deleteMany();
   await prisma.preventiveMaintenancePlan.deleteMany();
   await prisma.internalUser.deleteMany();
   await prisma.vendorUser.deleteMany();
   await prisma.vendorPriceListItem.deleteMany();
+  await prisma.asset.deleteMany();
+  await prisma.assetCategory.deleteMany();
   await prisma.store.deleteMany();
   await prisma.region.deleteMany();
   await prisma.company.deleteMany();
@@ -317,25 +318,115 @@ async function main() {
     },
   });
 
-  console.log('Creating demo assets (5 per store for first 4 stores)...');
+  // Create asset categories for Retail A
+  console.log('Creating asset categories...');
+  const categories = await Promise.all([
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Electrical Installations', depreciationYears: 20, depreciationRate: 5.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Heating, Ventilation and Air Conditioning', depreciationYears: 10, depreciationRate: 10.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Refrigeration', depreciationYears: 10, depreciationRate: 10.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Kitchen Equipment', depreciationYears: 7, depreciationRate: 14.29, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Elevators', depreciationYears: 20, depreciationRate: 5.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Automatic Doors', depreciationYears: 10, depreciationRate: 10.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Fire Protection System', depreciationYears: 10, depreciationRate: 10.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Water and Sewage', depreciationYears: 15, depreciationRate: 6.67, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Construction Works', depreciationYears: 40, depreciationRate: 2.50, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Hygiene', depreciationYears: 5, depreciationRate: 20.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Environmental', depreciationYears: 10, depreciationRate: 10.00, active: true } }),
+    prisma.assetCategory.create({ data: { companyId: retailA.id, name: 'Other', depreciationYears: 5, depreciationRate: 20.00, active: true } }),
+  ]);
 
-  const assetNames = ['HVAC Unit 1', 'Refrigeration Unit 1', 'Elevator 1', 'Automatic Door 1', 'Electrical Panel 1'];
-  const storesWithAssets = [store1North, store2North, store3North, store4North];
-  const assetIdsByStore: Map<number, number[]> = new Map();
-  for (const store of storesWithAssets) {
-    const ids: number[] = [];
-    for (let i = 0; i < assetNames.length; i++) {
-      const a = await prisma.asset.create({
-        data: {
-          storeId: store.id,
-          description: assetNames[i],
-          category: i === 0 ? 'HVAC' : i === 1 ? 'Refrigeration' : i === 2 ? 'Elevators' : i === 3 ? 'Doors' : 'Electrical',
-          active: true,
-        },
-      });
-      ids.push(a.id);
-    }
-    assetIdsByStore.set(store.id, ids);
+  const [electrical, hvac, refrigeration, kitchen, elevators, autoDoors, fireProt, water, construction, hygiene, environmental, other] = categories;
+
+  // Create demo assets for first 4 stores
+  console.log('Creating demo assets...');
+  const stores = storesRetailA;
+  const storesForAssets = stores.slice(0, 4);
+  for (const store of storesForAssets) {
+    await Promise.all([
+      // Electrical Installations (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: electrical.id, name: `Main Distribution Board — ${store.name}`, description: 'Main electrical distribution board, 3-phase 400V', serialNumber: `EDB-${store.id}-001`, manufacturer: 'Schneider Electric', model: 'PrismaSeT G', purchaseDate: new Date('2019-01-10'), warrantyExpiry: new Date('2024-01-10'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: electrical.id, name: `Emergency Lighting System — ${store.name}`, description: 'Emergency lighting system with central battery, 50 luminaires', serialNumber: `EML-${store.id}-001`, manufacturer: 'Legrand', model: 'URA21', purchaseDate: new Date('2020-03-15'), warrantyExpiry: new Date('2025-03-15'), purchaseValue: 3200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: electrical.id, name: `UPS System — ${store.name}`, description: 'Uninterruptible power supply, 10kVA, 30min backup', serialNumber: `UPS-${store.id}-001`, manufacturer: 'APC', model: 'Smart-UPS 10000', purchaseDate: new Date('2021-07-01'), warrantyExpiry: new Date('2026-07-01'), purchaseValue: 4500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: electrical.id, name: `Sub-distribution Panel — ${store.name}`, description: 'Secondary electrical distribution panel, 63A', serialNumber: `SDP-${store.id}-001`, manufacturer: 'ABB', model: 'MISTRAL41F', purchaseDate: new Date('2019-01-10'), warrantyExpiry: new Date('2024-01-10'), purchaseValue: 2200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: electrical.id, name: `Power Factor Correction Unit — ${store.name}`, description: 'Automatic power factor correction bank, 100kVAr', serialNumber: `PFC-${store.id}-001`, manufacturer: 'Circutor', model: 'OPTIM-10', purchaseDate: new Date('2020-06-01'), warrantyExpiry: new Date('2025-06-01'), purchaseValue: 5800.00, status: 'ACTIVE', active: true } }),
+
+      // HVAC (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hvac.id, name: `Split AC Unit — ${store.name}`, description: 'Daikin split air conditioning unit, 12kW cooling capacity', serialNumber: `DAI-${store.id}-001`, manufacturer: 'Daikin', model: 'FTXM35R', purchaseDate: new Date('2021-03-15'), warrantyExpiry: new Date('2026-03-15'), purchaseValue: 2800.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hvac.id, name: `Central Ventilation Unit — ${store.name}`, description: 'Central ventilation unit with heat recovery, 2000m³/h capacity', serialNumber: `VNT-${store.id}-001`, manufacturer: 'Systemair', model: 'SAVE VTR 300', purchaseDate: new Date('2020-05-10'), warrantyExpiry: new Date('2025-05-10'), purchaseValue: 4200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hvac.id, name: `Heat Pump — ${store.name}`, description: 'Commercial heat pump, 18kW heating/cooling capacity', serialNumber: `HTP-${store.id}-001`, manufacturer: 'Mitsubishi Electric', model: 'PUHZ-ZRP140YKA', purchaseDate: new Date('2022-02-20'), warrantyExpiry: new Date('2027-02-20'), purchaseValue: 6500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hvac.id, name: `Fan Coil Unit — ${store.name}`, description: 'Fan coil unit, 4-pipe system, 3.5kW cooling', serialNumber: `FCU-${store.id}-001`, manufacturer: 'Carrier', model: '42EP', purchaseDate: new Date('2021-03-15'), warrantyExpiry: new Date('2026-03-15'), purchaseValue: 1800.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hvac.id, name: `Air Handling Unit — ${store.name}`, description: 'Central air handling unit with filtration and heat recovery', serialNumber: `AHU-${store.id}-001`, manufacturer: 'Robatherm', model: 'NRECO-20', purchaseDate: new Date('2019-09-01'), warrantyExpiry: new Date('2024-09-01'), purchaseValue: 22000.00, status: 'ACTIVE', active: true } }),
+
+      // Refrigeration (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: refrigeration.id, name: `Refrigerated Display Case — ${store.name}`, description: 'Commercial refrigerated display case for chilled products', serialNumber: `ELX-${store.id}-001`, manufacturer: 'Electrolux', model: 'RC4000', purchaseDate: new Date('2020-06-01'), warrantyExpiry: new Date('2025-06-01'), purchaseValue: 5500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: refrigeration.id, name: `Walk-in Freezer — ${store.name}`, description: 'Walk-in freezer room, -18°C, 12m² floor area', serialNumber: `WIF-${store.id}-001`, manufacturer: 'Carrier', model: 'XCF-12', purchaseDate: new Date('2019-08-15'), warrantyExpiry: new Date('2024-08-15'), purchaseValue: 18000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: refrigeration.id, name: `Ice Machine — ${store.name}`, description: 'Commercial ice machine, 50kg/day production capacity', serialNumber: `ICM-${store.id}-001`, manufacturer: 'Scotsman', model: 'EC 86 AS', purchaseDate: new Date('2021-04-01'), warrantyExpiry: new Date('2026-04-01'), purchaseValue: 3800.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: refrigeration.id, name: `Chest Freezer — ${store.name}`, description: 'Commercial chest freezer, 600L, -22°C', serialNumber: `CFZ-${store.id}-001`, manufacturer: 'Liebherr', model: 'GTP 3656', purchaseDate: new Date('2020-11-01'), warrantyExpiry: new Date('2025-11-01'), purchaseValue: 2400.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: refrigeration.id, name: `Refrigerated Counter — ${store.name}`, description: 'Refrigerated service counter, 2m length, 0-4°C', serialNumber: `RFC-${store.id}-001`, manufacturer: 'Zanussi', model: 'TC18', purchaseDate: new Date('2021-01-15'), warrantyExpiry: new Date('2026-01-15'), purchaseValue: 4200.00, status: 'ACTIVE', active: true } }),
+
+      // Kitchen Equipment (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: kitchen.id, name: `Commercial Dishwasher — ${store.name}`, description: 'Hood-type commercial dishwasher, 60 racks/hour', serialNumber: `DSW-${store.id}-001`, manufacturer: 'Hobart', model: 'FX-90', purchaseDate: new Date('2021-02-01'), warrantyExpiry: new Date('2026-02-01'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: kitchen.id, name: `Combi Oven — ${store.name}`, description: 'Combination steam/convection oven, 10 GN 1/1', serialNumber: `CMB-${store.id}-001`, manufacturer: 'Rational', model: 'SCC 101', purchaseDate: new Date('2020-08-01'), warrantyExpiry: new Date('2025-08-01'), purchaseValue: 12000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: kitchen.id, name: `Commercial Fryer — ${store.name}`, description: 'Electric commercial fryer, 2x8L capacity', serialNumber: `FRY-${store.id}-001`, manufacturer: 'Electrolux', model: 'E7FRED2K00', purchaseDate: new Date('2021-05-01'), warrantyExpiry: new Date('2026-05-01'), purchaseValue: 3200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: kitchen.id, name: `Coffee Machine — ${store.name}`, description: 'Professional espresso machine, 2-group', serialNumber: `COF-${store.id}-001`, manufacturer: 'Franke', model: 'A600', purchaseDate: new Date('2022-01-10'), warrantyExpiry: new Date('2027-01-10'), purchaseValue: 9500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: kitchen.id, name: `Induction Cooktop — ${store.name}`, description: 'Commercial induction cooktop, 4-zone, 14kW', serialNumber: `IND-${store.id}-001`, manufacturer: 'Eloma', model: 'EMI-4', purchaseDate: new Date('2021-09-01'), warrantyExpiry: new Date('2026-09-01'), purchaseValue: 4800.00, status: 'ACTIVE', active: true } }),
+
+      // Elevators (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: elevators.id, name: `Passenger Elevator — ${store.name}`, description: 'Passenger elevator, capacity 630kg, 4 stops', serialNumber: `OTS-${store.id}-001`, manufacturer: 'OTIS', model: 'Gen2 Comfort', purchaseDate: new Date('2018-09-20'), warrantyExpiry: new Date('2023-09-20'), purchaseValue: 45000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: elevators.id, name: `Goods Lift — ${store.name}`, description: 'Goods lift, capacity 2000kg, 3 stops', serialNumber: `GLF-${store.id}-001`, manufacturer: 'Kone', model: 'MonoSpace 700', purchaseDate: new Date('2019-06-15'), warrantyExpiry: new Date('2024-06-15'), purchaseValue: 35000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: elevators.id, name: `Escalator — ${store.name}`, description: 'Moving escalator, width 1000mm, rise 4.5m', serialNumber: `ESC-${store.id}-001`, manufacturer: 'Schindler', model: '9300 AE', purchaseDate: new Date('2018-11-01'), warrantyExpiry: new Date('2023-11-01'), purchaseValue: 85000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: elevators.id, name: `Platform Lift — ${store.name}`, description: 'Disabled access platform lift, capacity 300kg, 2 stops', serialNumber: `PLF-${store.id}-001`, manufacturer: 'Hiro Lift', model: 'P16', purchaseDate: new Date('2020-04-01'), warrantyExpiry: new Date('2025-04-01'), purchaseValue: 18000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: elevators.id, name: `Dumbwaiter — ${store.name}`, description: 'Service dumbwaiter, capacity 100kg, 3 stops', serialNumber: `DMW-${store.id}-001`, manufacturer: 'Kleemann', model: 'MRL-100', purchaseDate: new Date('2019-03-01'), warrantyExpiry: new Date('2024-03-01'), purchaseValue: 12000.00, status: 'ACTIVE', active: true } }),
+
+      // Automatic Doors (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: autoDoors.id, name: `Sliding Entrance Door — ${store.name}`, description: 'Automatic sliding entrance door, 2-leaf, 2.5m opening', serialNumber: `SLD-${store.id}-001`, manufacturer: 'GEZE', model: 'Slimdrive SL', purchaseDate: new Date('2019-05-01'), warrantyExpiry: new Date('2024-05-01'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: autoDoors.id, name: `Revolving Door — ${store.name}`, description: 'Automatic revolving door, 3-wing, diameter 2.2m', serialNumber: `RVD-${store.id}-001`, manufacturer: 'Boon Edam', model: 'Tourniket', purchaseDate: new Date('2018-07-01'), warrantyExpiry: new Date('2023-07-01'), purchaseValue: 32000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: autoDoors.id, name: `Emergency Exit Door — ${store.name}`, description: 'Automatic emergency exit door with push bar', serialNumber: `EXD-${store.id}-001`, manufacturer: 'ASSA ABLOY', model: 'Besam UniSlide', purchaseDate: new Date('2019-05-01'), warrantyExpiry: new Date('2024-05-01'), purchaseValue: 4200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: autoDoors.id, name: `Loading Dock Door — ${store.name}`, description: 'Sectional loading dock door, 3x3m, insulated', serialNumber: `LDD-${store.id}-001`, manufacturer: 'Hörmann', model: 'ALR F42', purchaseDate: new Date('2018-09-01'), warrantyExpiry: new Date('2023-09-01'), purchaseValue: 5500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: autoDoors.id, name: `Fire Door — ${store.name}`, description: 'Automatic fire door, EI60 rated, single leaf', serialNumber: `FRD-${store.id}-001`, manufacturer: 'Mercor', model: 'Firestop 60', purchaseDate: new Date('2019-01-15'), warrantyExpiry: new Date('2024-01-15'), purchaseValue: 3800.00, status: 'ACTIVE', active: true } }),
+
+      // Fire Protection System (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: fireProt.id, name: `Fire Alarm Panel — ${store.name}`, description: 'Addressable fire alarm system with 45 detectors and central panel', serialNumber: `FAS-${store.id}-001`, manufacturer: 'Bosch', model: 'FPA-5000', purchaseDate: new Date('2019-03-01'), warrantyExpiry: new Date('2024-03-01'), purchaseValue: 12000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: fireProt.id, name: `Sprinkler System — ${store.name}`, description: 'Wet pipe sprinkler system, 120 sprinkler heads', serialNumber: `SPR-${store.id}-001`, manufacturer: 'Viking', model: 'VK100', purchaseDate: new Date('2018-09-01'), warrantyExpiry: new Date('2023-09-01'), purchaseValue: 25000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: fireProt.id, name: `Fire Extinguisher Set — ${store.name}`, description: 'Set of 6 powder fire extinguishers, 6kg each', serialNumber: `FEX-${store.id}-001`, manufacturer: 'Ansul', model: 'Sentry 6kg', purchaseDate: new Date('2022-01-01'), warrantyExpiry: new Date('2027-01-01'), purchaseValue: 600.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: fireProt.id, name: `Smoke Detection System — ${store.name}`, description: 'Optical smoke detection system, 30 detectors', serialNumber: `SMK-${store.id}-001`, manufacturer: 'Siemens', model: 'FDO221', purchaseDate: new Date('2019-03-01'), warrantyExpiry: new Date('2024-03-01'), purchaseValue: 6500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: fireProt.id, name: `Fire Suppression System — ${store.name}`, description: 'Kitchen hood fire suppression system, wet chemical', serialNumber: `FSS-${store.id}-001`, manufacturer: 'Kidde', model: 'Sapphire', purchaseDate: new Date('2020-06-01'), warrantyExpiry: new Date('2025-06-01'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+
+      // Water and Sewage (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: water.id, name: `Booster Pump Station — ${store.name}`, description: 'Pressure booster pump station, 3 pumps, 5bar', serialNumber: `BPS-${store.id}-001`, manufacturer: 'Grundfos', model: 'Hydro MPC-E 3', purchaseDate: new Date('2019-04-01'), warrantyExpiry: new Date('2024-04-01'), purchaseValue: 12000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: water.id, name: `Hot Water Boiler — ${store.name}`, description: 'Gas condensing boiler, 100kW, hot water supply', serialNumber: `HWB-${store.id}-001`, manufacturer: 'Viessmann', model: 'Vitodens 200-W', purchaseDate: new Date('2020-01-15'), warrantyExpiry: new Date('2025-01-15'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: water.id, name: `Grease Trap — ${store.name}`, description: 'Grease separator, 4000L capacity, underground', serialNumber: `GRT-${store.id}-001`, manufacturer: 'Kessel', model: 'Grease Ex 4000', purchaseDate: new Date('2018-06-01'), warrantyExpiry: new Date('2023-06-01'), purchaseValue: 5500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: water.id, name: `Sewage Pump — ${store.name}`, description: 'Submersible sewage pump, 15kW, automatic', serialNumber: `SWP-${store.id}-001`, manufacturer: 'Flygt', model: 'N 3068', purchaseDate: new Date('2019-08-01'), warrantyExpiry: new Date('2024-08-01'), purchaseValue: 4200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: water.id, name: `Water Softener — ${store.name}`, description: 'Automatic water softener, 3m³/h flow rate', serialNumber: `WSF-${store.id}-001`, manufacturer: 'BWT', model: 'Rondomat Duo 3', purchaseDate: new Date('2020-09-01'), warrantyExpiry: new Date('2025-09-01'), purchaseValue: 2800.00, status: 'ACTIVE', active: true } }),
+
+      // Construction Works (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: construction.id, name: `Roof Membrane System — ${store.name}`, description: 'Flat roof waterproofing membrane, 800m² coverage', serialNumber: `RMS-${store.id}-001`, manufacturer: 'Sika', model: 'Sarnafil TS 77', purchaseDate: new Date('2018-05-01'), warrantyExpiry: new Date('2028-05-01'), purchaseValue: 35000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: construction.id, name: `Floor Coating — ${store.name}`, description: 'Epoxy floor coating system, 600m² sales floor area', serialNumber: `FLC-${store.id}-001`, manufacturer: 'Flowcrete', model: 'Deckshield ED', purchaseDate: new Date('2019-02-01'), warrantyExpiry: new Date('2024-02-01'), purchaseValue: 18000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: construction.id, name: `Facade Cladding — ${store.name}`, description: 'Composite facade cladding panels, 400m²', serialNumber: `FAC-${store.id}-001`, manufacturer: 'Kingspan', model: 'Benchmark Karrier', purchaseDate: new Date('2018-05-01'), warrantyExpiry: new Date('2028-05-01'), purchaseValue: 45000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: construction.id, name: `Expansion Joints — ${store.name}`, description: 'Structural expansion joint system, 120m total length', serialNumber: `EXJ-${store.id}-001`, manufacturer: 'Migua', model: 'GFS-25', purchaseDate: new Date('2018-05-01'), warrantyExpiry: new Date('2028-05-01'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: construction.id, name: `Waterproofing System — ${store.name}`, description: 'Underground waterproofing, basement walls and floor', serialNumber: `WPS-${store.id}-001`, manufacturer: 'Mapei', model: 'Mapelastic', purchaseDate: new Date('2018-05-01'), warrantyExpiry: new Date('2028-05-01'), purchaseValue: 12000.00, status: 'ACTIVE', active: true } }),
+
+      // Hygiene (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hygiene.id, name: `Hand Dryer System — ${store.name}`, description: 'High-speed hand dryers, 8 units in restrooms', serialNumber: `HDS-${store.id}-001`, manufacturer: 'Dyson', model: 'Airblade V', purchaseDate: new Date('2021-01-01'), warrantyExpiry: new Date('2024-01-01'), purchaseValue: 4800.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hygiene.id, name: `Soap Dispenser System — ${store.name}`, description: 'Automatic soap dispensers, 10 units', serialNumber: `SDS-${store.id}-001`, manufacturer: 'Tork', model: 'S4 System', purchaseDate: new Date('2021-01-01'), warrantyExpiry: new Date('2026-01-01'), purchaseValue: 1500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hygiene.id, name: `Air Purification Unit — ${store.name}`, description: 'Commercial air purifier with HEPA filter, 1000m³/h', serialNumber: `APU-${store.id}-001`, manufacturer: 'Blueair', model: 'Pro XL', purchaseDate: new Date('2021-06-01'), warrantyExpiry: new Date('2026-06-01'), purchaseValue: 3500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hygiene.id, name: `Pest Control System — ${store.name}`, description: 'Integrated pest control monitoring system', serialNumber: `PCS-${store.id}-001`, manufacturer: 'Rentokil', model: 'PestConnect', purchaseDate: new Date('2020-03-01'), warrantyExpiry: new Date('2025-03-01'), purchaseValue: 2800.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: hygiene.id, name: `Sanitary Waste Disposal — ${store.name}`, description: 'Sanitary waste disposal units, 6 cubicles', serialNumber: `SWD-${store.id}-001`, manufacturer: 'Daniels Health', model: 'Sharpsmart', purchaseDate: new Date('2021-01-01'), warrantyExpiry: new Date('2026-01-01'), purchaseValue: 1800.00, status: 'ACTIVE', active: true } }),
+
+      // Environmental (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: environmental.id, name: `Solar Panel System — ${store.name}`, description: 'Rooftop solar PV system, 50kWp capacity', serialNumber: `SOL-${store.id}-001`, manufacturer: 'SunPower', model: 'Maxeon 3', purchaseDate: new Date('2022-04-01'), warrantyExpiry: new Date('2047-04-01'), purchaseValue: 45000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: environmental.id, name: `EV Charging Station — ${store.name}`, description: 'Electric vehicle charging station, 4 points, 22kW each', serialNumber: `EVC-${store.id}-001`, manufacturer: 'ABB', model: 'Terra AC W22', purchaseDate: new Date('2022-06-01'), warrantyExpiry: new Date('2027-06-01'), purchaseValue: 12000.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: environmental.id, name: `Energy Monitoring System — ${store.name}`, description: 'Building energy management system with smart metering', serialNumber: `EMS-${store.id}-001`, manufacturer: 'Schneider Electric', model: 'EcoStruxure', purchaseDate: new Date('2021-09-01'), warrantyExpiry: new Date('2026-09-01'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: environmental.id, name: `Rainwater Harvesting System — ${store.name}`, description: 'Rainwater collection and reuse system, 10000L tank', serialNumber: `RWH-${store.id}-001`, manufacturer: 'Graf', model: 'Carat S', purchaseDate: new Date('2020-08-01'), warrantyExpiry: new Date('2025-08-01'), purchaseValue: 6500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: environmental.id, name: `LED Lighting System — ${store.name}`, description: 'Full LED lighting system, 300 fixtures, DALI controlled', serialNumber: `LED-${store.id}-001`, manufacturer: 'Philips', model: 'CoreLine', purchaseDate: new Date('2021-03-01'), warrantyExpiry: new Date('2026-03-01'), purchaseValue: 28000.00, status: 'ACTIVE', active: true } }),
+
+      // Other (5)
+      prisma.asset.create({ data: { storeId: store.id, categoryId: other.id, name: `Security Camera System — ${store.name}`, description: 'IP CCTV system with 16 cameras and NVR recorder', serialNumber: `CCT-${store.id}-001`, manufacturer: 'Hikvision', model: 'DS-7716NI-K4', purchaseDate: new Date('2021-11-15'), warrantyExpiry: new Date('2024-11-15'), purchaseValue: 3200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: other.id, name: `Access Control System — ${store.name}`, description: 'Electronic access control with card readers, 8 doors', serialNumber: `ACS-${store.id}-001`, manufacturer: 'HID Global', model: 'EDGE EVO', purchaseDate: new Date('2021-08-01'), warrantyExpiry: new Date('2026-08-01'), purchaseValue: 8500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: other.id, name: `Burglar Alarm System — ${store.name}`, description: 'Intruder alarm system with motion sensors and central monitoring', serialNumber: `BAS-${store.id}-001`, manufacturer: 'Bosch', model: 'Solution 3000', purchaseDate: new Date('2020-10-15'), warrantyExpiry: new Date('2025-10-15'), purchaseValue: 4200.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: other.id, name: `PA System — ${store.name}`, description: 'Public address and background music system, 40 speakers', serialNumber: `PAS-${store.id}-001`, manufacturer: 'Bosch', model: 'PAVIRO', purchaseDate: new Date('2019-07-01'), warrantyExpiry: new Date('2024-07-01'), purchaseValue: 6500.00, status: 'ACTIVE', active: true } }),
+      prisma.asset.create({ data: { storeId: store.id, categoryId: other.id, name: `Digital Signage System — ${store.name}`, description: 'Digital signage network with 12 displays and central management', serialNumber: `DSS-${store.id}-001`, manufacturer: 'Samsung', model: 'QM65R', purchaseDate: new Date('2021-05-01'), warrantyExpiry: new Date('2026-05-01'), purchaseValue: 18000.00, status: 'ACTIVE', active: true } }),
+    ]);
   }
 
   console.log('Seed completed successfully.');
@@ -346,7 +437,8 @@ async function main() {
   console.log('  Internal users: 16');
   console.log('  Vendor companies: 2');
   console.log('  Vendor users: 7');
-  console.log('  Assets: created');
+  console.log('  Asset categories: 12');
+  console.log('  Assets: created (60 per store for first 4 stores = 240 total)');
 }
 
 main()
