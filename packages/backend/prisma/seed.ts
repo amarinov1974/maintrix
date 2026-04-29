@@ -94,53 +94,53 @@ async function main() {
   console.log('Creating internal users (Retail A)...');
 
   const sm1 = await prisma.internalUser.create({
-    data: { name: 'Ivana Petrović', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store1North.id, active: true },
+    data: { name: 'Ivana Petrović', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store1North.id, active: true },
   });
   const sm2 = await prisma.internalUser.create({
-    data: { name: 'Tomislav Knežević', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store2North.id, active: true },
+    data: { name: 'Tomislav Knežević', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store2North.id, active: true },
   });
   const sm3 = await prisma.internalUser.create({
-    data: { name: 'Martina Jurić', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store3North.id, active: true },
+    data: { name: 'Martina Jurić', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store3North.id, active: true },
   });
   const sm4 = await prisma.internalUser.create({
-    data: { name: 'Davor Šimić', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store4North.id, active: true },
+    data: { name: 'Davor Šimić', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store4North.id, active: true },
   });
   const sm5 = await prisma.internalUser.create({
-    data: { name: 'Kristina Kovačić', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store5South.id, active: true },
+    data: { name: 'Kristina Kovačić', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store5South.id, active: true },
   });
   const sm6 = await prisma.internalUser.create({
-    data: { name: 'Matej Babić', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store6South.id, active: true },
+    data: { name: 'Matej Babić', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store6South.id, active: true },
   });
   const sm7 = await prisma.internalUser.create({
-    data: { name: 'Ana Horvat', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store7South.id, active: true },
+    data: { name: 'Ana Horvat', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store7South.id, active: true },
   });
   const sm8 = await prisma.internalUser.create({
-    data: { name: 'Nikola Božić', email: 'anthony.marinov@yahoo.com', role: 'SM', companyId: retailA.id, storeId: store8South.id, active: true },
+    data: { name: 'Nikola Božić', email: 'anthony.marinov@gmail.com', role: 'SM', companyId: retailA.id, storeId: store8South.id, active: true },
   });
 
   const amNorth = await prisma.internalUser.create({
-    data: { name: 'Marko Pavlović', email: 'anthony.marinov@yahoo.com', role: 'AM', companyId: retailA.id, regionId: northRegion.id, active: true },
+    data: { name: 'Marko Pavlović', email: 'anthony.marinov@gmail.com', role: 'AM', companyId: retailA.id, regionId: northRegion.id, active: true },
   });
   const amSouth = await prisma.internalUser.create({
-    data: { name: 'Ivana Marković', email: 'anthony.marinov@yahoo.com', role: 'AM', companyId: retailA.id, regionId: southRegion.id, active: true },
+    data: { name: 'Ivana Marković', email: 'anthony.marinov@gmail.com', role: 'AM', companyId: retailA.id, regionId: southRegion.id, active: true },
   });
   const ammNorth = await prisma.internalUser.create({
-    data: { name: 'Petar Kovač', email: 'anthony.marinov@yahoo.com', role: 'AMM', companyId: retailA.id, regionId: northRegion.id, active: true },
+    data: { name: 'Petar Kovač', email: 'anthony.marinov@gmail.com', role: 'AMM', companyId: retailA.id, regionId: northRegion.id, active: true },
   });
   const ammSouth = await prisma.internalUser.create({
-    data: { name: 'Sandra Novak', email: 'anthony.marinov@yahoo.com', role: 'AMM', companyId: retailA.id, regionId: southRegion.id, active: true },
+    data: { name: 'Sandra Novak', email: 'anthony.marinov@gmail.com', role: 'AMM', companyId: retailA.id, regionId: southRegion.id, active: true },
   });
   const salesDir = await prisma.internalUser.create({
-    data: { name: 'Goran Jurković', email: 'anthony.marinov@yahoo.com', role: 'D', companyId: retailA.id, active: true },
+    data: { name: 'Goran Jurković', email: 'anthony.marinov@gmail.com', role: 'D', companyId: retailA.id, active: true },
   });
   const maintDir = await prisma.internalUser.create({
-    data: { name: 'Maja Šarić', email: 'anthony.marinov@yahoo.com', role: 'C2', companyId: retailA.id, active: true },
+    data: { name: 'Maja Šarić', email: 'anthony.marinov@gmail.com', role: 'C2', companyId: retailA.id, active: true },
   });
   const bod = await prisma.internalUser.create({
-    data: { name: 'Zoran Tomašević', email: 'anthony.marinov@yahoo.com', role: 'BOD', companyId: retailA.id, active: true },
+    data: { name: 'Zoran Tomašević', email: 'anthony.marinov@gmail.com', role: 'BOD', companyId: retailA.id, active: true },
   });
   const c3 = await prisma.internalUser.create({
-    data: { name: 'Ante Jurić', email: 'anthony.marinov@yahoo.com', role: 'ADMIN', companyId: retailA.id, active: true },
+    data: { name: 'Ante Jurić', email: 'anthony.marinov@gmail.com', role: 'ADMIN', companyId: retailA.id, active: true },
   });
 
   console.log('Creating vendor companies and users...');
@@ -153,25 +153,25 @@ async function main() {
   });
 
   const vendorAna = await prisma.vendorUser.create({
-    data: { name: 'Ana Kovač', email: 'anthony.marinov@yahoo.com', role: 'S1', vendorCompanyId: voltaris.id, active: true },
+    data: { name: 'Ana Kovač', email: 'anthony.marinov@gmail.com', role: 'S1', vendorCompanyId: voltaris.id, active: true },
   });
   const vendorMarko = await prisma.vendorUser.create({
-    data: { name: 'Marko Horvat', email: 'anthony.marinov@yahoo.com', role: 'S2', vendorCompanyId: voltaris.id, active: true },
+    data: { name: 'Marko Horvat', email: 'anthony.marinov@gmail.com', role: 'S2', vendorCompanyId: voltaris.id, active: true },
   });
   const vendorPetra = await prisma.vendorUser.create({
-    data: { name: 'Petra Novak', email: 'anthony.marinov@yahoo.com', role: 'S2', vendorCompanyId: voltaris.id, active: true },
+    data: { name: 'Petra Novak', email: 'anthony.marinov@gmail.com', role: 'S2', vendorCompanyId: voltaris.id, active: true },
   });
   const vendorIvan = await prisma.vendorUser.create({
-    data: { name: 'Ivan Babić', email: 'anthony.marinov@yahoo.com', role: 'S3', vendorCompanyId: voltaris.id, active: true },
+    data: { name: 'Ivan Babić', email: 'anthony.marinov@gmail.com', role: 'S3', vendorCompanyId: voltaris.id, active: true },
   });
   const vendorLuka = await prisma.vendorUser.create({
-    data: { name: 'Luka Marić', email: 'anthony.marinov@yahoo.com', role: 'S1', vendorCompanyId: thermacore.id, active: true },
+    data: { name: 'Luka Marić', email: 'anthony.marinov@gmail.com', role: 'S1', vendorCompanyId: thermacore.id, active: true },
   });
   const vendorMaja = await prisma.vendorUser.create({
-    data: { name: 'Maja Tomić', email: 'anthony.marinov@yahoo.com', role: 'S2', vendorCompanyId: thermacore.id, active: true },
+    data: { name: 'Maja Tomić', email: 'anthony.marinov@gmail.com', role: 'S2', vendorCompanyId: thermacore.id, active: true },
   });
   const vendorJosip = await prisma.vendorUser.create({
-    data: { name: 'Josip Jurić', email: 'anthony.marinov@yahoo.com', role: 'S3', vendorCompanyId: thermacore.id, active: true },
+    data: { name: 'Josip Jurić', email: 'anthony.marinov@gmail.com', role: 'S3', vendorCompanyId: thermacore.id, active: true },
   });
 
   console.log('Creating vendor price list (Voltaris Electrical Solutions)...');
