@@ -811,9 +811,9 @@ export class TicketService {
   /**
    * Get ticket by ID
    */
-  async getTicket(ticketId: number, _userId: number): Promise<TicketDetailResponse> {
+  async getTicket(ticketId: number, _userId: number, companyId?: number): Promise<TicketDetailResponse> {
     const ticket = await prisma.ticket.findUnique({
-      where: { id: ticketId },
+      where: { id: ticketId, ...(companyId != null ? { companyId } : {}) },
       include: {
         store: true,
         createdBy: true,

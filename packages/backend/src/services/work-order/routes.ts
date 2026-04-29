@@ -215,7 +215,8 @@ router.post('/:id/close-without-cost', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const wo = await workOrderService.getWorkOrder(
-      parseInt(req.params.id, 10)
+      parseInt(req.params.id, 10),
+      req.session!.companyId
     );
     res.json(wo);
   } catch (error: unknown) {

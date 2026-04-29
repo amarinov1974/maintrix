@@ -228,7 +228,8 @@ router.get('/:id', async (req, res) => {
   try {
     const ticket = await ticketService.getTicket(
       parseInt(req.params.id, 10),
-      req.session!.userId
+      req.session!.userId,
+      req.session!.companyId
     );
     res.json(ticket);
   } catch (error: unknown) {

@@ -1160,9 +1160,9 @@ export class WorkOrderService {
   /**
    * Get work order by ID (includes S1 detail: store, category, urgent, commentToVendor, attachments, asset)
    */
-  async getWorkOrder(workOrderId: number): Promise<WorkOrderDetailResponse> {
+  async getWorkOrder(workOrderId: number, companyId?: number): Promise<WorkOrderDetailResponse> {
     const wo = await prisma.workOrder.findUnique({
-      where: { id: workOrderId },
+      where: { id: workOrderId, ...(companyId != null ? { ticket: { companyId } } : {}) },
       include: {
         vendorCompany: true,
         assignedTechnician: true,
