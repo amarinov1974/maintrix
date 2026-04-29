@@ -206,6 +206,80 @@ router.get('/stores', async (req, res) => {
   }
 });
 
+router.post('/stores', async (req, res) => {
+  try {
+    const { name, address, regionId, phone } = req.body;
+    if (!name || !regionId) {
+      res.status(400).json({ error: 'Name and region are required' });
+      return;
+    }
+    const store = await prisma.store.create({
+      data: {
+        name,
+        address: address || null,
+        regionId: parseInt(regionId, 10),
+        companyId: req.session!.companyId,
+        active: true,
+      },
+      include: { region: true },
+    });
+    res.status(201).json({ store });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create store' });
+  }
+});
+
+router.put('/stores/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const { name, address, regionId, active } = req.body;
+
+    const existing = await prisma.store.findFirst({
+      where: { id, companyId: req.session!.companyId },
+    });
+    if (!existing) {
+      res.status(404).json({ error: 'Store not found' });
+      return;
+    }
+
+    const store = await prisma.store.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(address !== undefined && { address: address || null }),
+        ...(regionId && { regionId: parseInt(regionId, 10) }),
+        ...(active !== undefined && { active }),
+      },
+      include: { region: true },
+    });
+    res.json({ store });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update store' });
+  }
+});
+
+router.delete('/stores/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+
+    const existing = await prisma.store.findFirst({
+      where: { id, companyId: req.session!.companyId },
+    });
+    if (!existing) {
+      res.status(404).json({ error: 'Store not found' });
+      return;
+    }
+
+    await prisma.store.update({
+      where: { id },
+      data: { active: false },
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to deactivate store' });
+  }
+});
+
 router.get('/vendor-companies', async (req, res) => {
   try {
     const companies = await prisma.vendorCompany.findMany({

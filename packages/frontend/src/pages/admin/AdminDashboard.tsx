@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Layout } from '../../components/shared/Layout';
 import { apiClient } from '../../api/client';
 
-type Tab = 'users' | 'vendors';
+type Tab = 'users' | 'vendors' | 'stores';
 
 interface InternalUser {
   id: number;
@@ -29,11 +29,6 @@ interface VendorUser {
   vendorCompany: { id: number; name: string };
 }
 
-interface Store {
-  id: number;
-  name: string;
-}
-
 interface Region {
   id: number;
   name: string;
@@ -42,6 +37,14 @@ interface Region {
 interface VendorCompany {
   id: number;
   name: string;
+}
+
+interface Store {
+  id: number;
+  name: string;
+  address: string | null;
+  active: boolean;
+  region?: { name: string } | null;
 }
 
 const INTERNAL_ROLES = ['SM', 'AM', 'AMM', 'D', 'C2', 'ADMIN', 'BOD'];
@@ -53,6 +56,8 @@ export function AdminDashboard() {
   const [showAddVendor, setShowAddVendor] = useState(false);
   const [editingUser, setEditingUser] = useState<InternalUser | null>(null);
   const [editingVendor, setEditingVendor] = useState<VendorUser | null>(null);
+  const [showAddStore, setShowAddStore] = useState(false);
+  const [editingStore, setEditingStore] = useState<Store | null>(null);
   const queryClient = useQueryClient();
 
   const { data: internalUsers = [], isLoading: loadingInternal } = useQuery({
@@ -92,6 +97,14 @@ export function AdminDashboard() {
     queryFn: async () => {
       const { data } = await apiClient.get<{ companies: VendorCompany[] }>('/admin/vendor-companies');
       return data.companies;
+    },
+  });
+
+  const { data: stores2 = [], isLoading: loadingStores } = useQuery({
+    queryKey: ['admin-stores-list'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ stores: Store[] }>('/admin/stores');
+      return data.stores;
     },
   });
 
@@ -153,6 +166,38 @@ export function AdminDashboard() {
     },
   });
 
+  const createStore = useMutation({
+    mutationFn: async (data: Record<string, unknown>) => {
+      await apiClient.post('/admin/stores', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-stores-list'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stores'] });
+      setShowAddStore(false);
+    },
+  });
+
+  const updateStore = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Record<string, unknown> }) => {
+      await apiClient.put(`/admin/stores/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-stores-list'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stores'] });
+      setEditingStore(null);
+    },
+  });
+
+  const deactivateStore = useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.delete(`/admin/stores/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-stores-list'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stores'] });
+    },
+  });
+
   const handleAddInternalSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -210,6 +255,32 @@ export function AdminDashboard() {
     });
   };
 
+  const handleAddStoreSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    createStore.mutate({
+      name: fd.get('name'),
+      address: fd.get('address') || null,
+      regionId: fd.get('regionId'),
+    });
+  };
+
+  const handleEditStoreSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingStore) return;
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    updateStore.mutate({
+      id: editingStore.id,
+      data: {
+        name: fd.get('name'),
+        address: fd.get('address') || null,
+        regionId: fd.get('regionId'),
+      },
+    });
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -223,6 +294,7 @@ export function AdminDashboard() {
             {[
               { key: 'users', label: 'Internal Users' },
               { key: 'vendors', label: 'Vendor Users' },
+              { key: 'stores', label: 'Stores' },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -511,6 +583,125 @@ export function AdminDashboard() {
                       <button type="button" onClick={() => setEditingVendor(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
                       <button type="submit" disabled={updateVendorUser.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
                         {updateVendorUser.isPending ? 'Saving...' : 'Save'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'stores' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Stores ({stores2.filter(s => s.active).length} active)
+              </h2>
+              <button
+                onClick={() => setShowAddStore(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+              >
+                + Add Store
+              </button>
+            </div>
+
+            {showAddStore && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-medium text-gray-900 mb-3">New Store</h3>
+                <form onSubmit={handleAddStoreSubmit} className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Name *</label>
+                    <input name="name" required className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
+                    <input name="address" className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Region *</label>
+                    <select name="regionId" required className="w-full border rounded px-3 py-2 text-sm">
+                      <option value="">-- Select --</option>
+                      {(regions as Region[]).map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                    </select>
+                  </div>
+                  <div className="col-span-2 flex gap-2 justify-end">
+                    <button type="button" onClick={() => setShowAddStore(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                    <button type="submit" disabled={createStore.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+                      {createStore.isPending ? 'Saving...' : 'Add'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {loadingStores ? (
+              <p className="text-gray-500">Loading...</p>
+            ) : (
+              <div className="border rounded-lg overflow-hidden">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Name</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Address</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Region</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {stores2.map((store) => (
+                      <tr key={store.id} className={!store.active ? 'bg-gray-50 opacity-60' : ''}>
+                        <td className="px-4 py-3 font-medium">{store.name}</td>
+                        <td className="px-4 py-3 text-gray-600">{store.address || '—'}</td>
+                        <td className="px-4 py-3 text-gray-600">{store.region?.name || '—'}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs px-2 py-1 rounded ${store.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {store.active ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 flex gap-2">
+                          <button onClick={() => setEditingStore(store)} className="text-blue-600 hover:underline text-xs">Edit</button>
+                          {store.active && (
+                            <button
+                              onClick={() => { if (confirm(`Deactivate ${store.name}?`)) deactivateStore.mutate(store.id); }}
+                              className="text-red-600 hover:underline text-xs"
+                            >
+                              Deactivate
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {editingStore && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                  <h3 className="font-semibold text-gray-900 mb-4">Edit Store — {editingStore.name}</h3>
+                  <form onSubmit={handleEditStoreSubmit} className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                      <input name="name" defaultValue={editingStore.name} required className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
+                      <input name="address" defaultValue={editingStore.address || ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Region</label>
+                      <select name="regionId" className="w-full border rounded px-3 py-2 text-sm">
+                        <option value="">-- Not assigned --</option>
+                        {(regions as Region[]).map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                      </select>
+                    </div>
+                    <div className="flex gap-2 justify-end pt-2">
+                      <button type="button" onClick={() => setEditingStore(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                      <button type="submit" disabled={updateStore.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+                        {updateStore.isPending ? 'Saving...' : 'Save'}
                       </button>
                     </div>
                   </form>
