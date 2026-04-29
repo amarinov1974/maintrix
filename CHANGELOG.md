@@ -1,3 +1,51 @@
+## Session: 2026-04-30 — Asset Management Module
+
+### Overview
+Asset management module implemented with categories, depreciation
+and full demo asset database.
+
+### Changes
+
+#### 1. Asset schema expansion (schema.prisma)
+- Added AssetCategory model with depreciation rate per company
+- Expanded Asset model: name, serialNumber, manufacturer, model,
+  purchaseDate, warrantyExpiry, purchaseValue, status, categoryId
+- Added AssetStatus enum: ACTIVE, FAULTY, IN_SERVICE, DECOMMISSIONED
+
+#### 2. Prisma migrations fixed
+- Added migrations to Git (were previously in .gitignore)
+- Fixed production database migration state manually
+- Migrations now deploy correctly on Railway
+
+#### 3. Asset API endpoints (asset/routes.ts)
+- GET /api/assets — list with filtering (store, category, status, search)
+- GET /api/assets/categories — list categories for company
+- GET /api/assets/:id — single asset with book value calculation
+- Book value calculated from purchase value and depreciation rate
+
+#### 4. Asset List Page (AssetListPage.tsx)
+- Route: /assets
+- Accessible by: AM, AMM, D, C2, BOD, ADMIN
+- Filters: search, store, category, status
+- Columns: name, manufacturer/model, category, store, serial number,
+  warranty expiry (with ⚠️ for expired), purchase value, book value, status
+
+#### 5. Demo asset database (seed.ts)
+- 12 asset categories with depreciation rates
+- 240 realistic demo assets (60 per store × 4 stores)
+- Realistic manufacturers: Daikin, OTIS, Schneider Electric, Bosch, etc.
+
+#### 6. Redis reconnect strategy (session-manager.ts)
+- Added retryStrategy for Redis connection drops
+- Backend now reconnects automatically after Railway hibernation
+
+### Known TODO (next session)
+- [ ] Add Assets link to AMM/AM/Director dashboards
+- [ ] Asset detail page (service history, documents)
+- [ ] Asset management in Admin panel (add/edit/deactivate)
+- [ ] Link assets to tickets more prominently
+- [ ] Pagination for large asset lists
+
 ## Session: 2026-04-29 — Security Review, C3→ADMIN rename, Admin Panel
 
 ### Overview
