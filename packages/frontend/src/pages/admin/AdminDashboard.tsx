@@ -3,12 +3,16 @@
  * Preventive Maintenance plan upload and management
  */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Layout } from '../../components/shared/Layout';
 import { apiClient } from '../../api/client';
+import {
+  preventiveMaintenanceAPI,
+  type ParsedPmRow,
+} from '../../api/preventive-maintenance';
 
-type Tab = 'users' | 'vendors' | 'stores';
+type Tab = 'users' | 'vendors' | 'stores' | 'pm';
 
 interface InternalUser {
   id: number;
@@ -58,6 +62,12 @@ export function AdminDashboard() {
   const [editingVendor, setEditingVendor] = useState<VendorUser | null>(null);
   const [showAddStore, setShowAddStore] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pmStep, setPmStep] = useState<'upload' | 'preview' | 'success'>('upload');
+  const [parsedRows, setParsedRows] = useState<ParsedPmRow[]>([]);
+  const [parseErrors, setParseErrors] = useState<string[]>([]);
+  const [importSummary, setImportSummary] = useState('');
+  const [selectedPlanIds, setSelectedPlanIds] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
 
   const { data: internalUsers = [], isLoading: loadingInternal } = useQuery({
@@ -198,6 +208,39 @@ export function AdminDashboard() {
     },
   });
 
+  const { data: pmPlans = [], isLoading: plansLoading } = useQuery({
+    queryKey: ['preventive-maintenance-plans'],
+    queryFn: preventiveMaintenanceAPI.listPlans,
+  });
+
+  const parseMutation = useMutation({
+    mutationFn: preventiveMaintenanceAPI.parseFile,
+    onSuccess: (result) => {
+      setParsedRows(result.rows);
+      setParseErrors(result.errors);
+      setPmStep('preview');
+    },
+  });
+
+  const importMutation = useMutation({
+    mutationFn: preventiveMaintenanceAPI.importPlans,
+    onSuccess: (result) => {
+      setImportSummary(result.summary);
+      setPmStep('success');
+      queryClient.invalidateQueries({ queryKey: ['preventive-maintenance-plans'] });
+    },
+  });
+
+  const createWOMutation = useMutation({
+    mutationFn: preventiveMaintenanceAPI.createWorkOrdersFromPlans,
+    onSuccess: (result) => {
+      setSelectedPlanIds(new Set());
+      queryClient.invalidateQueries({ queryKey: ['preventive-maintenance-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['work-orders'] });
+      alert(result.summary);
+    },
+  });
+
   const handleAddInternalSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -281,6 +324,45 @@ export function AdminDashboard() {
     });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    parseMutation.mutate(file);
+    e.target.value = '';
+  };
+
+  const handleConfirmImport = () => {
+    if (parsedRows.length > 0) importMutation.mutate(parsedRows);
+  };
+
+  const handlePmReset = () => {
+    setPmStep('upload');
+    setParsedRows([]);
+    setParseErrors([]);
+    setImportSummary('');
+    fileInputRef.current?.click();
+  };
+
+  const togglePlanSelection = (id: number) => {
+    setSelectedPlanIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllPlans = () => {
+    const planIds = (pmPlans as { id: number }[]).map((p) => p.id);
+    if (selectedPlanIds.size === planIds.length) setSelectedPlanIds(new Set());
+    else setSelectedPlanIds(new Set(planIds));
+  };
+
+  const handleCreateWorkOrders = () => {
+    if (selectedPlanIds.size === 0) { alert('Select at least one plan'); return; }
+    createWOMutation.mutate(Array.from(selectedPlanIds));
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -295,6 +377,7 @@ export function AdminDashboard() {
               { key: 'users', label: 'Internal Users' },
               { key: 'vendors', label: 'Vendor Users' },
               { key: 'stores', label: 'Stores' },
+              { key: 'pm', label: 'PM Plans' },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -729,6 +812,161 @@ export function AdminDashboard() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'pm' && (
+          <div className="space-y-6">
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">Upload Preventive Maintenance Plan</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Upload an Excel (.xlsx) or CSV file with columns: asset_name, task_description,
+                vendor_company_id, vendor_user_id (optional), schedule_type (INTERVAL or SPECIFIC_DATES),
+                interval_days (if INTERVAL), specific_dates (if SPECIFIC_DATES, comma-separated)
+              </p>
+
+              {pmStep === 'upload' && (
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={parseMutation.isPending}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {parseMutation.isPending ? 'Parsing...' : 'Choose File'}
+                  </button>
+                  {parseMutation.isError && (
+                    <p className="mt-2 text-red-600 text-sm">Parse failed</p>
+                  )}
+                </div>
+              )}
+
+              {pmStep === 'preview' && (
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-2">Preview ({parsedRows.length} rows)</h3>
+                  {parseErrors.length > 0 && (
+                    <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded text-amber-800 text-sm">
+                      {parseErrors.map((err, i) => <div key={i}>{err}</div>)}
+                    </div>
+                  )}
+                  <div className="overflow-x-auto max-h-64 border rounded-lg mb-4">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-2 py-1 text-left">Asset</th>
+                          <th className="px-2 py-1 text-left">Task</th>
+                          <th className="px-2 py-1 text-left">Vendor Co ID</th>
+                          <th className="px-2 py-1 text-left">Schedule</th>
+                          <th className="px-2 py-1 text-left">Interval/Dates</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {parsedRows.map((row, i) => (
+                          <tr key={i} className="border-t">
+                            <td className="px-2 py-1">{row.asset_name}</td>
+                            <td className="px-2 py-1 max-w-[200px] truncate">{row.task_description}</td>
+                            <td className="px-2 py-1">{row.vendor_company_id}</td>
+                            <td className="px-2 py-1">{row.schedule_type}</td>
+                            <td className="px-2 py-1">
+                              {row.schedule_type === 'INTERVAL' ? `${row.interval_days} days` : row.specific_dates}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={handleConfirmImport}
+                      disabled={parsedRows.length === 0 || importMutation.isPending}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {importMutation.isPending ? 'Importing...' : 'Confirm Import'}
+                    </button>
+                    <button type="button" onClick={handlePmReset} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {pmStep === 'success' && (
+                <div>
+                  <p className="text-green-700 font-medium mb-2">{importSummary}</p>
+                  <button type="button" onClick={handlePmReset} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+                    Upload Another File
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Existing Plans ({(pmPlans as unknown[]).length})
+                </h2>
+                <button
+                  type="button"
+                  onClick={handleCreateWorkOrders}
+                  disabled={selectedPlanIds.size === 0 || createWOMutation.isPending}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {createWOMutation.isPending ? 'Creating...' : `Create Work Orders (${selectedPlanIds.size} selected)`}
+                </button>
+              </div>
+              {plansLoading ? (
+                <p className="text-gray-500">Loading...</p>
+              ) : (pmPlans as unknown[]).length === 0 ? (
+                <p className="text-gray-500 text-sm">No plans yet. Upload a file above.</p>
+              ) : (
+                <div className="overflow-x-auto max-h-80 border rounded-lg">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="px-2 py-1 w-8">
+                          <input
+                            type="checkbox"
+                            checked={(pmPlans as unknown[]).length > 0 && selectedPlanIds.size === (pmPlans as unknown[]).length}
+                            onChange={toggleAllPlans}
+                            className="rounded"
+                          />
+                        </th>
+                        <th className="px-2 py-1 text-left">Asset</th>
+                        <th className="px-2 py-1 text-left">Task</th>
+                        <th className="px-2 py-1 text-left">Vendor</th>
+                        <th className="px-2 py-1 text-left">Schedule</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(pmPlans as { id: number; assetName: string; taskDescription: string; vendorCompany?: { name: string }; scheduleType: string }[]).map((p) => (
+                        <tr key={p.id} className="border-t">
+                          <td className="px-2 py-1">
+                            <input
+                              type="checkbox"
+                              checked={selectedPlanIds.has(p.id)}
+                              onChange={() => togglePlanSelection(p.id)}
+                              className="rounded"
+                            />
+                          </td>
+                          <td className="px-2 py-1">{p.assetName}</td>
+                          <td className="px-2 py-1 max-w-[200px] truncate">{p.taskDescription}</td>
+                          <td className="px-2 py-1">{p.vendorCompany?.name ?? '-'}</td>
+                          <td className="px-2 py-1">{p.scheduleType}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
