@@ -16,6 +16,7 @@ import invoiceBatchRoutes from './services/invoice-batch/routes.js';
 import storeRoutes from './services/store/routes.js';
 import assetRoutes from './services/asset/routes.js';
 import preventiveMaintenanceRoutes from './services/preventive-maintenance/routes.js';
+import adminRoutes from './services/admin/routes.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 import { apiKeyMiddleware } from './middleware/api-key.middleware.js';
 import { csrfMiddleware } from './middleware/csrf.middleware.js';
@@ -62,6 +63,7 @@ app.use('/api/invoice-batches', invoiceBatchRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/preventive-maintenance', preventiveMaintenanceRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.post('/api/demo/delete-all-tickets', async (_req, res) => {
   if (process.env.NODE_ENV === 'production') {
