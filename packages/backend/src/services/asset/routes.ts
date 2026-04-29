@@ -58,6 +58,21 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * GET /api/assets/categories
+ */
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = await prisma.assetCategory.findMany({
+      where: { companyId: req.session!.companyId, active: true },
+      orderBy: { name: 'asc' },
+    });
+    res.json({ categories });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+});
+
+/**
  * GET /api/assets/:id
  * Get single asset by ID (existing endpoint for ticket submit)
  */

@@ -67,7 +67,7 @@ export function AssetListPage() {
   const { data: storesData } = useQuery({
     queryKey: ['admin-stores'],
     queryFn: async () => {
-      const { data } = await apiClient.get<{ stores: Store[] }>('/admin/stores');
+      const { data } = await apiClient.get<{ stores: Store[] }>('/stores');
       return data.stores;
     },
   });
@@ -75,7 +75,7 @@ export function AssetListPage() {
   const { data: categoriesData } = useQuery({
     queryKey: ['admin-asset-categories'],
     queryFn: async () => {
-      const { data } = await apiClient.get<{ categories: Category[] }>('/admin/asset-categories');
+      const { data } = await apiClient.get<{ categories: Category[] }>('/assets/categories');
       return data.categories;
     },
   });
