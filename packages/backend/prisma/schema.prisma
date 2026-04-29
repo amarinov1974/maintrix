@@ -23,6 +23,7 @@ model Company {
   regions       Region[]
   stores        Store[]
   internalUsers InternalUser[]
+  assetCategories AssetCategory[]
   tickets       Ticket[]
   preventiveMaintenancePlans PreventiveMaintenancePlan[]
 
@@ -146,24 +147,54 @@ model VendorUser {
   @@map("vendor_users")
 }
 
+enum AssetStatus {
+  ACTIVE
+  FAULTY
+  IN_SERVICE
+  DECOMMISSIONED
+}
+
 // ============================================================================
 // ASSET ENTITY
 // ============================================================================
 
-model Asset {
-  id          Int      @id @default(autoincrement())
-  storeId     Int      @map("store_id")
-  description String   @db.Text
-  category    String?  @db.VarChar(255)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now()) @map("created_at")
+model AssetCategory {
+  id                Int      @id @default(autoincrement())
+  companyId         Int      @map("company_id")
+  name              String   @db.VarChar(255)
+  depreciationYears Int      @map("depreciation_years")
+  depreciationRate  Decimal  @db.Decimal(5,2) @map("depreciation_rate")
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at")
+  company Company @relation(fields: [companyId], references: [id])
+  assets  Asset[]
+  @@index([companyId])
+  @@map("asset_categories")
+}
 
-  store      Store        @relation(fields: [storeId], references: [id])
+model Asset {
+  id              Int         @id @default(autoincrement())
+  storeId         Int         @map("store_id")
+  categoryId      Int?        @map("category_id")
+  name            String      @db.VarChar(255)
+  description     String?     @db.Text
+  serialNumber    String?     @db.VarChar(255) @map("serial_number")
+  manufacturer    String?     @db.VarChar(255)
+  model           String?     @db.VarChar(255)
+  purchaseDate    DateTime?   @map("purchase_date")
+  warrantyExpiry  DateTime?   @map("warranty_expiry")
+  purchaseValue   Decimal?    @db.Decimal(10,2) @map("purchase_value")
+  status          AssetStatus @default(ACTIVE)
+  notes           String?     @db.Text
+  active          Boolean     @default(true)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  store    Store         @relation(fields: [storeId], references: [id])
+  category AssetCategory? @relation(fields: [categoryId], references: [id])
   tickets    Ticket[]
   workOrders WorkOrder[]
   preventiveMaintenancePlans PreventiveMaintenancePlan[]
-
   @@index([storeId])
+  @@index([categoryId])
   @@map("assets")
 }
 

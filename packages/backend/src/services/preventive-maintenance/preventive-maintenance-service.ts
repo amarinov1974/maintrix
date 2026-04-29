@@ -167,7 +167,7 @@ export async function importPmPlans(
       for (const store of company.stores) {
         const asset = store.assets.find(
           (a) =>
-            a.description.toLowerCase().trim() ===
+            (a.description ?? '').toLowerCase().trim() ===
             r.asset_name.toLowerCase().trim()
         );
         if (asset) {

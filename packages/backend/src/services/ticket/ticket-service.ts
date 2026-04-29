@@ -1622,10 +1622,15 @@ export class TicketService {
     currentOwnerUserId: number | null;
     currentOwner?: { name: string } | null;
     assetId: number | null;
-    asset?: { description: string } | null;
+    asset?: { description: string | null } | null;
     createdAt: Date;
     updatedAt: Date;
   }): TicketResponse {
+    const asset = ticket.asset ? {
+      ...ticket.asset,
+      description: ticket.asset.description ?? '',
+    } : null;
+
     return {
       id: ticket.id,
       storeId: ticket.storeId,
@@ -1640,7 +1645,7 @@ export class TicketService {
       currentOwnerUserId: ticket.currentOwnerUserId,
       currentOwnerUserName: ticket.currentOwner?.name ?? null,
       assetId: ticket.assetId,
-      assetDescription: ticket.asset?.description ?? null,
+      assetDescription: asset?.description ?? null,
       createdAt: ticket.createdAt,
       updatedAt: ticket.updatedAt,
     };
