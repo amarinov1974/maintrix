@@ -1,3 +1,69 @@
+## Session: 2026-04-29 — Security Review, C3→ADMIN rename, Admin Panel
+
+### Overview
+Security review and fixes, C3 role renamed to ADMIN, full admin panel implemented.
+
+### Changes
+
+#### 1. Rate limiter trust proxy fix (app.ts)
+- Added app.set('trust proxy', 1) for correct IP detection on Railway
+- Rate limiter now correctly identifies users by real IP
+
+#### 2. Cleanup
+- Deleted old branches: phase-1-security, phase-2-fixes
+- Deleted 72 JS duplicate files from frontend (kept only TS/TSX)
+
+#### 3. Company scope filter on get by ID (ticket-service.ts, work-order-service.ts)
+- getTicket now filters by companyId from session
+- getWorkOrder now filters by companyId from session
+- Company A cannot access Company B tickets by guessing ID
+
+#### 4. Security review fixes
+- REDIS_URL and RESEND_API_KEY added to Zod env schema
+- SESSION_SECRET fallback removed from 3 locations (session-manager.ts, gate.ts, auth/routes.ts)
+- Redis error handler added
+- CSRF middleware changed to exact match instead of startsWith
+- Redis SCAN instead of KEYS in getActiveSessions
+- Hardcoded 'Retail A' removed from users/internal endpoint
+- Double DB query in notifyNewOwner() optimized to single query
+
+#### 5. C3 → ADMIN rename
+- InternalRole enum: C3 → ADMIN
+- Prisma migration: 20260429082825_rename_c3_to_admin
+- All frontend and backend references updated
+- Folder renamed: pages/c3 → pages/admin
+- Component renamed: C3Dashboard → AdminDashboard
+- Route changed: /c3 → /admin
+- Layout label changed: 'Maintenance Admin' → 'System Administrator'
+- Seed updated: role C3 → ADMIN
+- Seed email updated: yahoo.com → gmail.com
+
+#### 6. Admin Panel — Backend (services/admin/routes.ts)
+- New module: /api/admin/*
+- ADMIN role guard on all routes
+- GET/POST/PUT/DELETE /api/admin/users/internal
+- GET/POST/PUT/DELETE /api/admin/users/vendor
+- GET/POST/PUT/DELETE /api/admin/stores
+- GET /api/admin/vendor-companies
+- GET /api/admin/regions
+- Soft delete (active: false) instead of hard delete
+
+#### 7. Admin Panel — Frontend (pages/admin/AdminDashboard.tsx)
+- 3 tabs: Internal Users, Vendor Users, Stores
+- Add/Edit/Activate/Deactivate for all three
+- Modal edit forms
+- Company-scoped data
+
+### Known TODO (next session)
+- [ ] Custom domain (buy and configure)
+- [ ] Cookie hardening after custom domain (sameSite: strict)
+- [ ] Real login per user (Better Auth) — when first client arrives
+- [ ] KPI dashboard for management
+- [ ] Export Excel/PDF
+- [ ] SLA tracking
+- [ ] Design improvements
+- [ ] Super Admin panel (for managing multiple clients)
+
 # CMMS System — Changelog
 
 ## Session: 2026-04-27 — Phase 2 Fixes & Email Notifications
