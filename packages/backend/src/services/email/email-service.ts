@@ -33,32 +33,16 @@ export async function notifyNewOwner(params: {
 
   let email: string | null = null;
   let name: string | null = null;
+  let dashboardUrl = APP_URL;
 
   if (ownerType === 'INTERNAL') {
     const user = await prisma.internalUser.findUnique({
       where: { id: newOwnerId },
-      select: { email: true, name: true },
+      select: { email: true, name: true, role: true },
     });
     email = user?.email ?? null;
     name = user?.name ?? null;
-  } else {
-    const user = await prisma.vendorUser.findUnique({
-      where: { id: newOwnerId },
-      select: { email: true, name: true },
-    });
-    email = user?.email ?? null;
-    name = user?.name ?? null;
-  }
-
-  if (!email) return;
-
-  const entityLabel = entityType === 'TICKET' ? 'Tiket' : 'Radni nalog';
-  let dashboardUrl = APP_URL;
-  if (ownerType === 'INTERNAL') {
-    const userRole = await prisma.internalUser.findUnique({
-      where: { id: newOwnerId },
-      select: { role: true },
-    });
+    if (!email) return;
     const roleDashboards: Record<string, string> = {
       SM: '/store-manager',
       AM: '/area-manager',
@@ -68,19 +52,24 @@ export async function notifyNewOwner(params: {
       BOD: '/director',
       C3: '/c3',
     };
-    dashboardUrl = APP_URL + (roleDashboards[userRole?.role ?? ''] ?? '/');
+    dashboardUrl = APP_URL + (roleDashboards[user?.role ?? ''] ?? '/');
   } else {
-    const userRole = await prisma.vendorUser.findUnique({
+    const user = await prisma.vendorUser.findUnique({
       where: { id: newOwnerId },
-      select: { role: true },
+      select: { email: true, name: true, role: true },
     });
+    email = user?.email ?? null;
+    name = user?.name ?? null;
+    if (!email) return;
     const roleDashboards: Record<string, string> = {
       S1: '/vendor/s1',
       S2: '/vendor/s2',
       S3: '/vendor/s3',
     };
-    dashboardUrl = APP_URL + (roleDashboards[userRole?.role ?? ''] ?? '/');
+    dashboardUrl = APP_URL + (roleDashboards[user?.role ?? ''] ?? '/');
   }
+
+  const entityLabel = entityType === 'TICKET' ? 'Tiket' : 'Radni nalog';
   const subject = `[Maintrix] ${entityLabel} #${entityId} — dodijeljen vam je`;
   const html = `
     <h2>${entityLabel} #${entityId} je dodijeljen vama</h2>

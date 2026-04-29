@@ -29,7 +29,7 @@ export function verifyGateCredentials(username: string, password: string): boole
 }
 
 function createGateToken(): string {
-  const secret = process.env.SESSION_SECRET ?? 'fallback';
+  const secret = process.env.SESSION_SECRET!;
   const payload = JSON.stringify({ t: Date.now() });
   const payloadB64 = Buffer.from(payload, 'utf8').toString('base64url');
   const sig = crypto.createHmac('sha256', secret).update(payloadB64).digest('base64url');
@@ -42,7 +42,7 @@ export function verifyGateToken(token: string | undefined): boolean {
   if (!cfg) return true; // gate disabled
   const [payloadB64, sigB64] = token.split('.');
   if (!payloadB64 || !sigB64) return false;
-  const secret = process.env.SESSION_SECRET ?? 'fallback';
+  const secret = process.env.SESSION_SECRET!;
   const expectedSig = crypto.createHmac('sha256', secret).update(payloadB64).digest('base64url');
   if (sigB64 !== expectedSig) return false;
   try {

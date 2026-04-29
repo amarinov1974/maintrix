@@ -16,7 +16,7 @@ import {
 } from './gate.js';
 
 function createGateToken(): string {
-  const secret = process.env.SESSION_SECRET ?? 'fallback';
+  const secret = process.env.SESSION_SECRET!;
   const payload = JSON.stringify({ t: Date.now() });
   const payloadB64 = Buffer.from(payload, 'utf8').toString('base64url');
   const sig = crypto.createHmac('sha256', secret).update(payloadB64).digest('base64url');
@@ -177,7 +177,7 @@ const INTERNAL_ROLE_ORDER = ['SM', 'AM', 'AMM', 'D', 'C2', 'C3', 'BOD'];
 router.get('/users/internal', requireGate, async (_req, res) => {
   try {
     const users = await prisma.internalUser.findMany({
-      where: { active: true, company: { name: 'Retail A' } },
+      where: { active: true },
       include: {
         company: true,
         store: true,
