@@ -316,4 +316,104 @@ router.get('/asset-categories', async (req, res) => {
   }
 });
 
+// ─── Assets ───────────────────────────────────────────────────────────────
+
+router.get('/assets', async (req, res) => {
+  try {
+    const companyId = req.session!.companyId;
+    const assets = await prisma.asset.findMany({
+      where: { store: { companyId } },
+      include: {
+        store: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true } },
+      },
+      orderBy: [{ store: { name: 'asc' } }, { name: 'asc' }],
+    });
+    res.json({ assets });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch assets' });
+  }
+});
+
+router.post('/assets', async (req, res) => {
+  try {
+    const companyId = req.session!.companyId;
+    const { name, storeId, categoryId, serialNumber, manufacturer, model,
+            purchaseDate, warrantyExpiry, purchaseValue, status, notes } = req.body;
+    // Provjeri da store pripada toj kompaniji
+    const store = await prisma.store.findFirst({ where: { id: Number(storeId), companyId } });
+    if (!store) { res.status(400).json({ error: 'Invalid store' }); return; }
+    const asset = await prisma.asset.create({
+      data: {
+        name, storeId: Number(storeId),
+        categoryId: categoryId ? Number(categoryId) : null,
+        serialNumber: serialNumber || null,
+        manufacturer: manufacturer || null,
+        model: model || null,
+        purchaseDate: purchaseDate ? new Date(purchaseDate) : null,
+        warrantyExpiry: warrantyExpiry ? new Date(warrantyExpiry) : null,
+        purchaseValue: purchaseValue ? Number(purchaseValue) : null,
+        status: status || 'ACTIVE',
+        notes: notes || null,
+      },
+      include: {
+        store: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true } },
+      },
+    });
+    res.status(201).json({ asset });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create asset' });
+  }
+});
+
+router.put('/assets/:id', async (req, res) => {
+  try {
+    const companyId = req.session!.companyId;
+    const id = parseInt(req.params.id, 10);
+    const { name, storeId, categoryId, serialNumber, manufacturer, model,
+            purchaseDate, warrantyExpiry, purchaseValue, status, notes, active } = req.body;
+    // Provjeri da asset pripada toj kompaniji
+    const existing = await prisma.asset.findFirst({ where: { id, store: { companyId } } });
+    if (!existing) { res.status(404).json({ error: 'Asset not found' }); return; }
+    const asset = await prisma.asset.update({
+      where: { id },
+      data: {
+        ...(name != null && { name }),
+        ...(storeId != null && { storeId: Number(storeId) }),
+        ...(categoryId !== undefined && { categoryId: categoryId ? Number(categoryId) : null }),
+        ...(serialNumber !== undefined && { serialNumber: serialNumber || null }),
+        ...(manufacturer !== undefined && { manufacturer: manufacturer || null }),
+        ...(model !== undefined && { model: model || null }),
+        ...(purchaseDate !== undefined && { purchaseDate: purchaseDate ? new Date(purchaseDate) : null }),
+        ...(warrantyExpiry !== undefined && { warrantyExpiry: warrantyExpiry ? new Date(warrantyExpiry) : null }),
+        ...(purchaseValue !== undefined && { purchaseValue: purchaseValue ? Number(purchaseValue) : null }),
+        ...(status != null && { status }),
+        ...(notes !== undefined && { notes: notes || null }),
+        ...(active !== undefined && { active: Boolean(active) }),
+      },
+      include: {
+        store: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true } },
+      },
+    });
+    res.json({ asset });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update asset' });
+  }
+});
+
+router.delete('/assets/:id', async (req, res) => {
+  try {
+    const companyId = req.session!.companyId;
+    const id = parseInt(req.params.id, 10);
+    const existing = await prisma.asset.findFirst({ where: { id, store: { companyId } } });
+    if (!existing) { res.status(404).json({ error: 'Asset not found' }); return; }
+    await prisma.asset.update({ where: { id }, data: { active: false } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to deactivate asset' });
+  }
+});
+
 export default router;

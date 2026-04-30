@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/shared/Layout';
 import { apiClient } from '../../api/client';
 import { useSession } from '../../contexts/SessionContext';
@@ -46,21 +47,29 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function AssetListPage() {
   const { session } = useSession();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [selectedStore, setSelectedStore] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
 
-  const { data: assetsData, isLoading } = useQuery({
-    queryKey: ['assets', selectedStore, selectedCategory, selectedStatus, search],
+  const { data: assetsResponse, isLoading } = useQuery({
+    queryKey: ['assets', selectedStore, selectedCategory, selectedStatus, search, page, limit],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (selectedStore) params.append('storeId', selectedStore);
       if (selectedCategory) params.append('categoryId', selectedCategory);
       if (selectedStatus) params.append('status', selectedStatus);
       if (search) params.append('search', search);
-      const { data } = await apiClient.get<{ assets: Asset[] }>(`/assets?${params.toString()}`);
-      return data.assets;
+      params.append('page', String(page));
+      params.append('limit', String(limit));
+      const { data } = await apiClient.get<{
+        assets: Asset[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>(`/assets?${params.toString()}`);
+      return data;
     },
   });
 
@@ -80,7 +89,8 @@ export function AssetListPage() {
     },
   });
 
-  const assets = assetsData ?? [];
+  const assets = assetsResponse?.assets ?? [];
+  const pagination = assetsResponse?.pagination;
   const stores = storesData ?? [];
   const categories = categoriesData ?? [];
 
@@ -113,12 +123,12 @@ export function AssetListPage() {
             type="text"
             placeholder="Search name, serial, manufacturer..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="col-span-2 border rounded-lg px-3 py-2 text-sm"
           />
           <select
             value={selectedStore}
-            onChange={(e) => setSelectedStore(e.target.value)}
+            onChange={(e) => { setSelectedStore(e.target.value); setPage(1); }}
             className="border rounded-lg px-3 py-2 text-sm"
           >
             <option value="">All Stores</option>
@@ -126,7 +136,7 @@ export function AssetListPage() {
           </select>
           <select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
             className="border rounded-lg px-3 py-2 text-sm"
           >
             <option value="">All Categories</option>
@@ -134,7 +144,7 @@ export function AssetListPage() {
           </select>
           <select
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) => { setSelectedStatus(e.target.value); setPage(1); }}
             className="border rounded-lg px-3 py-2 text-sm"
           >
             <option value="">All Statuses</option>
@@ -143,8 +153,19 @@ export function AssetListPage() {
             <option value="IN_SERVICE">In Service</option>
             <option value="DECOMMISSIONED">Decommissioned</option>
           </select>
-          <div className="flex items-center text-sm text-gray-500">
-            {isLoading ? 'Loading...' : `${assets.length} assets found`}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">
+              {isLoading ? 'Loading...' : `${pagination?.total ?? assets.length} assets`}
+            </span>
+            <select
+              value={limit}
+              onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }}
+              className="border rounded-lg px-2 py-1 text-sm"
+            >
+              <option value={25}>25 per page</option>
+              <option value={50}>50 per page</option>
+              <option value={100}>100 per page</option>
+            </select>
           </div>
         </div>
 
@@ -167,11 +188,16 @@ export function AssetListPage() {
                     <th className="px-4 py-3 text-right font-medium text-gray-700">Purchase Value</th>
                     <th className="px-4 py-3 text-right font-medium text-gray-700">Book Value</th>
                     <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
+                    <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {assets.map((asset) => (
-                    <tr key={asset.id} className="hover:bg-gray-50">
+                    <tr
+                      key={asset.id}
+                      onClick={() => navigate(`/assets/${asset.id}`)}
+                      className="hover:bg-gray-50 cursor-pointer"
+                    >
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{asset.name}</div>
                         <div className="text-xs text-gray-500">{asset.manufacturer} {asset.model}</div>
@@ -202,10 +228,53 @@ export function AssetListPage() {
                           {STATUS_LABELS[asset.status]}
                         </span>
                       </td>
+                      <td className="px-4 py-3">
+                        <span className="text-blue-600 text-sm">View →</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-600">
+              Showing {((pagination.page - 1) * pagination.limit) + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} assets
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(1)}
+                disabled={pagination.page === 1}
+                className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                «
+              </button>
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={pagination.page === 1}
+                className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ‹ Prev
+              </button>
+              <span className="text-sm text-gray-700 px-2">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                disabled={pagination.page === pagination.totalPages}
+                className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next ›
+              </button>
+              <button
+                onClick={() => setPage(pagination.totalPages)}
+                disabled={pagination.page === pagination.totalPages}
+                className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                »
+              </button>
             </div>
           </div>
         )}

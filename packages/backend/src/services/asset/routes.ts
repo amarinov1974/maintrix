@@ -2,8 +2,44 @@
  * Asset routes
  */
 import { Router } from 'express';
+import path from 'path';
+import fs from 'fs';
+import multer from 'multer';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { prisma } from '../../config/database.js';
+import { addAssetAttachment } from '../attachment/attachment-service.js';
+
+const uploadsDir = process.env.UPLOADS_DIR ?? path.join(process.cwd(), 'uploads');
+
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+  'application/pdf', 'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+];
+
+const assetAttachmentStorage = multer.diskStorage({
+  destination: (req, _file, cb) => {
+    const assetId = parseInt(req.params.id, 10);
+    if (Number.isNaN(assetId)) return cb(new Error('Invalid asset id'), '');
+    const dir = path.join(uploadsDir, 'assets', String(assetId));
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (_req, file, cb) => {
+    const safe = (file.originalname || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
+    cb(null, `${Date.now()}-${safe}`);
+  },
+});
+
+const uploadAssetAttachment = multer({
+  storage: assetAttachmentStorage,
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    ALLOWED_MIME_TYPES.includes(file.mimetype) ? cb(null, true) : cb(new Error('File type not allowed'));
+  },
+});
 
 const router = Router();
 router.use(requireAuth);
@@ -14,32 +50,42 @@ router.use(requireAuth);
  */
 router.get('/', async (req, res) => {
   try {
-    const { storeId, categoryId, status, search } = req.query;
+    const { storeId, categoryId, status, search, page, limit } = req.query;
     const companyId = req.session!.companyId;
 
-    const assets = await prisma.asset.findMany({
-      where: {
-        store: { companyId },
-        active: true,
-        ...(storeId ? { storeId: parseInt(storeId as string, 10) } : {}),
-        ...(categoryId ? { categoryId: parseInt(categoryId as string, 10) } : {}),
-        ...(status ? { status: status as 'ACTIVE' | 'FAULTY' | 'IN_SERVICE' | 'DECOMMISSIONED' } : {}),
-        ...(search ? {
-          OR: [
-            { name: { contains: search as string, mode: 'insensitive' } },
-            { serialNumber: { contains: search as string, mode: 'insensitive' } },
-            { manufacturer: { contains: search as string, mode: 'insensitive' } },
-          ]
-        } : {}),
-      },
-      include: {
-        store: { select: { id: true, name: true } },
-        category: { select: { id: true, name: true, depreciationYears: true, depreciationRate: true } },
-      },
-      orderBy: [{ store: { name: 'asc' } }, { name: 'asc' }],
-    });
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 50));
+    const skip = (pageNum - 1) * limitNum;
 
-    // Calculate current book value for each asset
+    const where = {
+      store: { companyId },
+      active: true,
+      ...(storeId ? { storeId: parseInt(storeId as string, 10) } : {}),
+      ...(categoryId ? { categoryId: parseInt(categoryId as string, 10) } : {}),
+      ...(status ? { status: status as 'ACTIVE' | 'FAULTY' | 'IN_SERVICE' | 'DECOMMISSIONED' } : {}),
+      ...(search ? {
+        OR: [
+          { name: { contains: search as string, mode: 'insensitive' as const } },
+          { serialNumber: { contains: search as string, mode: 'insensitive' as const } },
+          { manufacturer: { contains: search as string, mode: 'insensitive' as const } },
+        ]
+      } : {}),
+    };
+
+    const [assets, total] = await prisma.$transaction([
+      prisma.asset.findMany({
+        where,
+        include: {
+          store: { select: { id: true, name: true } },
+          category: { select: { id: true, name: true, depreciationYears: true, depreciationRate: true } },
+        },
+        orderBy: [{ store: { name: 'asc' } }, { name: 'asc' }],
+        skip,
+        take: limitNum,
+      }),
+      prisma.asset.count({ where }),
+    ]);
+
     const assetsWithValue = assets.map((asset) => {
       let currentValue: number | null = null;
       const cat = asset.category;
@@ -51,7 +97,15 @@ router.get('/', async (req, res) => {
       return { ...asset, currentValue: currentValue ? Math.round(currentValue * 100) / 100 : null };
     });
 
-    res.json({ assets: assetsWithValue });
+    res.json({
+      assets: assetsWithValue,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch assets' });
   }
@@ -79,21 +133,37 @@ router.get('/categories', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    if (Number.isNaN(id)) {
-      res.status(404).json({ error: 'Asset not found' });
-      return;
-    }
+    if (Number.isNaN(id)) { res.status(404).json({ error: 'Asset not found' }); return; }
+
     const asset = await prisma.asset.findFirst({
       where: { id, store: { companyId: req.session!.companyId } },
       include: {
         store: { select: { id: true, name: true } },
         category: { select: { id: true, name: true, depreciationYears: true, depreciationRate: true } },
+        attachments: {
+          orderBy: { createdAt: 'desc' },
+          select: { id: true, fileName: true, filePath: true, createdAt: true },
+        },
+        tickets: {
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true, currentStatus: true, category: true,
+            description: true, urgent: true, createdAt: true, updatedAt: true,
+            createdBy: { select: { name: true } },
+          },
+        },
+        workOrders: {
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true, currentStatus: true, createdAt: true, updatedAt: true,
+            vendorCompany: { select: { name: true } },
+            ticket: { select: { category: true } },
+          },
+        },
       },
     });
-    if (!asset) {
-      res.status(404).json({ error: 'Asset not found' });
-      return;
-    }
+
+    if (!asset) { res.status(404).json({ error: 'Asset not found' }); return; }
 
     let currentValue: number | null = null;
     const cat = asset.category;
@@ -106,6 +176,23 @@ router.get('/:id', async (req, res) => {
     res.json({ ...asset, currentValue: currentValue ? Math.round(currentValue * 100) / 100 : null });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch asset' });
+  }
+});
+
+router.post('/:id/attachments', uploadAssetAttachment.single('file'), async (req, res) => {
+  try {
+    if (!req.file) { res.status(400).json({ error: 'No file uploaded' }); return; }
+    const assetId = parseInt(req.params.id, 10);
+    const result = await addAssetAttachment(
+      assetId,
+      req.file.path,
+      req.file.originalname || req.file.filename,
+      req.session!.userId
+    );
+    res.status(201).json(result);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Upload failed';
+    res.status(400).json({ error: message });
   }
 });
 

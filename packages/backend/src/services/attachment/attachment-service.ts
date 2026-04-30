@@ -51,3 +51,36 @@ export async function addTicketAttachment(
   };
 }
 
+export async function addAssetAttachment(
+  assetId: number,
+  filePath: string,
+  fileName: string,
+  uploadedById: number
+): Promise<TicketAttachmentResult> {
+  const asset = await prisma.asset.findUnique({
+    where: { id: assetId },
+    select: { id: true },
+  });
+  if (!asset) throw new Error('Asset not found');
+
+  const attachment = await prisma.attachment.create({
+    data: {
+      entityType: 'ASSET',
+      entityId: assetId,
+      assetId,
+      filePath,
+      fileName: fileName.slice(0, 255),
+      uploadedByType: 'INTERNAL',
+      uploadedById,
+      internalFlag: true,
+    },
+  });
+
+  return {
+    id: attachment.id,
+    fileName: attachment.fileName,
+    createdAt: attachment.createdAt,
+    internalFlag: attachment.internalFlag,
+  };
+}
+

@@ -1,8 +1,9 @@
-/**
+﻿/**
  * Area Manager Dashboard
  */
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
@@ -72,13 +73,21 @@ export function AreaManagerDashboard() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Area Manager Dashboard
-          </h1>
-          <p className="text-gray-600">
-            {session?.regionName ?? 'Regional Approval'}
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Area Manager Dashboard
+            </h1>
+            <p className="text-gray-600">
+              {session?.regionName ?? 'Regional Approval'}
+            </p>
+          </div>
+          <Link
+            to="/assets"
+            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+          >
+            🏭 Asset Register
+          </Link>
         </div>
 
         <Card className="bg-blue-50 border-blue-200">

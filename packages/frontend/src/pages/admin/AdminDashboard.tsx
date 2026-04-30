@@ -12,7 +12,7 @@ import {
   type ParsedPmRow,
 } from '../../api/preventive-maintenance';
 
-type Tab = 'users' | 'vendors' | 'stores' | 'pm';
+type Tab = 'users' | 'vendors' | 'stores' | 'assets' | 'pm';
 
 interface InternalUser {
   id: number;
@@ -51,6 +51,22 @@ interface Store {
   region?: { name: string } | null;
 }
 
+interface AdminAsset {
+  id: number;
+  name: string;
+  serialNumber: string | null;
+  manufacturer: string | null;
+  model: string | null;
+  purchaseDate: string | null;
+  warrantyExpiry: string | null;
+  purchaseValue: number | null;
+  status: 'ACTIVE' | 'FAULTY' | 'IN_SERVICE' | 'DECOMMISSIONED';
+  notes: string | null;
+  active: boolean;
+  store: { id: number; name: string };
+  category: { id: number; name: string } | null;
+}
+
 const INTERNAL_ROLES = ['SM', 'AM', 'AMM', 'D', 'C2', 'ADMIN', 'BOD'];
 const VENDOR_ROLES = ['S1', 'S2', 'S3'];
 
@@ -62,6 +78,8 @@ export function AdminDashboard() {
   const [editingVendor, setEditingVendor] = useState<VendorUser | null>(null);
   const [showAddStore, setShowAddStore] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
+  const [showAddAsset, setShowAddAsset] = useState(false);
+  const [editingAsset, setEditingAsset] = useState<AdminAsset | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pmStep, setPmStep] = useState<'upload' | 'preview' | 'success'>('upload');
   const [parsedRows, setParsedRows] = useState<ParsedPmRow[]>([]);
@@ -116,6 +134,24 @@ export function AdminDashboard() {
       const { data } = await apiClient.get<{ stores: Store[] }>('/admin/stores');
       return data.stores;
     },
+  });
+
+  const { data: adminAssets = [], isLoading: loadingAssets } = useQuery({
+    queryKey: ['admin-assets-list'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ assets: AdminAsset[] }>('/admin/assets');
+      return data.assets;
+    },
+    enabled: activeTab === 'assets',
+  });
+
+  const { data: adminCategories = [] } = useQuery({
+    queryKey: ['admin-asset-categories'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ categories: Array<{id: number; name: string}> }>('/admin/asset-categories');
+      return data.categories;
+    },
+    enabled: activeTab === 'assets',
   });
 
   const createInternalUser = useMutation({
@@ -205,6 +241,36 @@ export function AdminDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-stores-list'] });
       queryClient.invalidateQueries({ queryKey: ['admin-stores'] });
+    },
+  });
+
+  const createAsset = useMutation({
+    mutationFn: async (data: Record<string, unknown>) => {
+      await apiClient.post('/admin/assets', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-assets-list'] });
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      setShowAddAsset(false);
+    },
+  });
+
+  const updateAsset = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Record<string, unknown> }) => {
+      await apiClient.put(`/admin/assets/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-assets-list'] });
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      setEditingAsset(null);
+    },
+  });
+
+  const deactivateAsset = useMutation({
+    mutationFn: async (id: number) => { await apiClient.delete(`/admin/assets/${id}`); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-assets-list'] });
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
     },
   });
 
@@ -324,6 +390,46 @@ export function AdminDashboard() {
     });
   };
 
+  const handleAddAssetSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    createAsset.mutate({
+      name: fd.get('name'),
+      storeId: fd.get('storeId'),
+      categoryId: fd.get('categoryId') || null,
+      serialNumber: fd.get('serialNumber') || null,
+      manufacturer: fd.get('manufacturer') || null,
+      model: fd.get('model') || null,
+      purchaseDate: fd.get('purchaseDate') || null,
+      warrantyExpiry: fd.get('warrantyExpiry') || null,
+      purchaseValue: fd.get('purchaseValue') || null,
+      status: fd.get('status') || 'ACTIVE',
+      notes: fd.get('notes') || null,
+    });
+  };
+
+  const handleEditAssetSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingAsset) return;
+    const fd = new FormData(e.currentTarget);
+    updateAsset.mutate({
+      id: editingAsset.id,
+      data: {
+        name: fd.get('name'),
+        storeId: fd.get('storeId'),
+        categoryId: fd.get('categoryId') || null,
+        serialNumber: fd.get('serialNumber') || null,
+        manufacturer: fd.get('manufacturer') || null,
+        model: fd.get('model') || null,
+        purchaseDate: fd.get('purchaseDate') || null,
+        warrantyExpiry: fd.get('warrantyExpiry') || null,
+        purchaseValue: fd.get('purchaseValue') || null,
+        status: fd.get('status'),
+        notes: fd.get('notes') || null,
+      },
+    });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -377,6 +483,7 @@ export function AdminDashboard() {
               { key: 'users', label: 'Internal Users' },
               { key: 'vendors', label: 'Vendor Users' },
               { key: 'stores', label: 'Stores' },
+              { key: 'assets', label: 'Assets' },
               { key: 'pm', label: 'PM Plans' },
             ].map((tab) => (
               <button
@@ -806,6 +913,215 @@ export function AdminDashboard() {
                       <button type="button" onClick={() => setEditingStore(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
                       <button type="submit" disabled={updateStore.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
                         {updateStore.isPending ? 'Saving...' : 'Save'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'assets' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Assets ({adminAssets.filter(a => a.active).length} active)
+              </h2>
+              <button
+                onClick={() => setShowAddAsset(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+              >
+                + Add Asset
+              </button>
+            </div>
+
+            {showAddAsset && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-medium text-gray-900 mb-3">New Asset</h3>
+                <form onSubmit={handleAddAssetSubmit} className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Name *</label>
+                    <input name="name" required className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Store *</label>
+                    <select name="storeId" required className="w-full border rounded px-3 py-2 text-sm">
+                      <option value="">-- Select --</option>
+                      {stores2.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
+                    <select name="categoryId" className="w-full border rounded px-3 py-2 text-sm">
+                      <option value="">-- None --</option>
+                      {adminCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" className="w-full border rounded px-3 py-2 text-sm">
+                      <option value="ACTIVE">Active</option>
+                      <option value="FAULTY">Faulty</option>
+                      <option value="IN_SERVICE">In Service</option>
+                      <option value="DECOMMISSIONED">Decommissioned</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Serial Number</label>
+                    <input name="serialNumber" className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Manufacturer</label>
+                    <input name="manufacturer" className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Model</label>
+                    <input name="model" className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Value (€)</label>
+                    <input name="purchaseValue" type="number" step="0.01" className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Date</label>
+                    <input name="purchaseDate" type="date" className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Warranty Expiry</label>
+                    <input name="warrantyExpiry" type="date" className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea name="notes" rows={2} className="w-full border rounded px-3 py-2 text-sm" />
+                  </div>
+                  <div className="col-span-2 flex gap-2 justify-end">
+                    <button type="button" onClick={() => setShowAddAsset(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                    <button type="submit" disabled={createAsset.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+                      {createAsset.isPending ? 'Saving...' : 'Add'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {loadingAssets ? (
+              <p className="text-gray-500">Loading...</p>
+            ) : (
+              <div className="border rounded-lg overflow-hidden">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Name</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Store</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Category</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Serial</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {adminAssets.map((asset) => (
+                      <tr key={asset.id} className={!asset.active ? 'bg-gray-50 opacity-60' : ''}>
+                        <td className="px-4 py-3 font-medium">
+                          {asset.name}
+                          {asset.manufacturer && <div className="text-xs text-gray-500">{asset.manufacturer} {asset.model}</div>}
+                        </td>
+                        <td className="px-4 py-3 text-gray-600">{asset.store.name}</td>
+                        <td className="px-4 py-3 text-gray-600">{asset.category?.name ?? '—'}</td>
+                        <td className="px-4 py-3 text-gray-500 font-mono text-xs">{asset.serialNumber ?? '—'}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            asset.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                            asset.status === 'FAULTY' ? 'bg-red-100 text-red-800' :
+                            asset.status === 'IN_SERVICE' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>{asset.status.replace('_', ' ')}</span>
+                        </td>
+                        <td className="px-4 py-3 flex gap-2">
+                          <button onClick={() => setEditingAsset(asset)} className="text-blue-600 hover:underline text-xs">Edit</button>
+                          {asset.active ? (
+                            <button
+                              onClick={() => { if (confirm(`Deactivate ${asset.name}?`)) deactivateAsset.mutate(asset.id); }}
+                              className="text-red-600 hover:underline text-xs"
+                            >Deactivate</button>
+                          ) : (
+                            <button
+                              onClick={() => updateAsset.mutate({ id: asset.id, data: { active: true } })}
+                              className="text-green-600 hover:underline text-xs"
+                            >Activate</button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {editingAsset && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                  <h3 className="font-semibold text-gray-900 mb-4">Edit Asset — {editingAsset.name}</h3>
+                  <form onSubmit={handleEditAssetSubmit} className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Name *</label>
+                      <input name="name" defaultValue={editingAsset.name} required className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Store *</label>
+                      <select name="storeId" defaultValue={editingAsset.store.id} required className="w-full border rounded px-3 py-2 text-sm">
+                        {stores2.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
+                      <select name="categoryId" defaultValue={editingAsset.category?.id ?? ''} className="w-full border rounded px-3 py-2 text-sm">
+                        <option value="">-- None --</option>
+                        {adminCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                      <select name="status" defaultValue={editingAsset.status} className="w-full border rounded px-3 py-2 text-sm">
+                        <option value="ACTIVE">Active</option>
+                        <option value="FAULTY">Faulty</option>
+                        <option value="IN_SERVICE">In Service</option>
+                        <option value="DECOMMISSIONED">Decommissioned</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Serial Number</label>
+                      <input name="serialNumber" defaultValue={editingAsset.serialNumber ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Manufacturer</label>
+                      <input name="manufacturer" defaultValue={editingAsset.manufacturer ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Model</label>
+                      <input name="model" defaultValue={editingAsset.model ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Value (€)</label>
+                      <input name="purchaseValue" type="number" step="0.01" defaultValue={editingAsset.purchaseValue ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Date</label>
+                      <input name="purchaseDate" type="date" defaultValue={editingAsset.purchaseDate ? editingAsset.purchaseDate.slice(0,10) : ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Warranty Expiry</label>
+                      <input name="warrantyExpiry" type="date" defaultValue={editingAsset.warrantyExpiry ? editingAsset.warrantyExpiry.slice(0,10) : ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
+                      <textarea name="notes" rows={2} defaultValue={editingAsset.notes ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
+                    </div>
+                    <div className="col-span-2 flex gap-2 justify-end pt-2">
+                      <button type="button" onClick={() => setEditingAsset(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                      <button type="submit" disabled={updateAsset.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+                        {updateAsset.isPending ? 'Saving...' : 'Save'}
                       </button>
                     </div>
                   </form>

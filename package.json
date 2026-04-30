@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "cmms-system",
   "version": "1.0.0",
   "private": true,
@@ -6,12 +6,12 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=@cmms/backend & npm run dev --workspace=@cmms/frontend",
+    "dev": "npm run dev --workspace=@maintrix/backend & npm run dev --workspace=@maintrix/frontend",
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
-    "db:migrate": "npm run db:migrate --workspace=@cmms/backend",
-    "db:seed": "npm run db:seed --workspace=@cmms/backend",
-    "db:studio": "npm run db:studio --workspace=@cmms/backend"
+    "db:migrate": "npm run db:migrate --workspace=@maintrix/backend",
+    "db:seed": "npm run db:seed --workspace=@maintrix/backend",
+    "db:studio": "npm run db:studio --workspace=@maintrix/backend"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

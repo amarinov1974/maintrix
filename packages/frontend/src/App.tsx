@@ -25,6 +25,7 @@ import { S3Dashboard } from './pages/vendor/s3/S3Dashboard';
 import { S3MyWorkOrdersPage } from './pages/vendor/s3/S3MyWorkOrdersPage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AssetListPage } from './pages/assets/AssetListPage';
+import { AssetDetailPage } from './pages/assets/AssetDetailPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -188,6 +189,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['AM', 'AMM', 'D', 'C2', 'BOD', 'ADMIN']}>
                   <AssetListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/assets/:id"
+              element={
+                <ProtectedRoute allowedRoles={['AM', 'AMM', 'D', 'C2', 'BOD', 'ADMIN']}>
+                  <AssetDetailPage />
                 </ProtectedRoute>
               }
             />

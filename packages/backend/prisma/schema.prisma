@@ -193,6 +193,7 @@ model Asset {
   tickets    Ticket[]
   workOrders WorkOrder[]
   preventiveMaintenancePlans PreventiveMaintenancePlan[]
+  attachments Attachment[] @relation("AssetAttachments")
   @@index([storeId])
   @@index([categoryId])
   @@map("assets")
@@ -518,6 +519,7 @@ model InvoiceBatchItem {
 enum AttachmentEntityType {
   TICKET
   WORK_ORDER @map("WO")
+  ASSET
 }
 
 model Attachment {
@@ -526,6 +528,7 @@ model Attachment {
   entityId       Int                   @map("entity_id")
   ticketId       Int?                  @map("ticket_id")
   workOrderId    Int?                  @map("work_order_id")
+  assetId        Int?                  @map("asset_id")
   filePath       String                @db.Text @map("file_path")
   fileName       String                @db.VarChar(255) @map("file_name")
   uploadedByType OwnerType             @map("uploaded_by_type")
@@ -535,6 +538,7 @@ model Attachment {
 
   ticket    Ticket?    @relation("TicketAttachments", fields: [ticketId], references: [id], onDelete: Cascade)
   workOrder WorkOrder? @relation("WorkOrderAttachments", fields: [workOrderId], references: [id], onDelete: Cascade)
+  asset     Asset?     @relation("AssetAttachments", fields: [assetId], references: [id], onDelete: Cascade)
 
   @@index([entityType, entityId])
   @@map("attachments")
