@@ -22,13 +22,6 @@ import { apiKeyMiddleware } from './middleware/api-key.middleware.js';
 import { csrfMiddleware } from './middleware/csrf.middleware.js';
 import { prisma } from './config/database.js';
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: process.env.NODE_ENV === 'production' ? 20 : 200,
-  message: { error: 'Too many requests, please try again later' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 const app = express();
 app.set('trust proxy', 1);
@@ -55,7 +48,7 @@ app.get('/api/health', (_req, res) => {
 app.use(apiKeyMiddleware);
 app.use(csrfMiddleware);
 
-app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api/work-orders', workOrderRoutes);
