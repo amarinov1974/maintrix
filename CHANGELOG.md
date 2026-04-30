@@ -1,8 +1,9 @@
-## Session: 2026-04-30 — Asset Management Module
+## Session: 2026-04-30 — Asset Module Completion
 
 ### Overview
-Asset management module implemented with categories, depreciation
-and full demo asset database.
+Assets link na dashboardima, asset detail stranica sa servisnom historijom
+i dokumentima, asset management u Admin panelu, pagination za asset listu,
+asset browser u Submit Ticket, konzistentni inactive styling.
 
 ### Changes
 
@@ -39,12 +40,84 @@ and full demo asset database.
 - Added retryStrategy for Redis connection drops
 - Backend now reconnects automatically after Railway hibernation
 
+#### 7. Assets link na AMM/AM/Director dashboardima
+- AMMDashboard.tsx, AreaManagerDashboard.tsx, DirectorDashboard.tsx
+- Header sekcija proširena na flex justify-between
+- Dodan Link na /assets ("🏭 Asset Register") kao sekundarni button
+- Link import dodan u AM i Director dashboard
+
+#### 8. Asset detail stranica (AssetDetailPage.tsx)
+- Nova stranica na ruti /assets/:id
+- Header kartica: naziv, status badge, meta red (kategorija • store • serial)
+- Asset Details kartica: svi financijski i identifikacijski podaci
+- Documents kartica: lista attachmenta + upload forma (POST /api/assets/:id/attachments)
+- Service History kartica: Tickets tab + Work Orders tab (read-only, empty states)
+- App.tsx: dodana ruta /assets/:id s istim ProtectedRoute rolama kao /assets
+- AssetListPage.tsx: redovi tablice klikabilni (useNavigate), dodan "View →" stupac
+
+#### 9. Prisma schema — asset attachmenti
+- AttachmentEntityType enum: dodan ASSET
+- Attachment model: dodano assetId (nullable FK) + asset relation
+- Asset model: dodano attachments relation
+- Migracija: 20260430071326_add_asset_attachments
+
+#### 10. Backend — asset attachment endpoints
+- attachment-service.ts: dodana addAssetAttachment() funkcija
+- asset/routes.ts: multer setup za uploads/assets/:id/
+- GET /api/assets/:id proširen (uključuje tickets, workOrders, attachments)
+- POST /api/assets/:id/attachments
+
+#### 11. Asset management u Admin panelu
+- admin/routes.ts: GET/POST/PUT/DELETE /api/admin/assets
+  - company scope validacija na svim endpointima
+  - soft delete (active: false)
+- AdminDashboard.tsx: novi tab 'assets'
+  - AdminAsset interface
+  - adminAssets i adminCategories queryi (enabled samo kad je tab aktivan)
+  - createAsset, updateAsset, deactivateAsset mutacije
+  - Add forma + Edit modal + Activate/Deactivate akcije
+
+#### 12. Pagination za asset listu
+- asset/routes.ts: GET /api/assets podržava page + limit query params
+  - prisma.$transaction za assets + count u jednom roundtripu
+  - vraća pagination objekt (total, page, limit, totalPages)
+- AssetListPage.tsx: page + limit state
+  - query key uključuje page i limit
+  - filter/search onChange resetira na page 1
+  - "25/50/100 per page" dropdown
+  - pagination kontrole (first/prev/next/last + "Showing X–Y of total")
+  - kontrole vidljive samo kad totalPages > 1
+
+#### 13. Asset browser u Submit Ticket
+- api/assets.ts: proširen Asset interface, dodan listByStore()
+- SubmitTicketPage.tsx: zamijenjen Asset ID input s browse listom po store-u
+- Auto-fill category iz asset kategorije (direktan mapping po nazivu)
+- Category select se zaključava kad je asset odabran, s mogućnošću Clear
+- Filtrirani prikaz: samo ACTIVE i IN_SERVICE asseti
+
+#### 14. Konzistentni inactive styling u Admin panelu
+- Sva četiri taba (Internal Users, Vendor Users, Stores, Assets):
+  - Neaktivni redovi: bg-red-50 opacity-75
+  - Neaktivni badge: crveni "Inactive"
+  - Neaktivni naziv: "(inactive)" hint u crvenoj boji
+- Assets tab: aktivan asset prikazuje asset.status badge, neaktivan prikazuje "Inactive"
+
+#### 15. Dev fixes
+- Root package.json: workspace names @cmms → @maintrix
+- app.ts: rate limiter na /api/auth uklonjen za dev
+- session-manager.ts: Redis fallback na in-memory Map kad Redis nije dostupan lokalno
+
 ### Known TODO (next session)
-- [ ] Add Assets link to AMM/AM/Director dashboards
-- [ ] Asset detail page (service history, documents)
-- [ ] Asset management in Admin panel (add/edit/deactivate)
-- [ ] Link assets to tickets more prominently
-- [ ] Pagination for large asset lists
+- [ ] Tenant isolation — Postgres RLS ili Prisma middleware za companyId (blokirajući za prvog klijenta)
+- [ ] Pravi auth sustav (Better Auth) — zamjena za demo login
+- [ ] Browser run-through provjera asset modula
+- [ ] KPI dashboard za AM/D/BOD
+- [ ] SLA tracking na ticketima
+- [ ] Compliance/legal inspection modul (zakonski pregledi po assetu)
+- [ ] Asset detail page — klik na ticket/WO red otvara detalj
+- [ ] Excel/PDF export
+- [ ] Custom domena + cookie hardening (sameSite: strict)
+- [ ] Super Admin panel (upravljanje više klijenata)
 
 ## Session: 2026-04-29 — Security Review, C3→ADMIN rename, Admin Panel
 
