@@ -1022,9 +1022,10 @@ export function AdminDashboard() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {adminAssets.map((asset) => (
-                      <tr key={asset.id} className={!asset.active ? 'bg-gray-50 opacity-60' : ''}>
+                      <tr key={asset.id} className={!asset.active ? 'bg-red-50 opacity-75' : ''}>
                         <td className="px-4 py-3 font-medium">
                           {asset.name}
+                          {!asset.active && <span className="ml-2 text-xs text-red-600 font-normal">(inactive)</span>}
                           {asset.manufacturer && <div className="text-xs text-gray-500">{asset.manufacturer} {asset.model}</div>}
                         </td>
                         <td className="px-4 py-3 text-gray-600">{asset.store.name}</td>
