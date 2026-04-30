@@ -1,13 +1,15 @@
-/**
- * Assets API (lookup for ticket submit screen)
- */
-
 import { apiClient } from './client';
 
 export interface Asset {
   id: number;
-  description: string;
+  name: string;
+  description: string | null;
+  serialNumber: string | null;
+  manufacturer: string | null;
+  model: string | null;
+  status: 'ACTIVE' | 'FAULTY' | 'IN_SERVICE' | 'DECOMMISSIONED';
   storeId: number;
+  category: { id: number; name: string } | null;
 }
 
 export const assetsAPI = {
@@ -20,5 +22,12 @@ export const assetsAPI = {
       if (status === 404) return null;
       throw err;
     }
+  },
+
+  listByStore: async (storeId: number): Promise<Asset[]> => {
+    const { data } = await apiClient.get<{ assets: Asset[] }>(
+      `/assets?storeId=${storeId}&limit=100`
+    );
+    return data.assets;
   },
 };

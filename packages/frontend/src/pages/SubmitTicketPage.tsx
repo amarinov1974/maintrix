@@ -27,6 +27,10 @@ const CATEGORIES: { value: string; label: string }[] = [
   { value: 'OTHER', label: 'Other' },
 ];
 
+const ASSET_CATEGORY_TO_TICKET_CATEGORY: Record<string, string> = Object.fromEntries(
+  CATEGORIES.map(c => [c.label, c.value])
+);
+
 interface SubmitTicketPageProps {
   backLink: string;
   backLabel?: string;
@@ -44,6 +48,19 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
   const [assetIdInput, setAssetIdInput] = useState('');
   const [assetLookupMessage, setAssetLookupMessage] = useState<'idle' | 'found' | 'notfound' | null>(null);
   const [assetDescription, setAssetDescription] = useState<string | null>(null);
+  const effectiveStoreId = session?.role === 'SM'
+    ? (session as { storeId?: number }).storeId ?? null
+    : typeof storeId === 'number' ? storeId : null;
+
+  const { data: storeAssets = [] } = useQuery({
+    queryKey: ['assets-for-store', effectiveStoreId],
+    queryFn: () => assetsAPI.listByStore(effectiveStoreId!),
+    enabled: effectiveStoreId != null,
+  });
+
+  const [showAssetBrowser, setShowAssetBrowser] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<import('../api/assets').Asset | null>(null);
+  const [categoryLocked, setCategoryLocked] = useState(false);
   const [showSuccess, setShowSuccess] = useState<'draft' | 'submitted' | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -125,6 +142,28 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
       setAssetDescription(null);
       setAssetLookupMessage('notfound');
     }
+  };
+
+  const handleAssetSelect = (asset: import('../api/assets').Asset) => {
+    setSelectedAsset(asset);
+    setAssetIdInput(String(asset.id));
+    setShowAssetBrowser(false);
+    // Auto-fill category ako postoji mapping
+    if (asset.category) {
+      const mapped = ASSET_CATEGORY_TO_TICKET_CATEGORY[asset.category.name];
+      if (mapped) {
+        setCategory(mapped);
+        setCategoryLocked(true);
+      }
+    }
+  };
+
+  const handleClearAsset = () => {
+    setSelectedAsset(null);
+    setAssetIdInput('');
+    setAssetLookupMessage(null);
+    setAssetDescription(null);
+    setCategoryLocked(false);
   };
 
   const uploadFilesToTicket = async (ticketId: number) => {
@@ -248,8 +287,9 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              disabled={categoryLocked}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${categoryLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             >
               <option value="">— Select Category —</option>
               {CATEGORIES.map((cat) => (
@@ -258,6 +298,14 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
                 </option>
               ))}
             </select>
+            {categoryLocked && (
+              <p className="text-xs text-blue-600 mt-1">
+                Category auto-filled from selected asset.{` `}
+                <button type="button" onClick={handleClearAsset} className="underline">
+                  Clear asset
+                </button>
+              </p>
+            )}
           </div>
 
           {/* 8.4 Description (Mandatory) */}
@@ -347,36 +395,63 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Asset linking (optional)
             </label>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={assetIdInput}
-                  onChange={(e) => {
-                    setAssetIdInput(e.target.value);
-                    setAssetLookupMessage(null);
-                  }}
-                  onBlur={handleLookupAsset}
-                  placeholder="Asset ID"
-                  className="flex-1 p-3 border border-gray-300 rounded-lg"
-                />
-                <Button type="button" variant="secondary" onClick={handleLookupAsset}>
-                  Look up
-                </Button>
+            {selectedAsset ? (
+              <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-green-900">{selectedAsset.name}</p>
+                  <p className="text-xs text-green-700">
+                    {selectedAsset.manufacturer} {selectedAsset.model}
+                    {selectedAsset.serialNumber ? ` • S/N: ${selectedAsset.serialNumber}` : ''}
+                    {selectedAsset.category ? ` • ${selectedAsset.category.name}` : ''}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleClearAsset}
+                  className="text-xs text-gray-500 hover:text-red-600 underline"
+                >
+                  Remove
+                </button>
               </div>
-              <p className="text-xs text-gray-500">
-                Or scan barcode/QR to enter Asset ID.
-              </p>
-              {assetLookupMessage === 'found' && assetDescription != null && (
-                <p className="text-sm text-green-700">
-                  Asset: {assetDescription}
-                </p>
-              )}
-              {assetLookupMessage === 'notfound' && (
-                <p className="text-sm text-amber-600">Asset not found</p>
-              )}
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowAssetBrowser(!showAssetBrowser)}
+                  disabled={effectiveStoreId == null}
+                >
+                  {showAssetBrowser ? 'Close' : '🔍 Browse Assets'}
+                </Button>
+                {effectiveStoreId == null && (
+                  <p className="text-xs text-gray-500">Select a store first to browse assets.</p>
+                )}
+                {showAssetBrowser && storeAssets.length === 0 && (
+                  <p className="text-sm text-gray-500">No assets found for this store.</p>
+                )}
+                {showAssetBrowser && storeAssets.length > 0 && (
+                  <div className="border rounded-lg overflow-hidden max-h-60 overflow-y-auto">
+                    {storeAssets
+                      .filter(a => a.status === 'ACTIVE' || a.status === 'IN_SERVICE')
+                      .map(asset => (
+                        <button
+                          key={asset.id}
+                          type="button"
+                          onClick={() => handleAssetSelect(asset)}
+                          className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b last:border-b-0 transition"
+                        >
+                          <p className="text-sm font-medium text-gray-900">{asset.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {asset.manufacturer} {asset.model}
+                            {asset.serialNumber ? ` • S/N: ${asset.serialNumber}` : ''}
+                            {asset.category ? ` • ${asset.category.name}` : ''}
+                          </p>
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 8.8 Buttons */}
