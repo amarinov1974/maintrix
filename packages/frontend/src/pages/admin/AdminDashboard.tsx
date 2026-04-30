@@ -575,8 +575,11 @@ export function AdminDashboard() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {internalUsers.map((user) => (
-                      <tr key={user.id} className={!user.active ? 'bg-gray-50 opacity-60' : ''}>
-                        <td className="px-4 py-3 font-medium">{user.name}</td>
+                      <tr key={user.id} className={!user.active ? 'bg-red-50 opacity-75' : ''}>
+                        <td className="px-4 py-3 font-medium">
+                          {user.name}
+                          {!user.active && <span className="ml-2 text-xs text-red-600 font-normal">(inactive)</span>}
+                        </td>
                         <td className="px-4 py-3 text-gray-600">{user.email || '—'}</td>
                         <td className="px-4 py-3">
                           <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{user.role}</span>
@@ -585,9 +588,11 @@ export function AdminDashboard() {
                           {user.store?.name || user.region?.name || '—'}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded ${user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {user.active ? 'Active' : 'Inactive'}
-                          </span>
+                          {!user.active ? (
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                          ) : (
+                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Active</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
                           <button onClick={() => setEditingUser(user)} className="text-blue-600 hover:underline text-xs">Edit</button>
@@ -727,17 +732,22 @@ export function AdminDashboard() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {vendorUsers.map((user) => (
-                      <tr key={user.id} className={!user.active ? 'bg-gray-50 opacity-60' : ''}>
-                        <td className="px-4 py-3 font-medium">{user.name}</td>
+                      <tr key={user.id} className={!user.active ? 'bg-red-50 opacity-75' : ''}>
+                        <td className="px-4 py-3 font-medium">
+                          {user.name}
+                          {!user.active && <span className="ml-2 text-xs text-red-600 font-normal">(inactive)</span>}
+                        </td>
                         <td className="px-4 py-3 text-gray-600">{user.email || '—'}</td>
                         <td className="px-4 py-3">
                           <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">{user.role}</span>
                         </td>
                         <td className="px-4 py-3 text-gray-600">{user.vendorCompany.name}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded ${user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {user.active ? 'Active' : 'Inactive'}
-                          </span>
+                          {!user.active ? (
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                          ) : (
+                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Active</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
                           <button onClick={() => setEditingVendor(user)} className="text-blue-600 hover:underline text-xs">Edit</button>
@@ -855,14 +865,16 @@ export function AdminDashboard() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {stores2.map((store) => (
-                      <tr key={store.id} className={!store.active ? 'bg-gray-50 opacity-60' : ''}>
+                      <tr key={store.id} className={!store.active ? 'bg-red-50 opacity-75' : ''}>
                         <td className="px-4 py-3 font-medium">{store.name}</td>
                         <td className="px-4 py-3 text-gray-600">{store.address || '—'}</td>
                         <td className="px-4 py-3 text-gray-600">{store.region?.name || '—'}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded ${store.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {store.active ? 'Active' : 'Inactive'}
-                          </span>
+                          {!store.active ? (
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                          ) : (
+                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Active</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
                           <button onClick={() => setEditingStore(store)} className="text-blue-600 hover:underline text-xs">Edit</button>
@@ -1032,12 +1044,16 @@ export function AdminDashboard() {
                         <td className="px-4 py-3 text-gray-600">{asset.category?.name ?? '—'}</td>
                         <td className="px-4 py-3 text-gray-500 font-mono text-xs">{asset.serialNumber ?? '—'}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            asset.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                            asset.status === 'FAULTY' ? 'bg-red-100 text-red-800' :
-                            asset.status === 'IN_SERVICE' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-600'
-                          }`}>{asset.status.replace('_', ' ')}</span>
+                          {!asset.active ? (
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                          ) : (
+                            <span className={`text-xs px-2 py-1 rounded ${
+                              asset.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                              asset.status === 'FAULTY' ? 'bg-red-100 text-red-800' :
+                              asset.status === 'IN_SERVICE' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>{asset.status.replace('_', ' ')}</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
                           <button onClick={() => setEditingAsset(asset)} className="text-blue-600 hover:underline text-xs">Edit</button>
