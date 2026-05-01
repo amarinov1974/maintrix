@@ -1,3 +1,56 @@
+## Session: 2026-05-02 — Bug fixes, approval chain refactor, HR translations, vendor scope regression
+
+### Overview
+Sesija fokusirana na bug fixeve, redizajn approval chain UI-a, završetak HR prijevoda za vendor flow, i dijagnostika + popravak kritične vendor company scope regresije otkrivene tijekom screenshot reviewa.
+
+### Changes
+
+#### 1. Archive ticket bug fix (commit 6d89c8f)
+- Backend: archiveTicket() sada zahtijeva workOrders.length > 0
+- Frontend: gumb "Arhiviraj prijavu" sakriven kad nema WO-a, disabled s tooltipom kad WO-i nisu svi terminalni
+- Root cause: every([]) === true JavaScript zamka — ticket bez WO-a prolazio je validaciju "svi WO terminalni"
+- Dodani unit testovi za archiveTicket (3 scenarija)
+- REJECT i dalje pokriva "ticket koji ne treba posao" flow
+
+#### 2. Approval chain info refactor (commit 76ad452)
+- Uklonjen verbose "Vaša uloga u lancu odobrenja" info box s AreaManager i Director dashboarda
+- Nova shared komponenta ApprovalChainInfo s role-aware rečenicom i "Kako funkcionira odobrenje?" modalom
+- DirectorDashboard sada prikazuje različitu rečenicu ovisno o roli (D/C2/BOD) na temelju session.role
+- Pragovi (€1.000, €3.000) potvrđeni iz approval-chain-service prije implementacije
+
+#### 3. Vendor company scope regresija — fix (commit ab8c49c)
+- Otkriveno tijekom screenshot reviewa: tri S1 vendor korisnika vidjeli 0 WO-a svuda
+- Root cause: commit fdf56f7 primijenio uniformni ticket.companyId filter bez razlikovanja INTERNAL/VENDOR userTypea — vendor's session.companyId nikad ne matcha ticket.companyId (vendor ≠ retail)
+- Fix: listWorkOrders i getWorkOrder sada grananju po userType
+  - INTERNAL: scope po ticket.companyId
+  - VENDOR: scope po workOrder.vendorCompanyId
+- userType made required u service signature (compiler-enforced prevention budućih regresija iste klase)
+- Dodano 6 unit testova za scope (INTERNAL retail, VENDOR own, cross-tenant, multi-retail, get-by-id varijante)
+
+#### 4. HR prijevodi vendor flow + cleanup (commit 05433be)
+- S1/S2 work order detail modal: prevedeno (Detalji, Poslovnica, Adresa, Kategorija, Oprema, Trenutni status, Akcije, Povijest, Izvršio)
+- QR generation page i modal (shared između SMQRRequiredPage i TicketDetailModal): kompletni HR prijevod
+- "Unit *" → "Jedinica *" u izvještaju rada (S2)
+- Croatian pluralization helper za "radni nalog" (1/2/5 forme)
+- Dodatni stringovi otkriveni tijekom reviewa: error poruke, "Razlog (obavezno)", urgent badge → "Hitno", check-in follow-up
+- Uklonjen "Vaša uloga" info box s S1 i S3 dashboarda (S2 ga nije imao)
+
+#### 5. Tehnički dug dokumentiran (commits 35751e8, a705654)
+- Novi MAINTRIX_TECHNICAL_DEBT.md u root projekta
+- Lessons learned (incident-based), otvoreni dug po prioritetu (visoki/srednji/niski/operativni), bug paterni, vodeći principi
+- Updateano s screenshot review nalazima (2026-05-02): history log labels leak, native browser alert, work report validation, modal scroll UX
+- Vendor scope regresija označena kao popravljena (ab8c49c)
+
+### Known TODO (next session)
+- [ ] Smoke test 6 commita na Railway deploymentu (sutra)
+- [ ] Merge feat/croatian-ui → main nakon uspješnog smoke testa
+- [ ] State transition labels prijevod ("ASSIGN TECHNICIAN", "QR GENERATED", itd. u Povijesti)
+- [ ] Native browser alert za check-in zamijeniti app-level porukom u HR
+- [ ] Work report forma — dodati validaciju (min length, smislene provjere)
+- [ ] Modal scroll UX (sticky action bar pri sljedećem redesignu)
+- [ ] Vitest/PostCSS config fix — testovi se trenutno ne pokreću lokalno
+- [ ] Centralizirani authorization middleware (preventivno za buduće slične regresije)
+
 ## Session: 2026-04-30 — Asset Module Completion
 
 ### Overview
