@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authAPI, type User } from '../api/auth';
 import { SESSION_STORAGE_KEY } from '../api/client';
+import { MaintrixLogo } from '../components/shared/MaintrixLogo';
 
 const INTERNAL_ROLE_ORDER = ['SM', 'AM', 'AMM', 'D', 'C2', 'ADMIN', 'BOD'];
 
@@ -174,14 +175,9 @@ export function EntryScreen() {
       )}
       {showGateForm && (
         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-          <div className="flex items-center justify-center mb-4">
-            <img
-              src="/ntl-logo.png"
-              alt="NTL logo"
-              className="h-16 w-auto object-contain"
-            />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <MaintrixLogo size="md" variant="dark" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Maintrix</h1>
           <p className="text-gray-600 mb-6">Prijavite se za nastavak</p>
           <form
             onSubmit={(e) => {
@@ -231,14 +227,9 @@ export function EntryScreen() {
       {showDemoForm && (
       <>
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <div className="flex items-center justify-center mb-4">
-          <img
-            src="/ntl-logo.png"
-            alt="NTL logo"
-            className="h-16 w-auto object-contain"
-          />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <MaintrixLogo size="md" variant="dark" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Maintrix</h1>
         <p className="text-gray-600 mb-8">Demo način — odabir korisnika</p>
 
         <div className="mb-6">

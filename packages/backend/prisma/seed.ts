@@ -64,7 +64,14 @@ async function main() {
         companyId: retailA.id,
         regionId: northRegion.id,
         name: `Poslovnica ${i} Sjever`,
-        address: `North Address ${i}`,
+        address:
+          i === 1
+            ? 'Varaždinska cesta 12, Čakovec'
+            : i === 2
+              ? 'Ulica kralja Tomislava 45, Varaždin'
+              : i === 3
+                ? 'Koprivnička ulica 8, Koprivnica'
+                : 'Trg bana Josipa Jelačića 3, Bjelovar',
         active: true,
       },
     });
@@ -76,7 +83,14 @@ async function main() {
         companyId: retailA.id,
         regionId: southRegion.id,
         name: `Poslovnica ${i} Jug`,
-        address: `South Address ${i}`,
+        address:
+          i === 5
+            ? 'Splitska ulica 21, Split'
+            : i === 6
+              ? 'Ulica Ante Starčevića 14, Zadar'
+              : i === 7
+                ? 'Dubrovačka cesta 56, Dubrovnik'
+                : 'Šibenska ulica 9, Šibenik',
         active: true,
       },
     });
@@ -147,10 +161,10 @@ async function main() {
   console.log('Creating vendor companies and users...');
 
   const voltaris = await prisma.vendorCompany.create({
-    data: { name: 'Voltaris Electrical Solutions', active: true },
+    data: { name: 'Elektroservis Jadran d.o.o.', active: true },
   });
   const thermacore = await prisma.vendorCompany.create({
-    data: { name: 'ThermaCore HVAC Services', active: true },
+    data: { name: 'Termoklima Projekt d.o.o.', active: true },
   });
 
   const vendorAna = await prisma.vendorUser.create({
@@ -174,42 +188,49 @@ async function main() {
   const vendorJosip = await prisma.vendorUser.create({
     data: { name: 'Josip Jurić', email: 'anthony.marinov@gmail.com', role: 'S3', vendorCompanyId: thermacore.id, active: true },
   });
+  const frigo = await prisma.vendorCompany.create({
+    data: { name: 'Frigo Tehnika Adriatik d.o.o.', active: true },
+  });
+  await prisma.vendorUser.create({
+    data: { name: 'Tomislav Radić', email: 'anthony.marinov@gmail.com', role: 'S1', vendorCompanyId: frigo.id, active: true },
+  });
+  await prisma.vendorUser.create({
+    data: { name: 'Mateo Grgić', email: 'anthony.marinov@gmail.com', role: 'S2', vendorCompanyId: frigo.id, active: true },
+  });
+  await prisma.vendorUser.create({
+    data: { name: 'Filip Jurić', email: 'anthony.marinov@gmail.com', role: 'S3', vendorCompanyId: frigo.id, active: true },
+  });
 
-  console.log('Creating vendor price list (Voltaris Electrical Solutions)...');
+  console.log('Creating vendor price list (Elektroservis Jadran d.o.o.)...');
 
   const priceListData = [
-    // Cables & Wiring
-    { category: 'Cables & Wiring', description: 'NYM-J 3x1.5 mm² (Lighting circuits)', unit: 'meter', pricePerUnit: 1 },
-    { category: 'Cables & Wiring', description: 'NYM-J 3x2.5 mm² (Socket circuits)', unit: 'meter', pricePerUnit: 2 },
-    { category: 'Cables & Wiring', description: 'NYM-J 5x6 mm² (3-phase supply)', unit: 'meter', pricePerUnit: 3.5 },
-    { category: 'Cables & Wiring', description: 'H07V-K 6 mm² (Flexible conductor)', unit: 'meter', pricePerUnit: 4 },
-    { category: 'Cables & Wiring', description: 'Halogen-free cable 3x2.5 (Mall compliant)', unit: 'meter', pricePerUnit: 5 },
-    // Distribution & Protection
-    { category: 'Distribution & Protection', description: 'Distribution board 24M (Flush mounted)', unit: 'piece', pricePerUnit: 145 },
-    { category: 'Distribution & Protection', description: 'Distribution board 36M (Surface mounted)', unit: 'piece', pricePerUnit: 185 },
-    { category: 'Distribution & Protection', description: 'MCB 16A C-curve (1P)', unit: 'piece', pricePerUnit: 12 },
-    { category: 'Distribution & Protection', description: 'MCB 3P 32A (3-phase)', unit: 'piece', pricePerUnit: 38 },
-    { category: 'Distribution & Protection', description: 'RCD 40A 30mA (Type A)', unit: 'piece', pricePerUnit: 65 },
-    { category: 'Distribution & Protection', description: 'SPD Type 2 (3P+N)', unit: 'piece', pricePerUnit: 120 },
-    // Lighting - Retail Grade
-    { category: 'Lighting - Retail Grade', description: 'LED Panel 60x60 (36W 4000K)', unit: 'piece', pricePerUnit: 32 },
-    { category: 'Lighting - Retail Grade', description: 'LED Linear Light (150cm 50W)', unit: 'piece', pricePerUnit: 48 },
-    { category: 'Lighting - Retail Grade', description: 'LED Track Light (30W adjustable)', unit: 'piece', pricePerUnit: 55 },
-    { category: 'Lighting - Retail Grade', description: 'Emergency Exit Light (3h autonomy)', unit: 'piece', pricePerUnit: 42 },
-    { category: 'Lighting - Retail Grade', description: 'Emergency Module Kit (Retrofit)', unit: 'piece', pricePerUnit: 28 },
-    // Installation Accessories
-    { category: 'Installation Accessories', description: 'PVC Conduit Ø25 (Rigid)', unit: 'meter', pricePerUnit: 1 },
-    { category: 'Installation Accessories', description: 'Flexible Conduit Ø20 (Corrugated)', unit: 'meter', pricePerUnit: 1 },
-    { category: 'Installation Accessories', description: 'Cable Tray 100mm (Perforated)', unit: 'meter', pricePerUnit: 14 },
-    { category: 'Installation Accessories', description: 'Junction Box 100x100 (IP54)', unit: 'piece', pricePerUnit: 6 },
-    { category: 'Installation Accessories', description: 'Socket outlet (Modular white)', unit: 'piece', pricePerUnit: 7 },
-    { category: 'Installation Accessories', description: 'Light switch (Modular white)', unit: 'piece', pricePerUnit: 6 },
-    // Power & Special Equipment
-    { category: 'Power & Special Equipment', description: 'Industrial socket 32A (5P 400V)', unit: 'piece', pricePerUnit: 28 },
-    { category: 'Power & Special Equipment', description: 'Industrial plug 32A (5P 400V)', unit: 'piece', pricePerUnit: 22 },
-    { category: 'Power & Special Equipment', description: 'EV Charger 22kW (Wallbox)', unit: 'piece', pricePerUnit: 890 },
-    { category: 'Power & Special Equipment', description: 'Data cabinet 12U (Wall mounted)', unit: 'piece', pricePerUnit: 165 },
-    { category: 'Power & Special Equipment', description: 'CAT6 cable (305m box)', unit: 'box', pricePerUnit: 95 },
+    { category: 'Kabeli i ožičenje', description: 'NYM-J 3x1.5 mm² (Strujni krug rasvjete)', unit: 'metar', pricePerUnit: 1 },
+    { category: 'Kabeli i ožičenje', description: 'NYM-J 3x2.5 mm² (Strujni krug utičnica)', unit: 'metar', pricePerUnit: 2 },
+    { category: 'Kabeli i ožičenje', description: 'NYM-J 5x6 mm² (Trofazni napajanje)', unit: 'metar', pricePerUnit: 3.5 },
+    { category: 'Kabeli i ožičenje', description: 'H07V-K 6 mm² (Fleksibilni vodič)', unit: 'metar', pricePerUnit: 4 },
+    { category: 'Kabeli i ožičenje', description: 'Halogeni kabel 3x2.5 (Sukladno normama)', unit: 'metar', pricePerUnit: 5 },
+    { category: 'Razvodni ormarići i zaštita', description: 'Razvodni ormarić 24M (Ugradni)', unit: 'komad', pricePerUnit: 145 },
+    { category: 'Razvodni ormarići i zaštita', description: 'Razvodni ormarić 36M (Nadžbukni)', unit: 'komad', pricePerUnit: 185 },
+    { category: 'Razvodni ormarići i zaštita', description: 'Automatski osigurač 16A C-krivulja (1P)', unit: 'komad', pricePerUnit: 12 },
+    { category: 'Razvodni ormarići i zaštita', description: 'Automatski osigurač 3P 32A (Trofazni)', unit: 'komad', pricePerUnit: 38 },
+    { category: 'Razvodni ormarići i zaštita', description: 'Diferencijalni osigurač 40A 30mA (Tip A)', unit: 'komad', pricePerUnit: 65 },
+    { category: 'Razvodni ormarići i zaštita', description: 'Odvodnik prenapona Tip 2 (3P+N)', unit: 'komad', pricePerUnit: 120 },
+    { category: 'Rasvjeta', description: 'LED Panel 60x60 (36W 4000K)', unit: 'komad', pricePerUnit: 32 },
+    { category: 'Rasvjeta', description: 'LED Linearno svjetlo (150cm 50W)', unit: 'komad', pricePerUnit: 48 },
+    { category: 'Rasvjeta', description: 'LED Track Light (30W podesivi)', unit: 'komad', pricePerUnit: 55 },
+    { category: 'Rasvjeta', description: 'Panik svjetlo (3h autonomija)', unit: 'komad', pricePerUnit: 42 },
+    { category: 'Rasvjeta', description: 'Modul za panik rasvjetu (Retrofit)', unit: 'komad', pricePerUnit: 28 },
+    { category: 'Instalacijski pribor', description: 'PVC cijev Ø25 (Kruta)', unit: 'metar', pricePerUnit: 1 },
+    { category: 'Instalacijski pribor', description: 'Fleksibilna cijev Ø20 (Valovita)', unit: 'metar', pricePerUnit: 1 },
+    { category: 'Instalacijski pribor', description: 'Kabelska polica 100mm (Perforirana)', unit: 'metar', pricePerUnit: 14 },
+    { category: 'Instalacijski pribor', description: 'Razvodna kutija 100x100 (IP54)', unit: 'komad', pricePerUnit: 6 },
+    { category: 'Instalacijski pribor', description: 'Utičnica (Modularna bijela)', unit: 'komad', pricePerUnit: 7 },
+    { category: 'Instalacijski pribor', description: 'Prekidač (Modularni bijeli)', unit: 'komad', pricePerUnit: 6 },
+    { category: 'Posebna oprema', description: 'Industrijska utičnica 32A (5P 400V)', unit: 'komad', pricePerUnit: 28 },
+    { category: 'Posebna oprema', description: 'Industrijski utikač 32A (5P 400V)', unit: 'komad', pricePerUnit: 22 },
+    { category: 'Posebna oprema', description: 'Punjač za el. vozila 22kW (Wallbox)', unit: 'komad', pricePerUnit: 890 },
+    { category: 'Posebna oprema', description: 'Mrežni ormarić 12U (Zidni)', unit: 'komad', pricePerUnit: 165 },
+    { category: 'Posebna oprema', description: 'CAT6 kabel (Kutija 305m)', unit: 'kutija', pricePerUnit: 95 },
   ];
 
   const priceListItems: { id: number }[] = [];
@@ -227,13 +248,13 @@ async function main() {
     priceListItems.push(item);
   }
 
-  // Voltaris billing rules: not selectable in UI; applied automatically per intervention
+  // Elektroservis Jadran billing rules: not selectable in UI; applied automatically per intervention
   await prisma.vendorPriceListItem.create({
     data: {
       vendorId: voltaris.id,
-      category: 'Fixed Fees',
-      description: 'Arrival to location',
-      unit: 'arrival',
+      category: 'Fiksne naknade',
+      description: 'Dolazak na lokaciju',
+      unit: 'dolazak',
       pricePerUnit: 50,
       active: true,
       selectableInUI: false,
@@ -243,42 +264,42 @@ async function main() {
   await prisma.vendorPriceListItem.create({
     data: {
       vendorId: voltaris.id,
-      category: 'Labor',
-      description: 'Service time (15 min units)',
-      unit: '15 min',
-      pricePerUnit: 10,
+      category: 'Radni sat',
+      description: 'Radni sat',
+      unit: 'sat',
+      pricePerUnit: 40,
       active: true,
       selectableInUI: false,
-      unitMinutes: 15,
+      unitMinutes: 60,
     },
   });
 
-  console.log('Creating vendor price list (ThermaCore HVAC Services)...');
+  console.log('Creating vendor price list (Termoklima Projekt d.o.o.)...');
   const thermacorePriceListData = [
-    { category: 'Air Conditioning Units', description: 'Split AC Set (3.5 kW inverter indoor + outdoor)', unit: 'set', pricePerUnit: 780 },
-    { category: 'Air Conditioning Units', description: 'Split AC Set (5.0 kW inverter)', unit: 'set', pricePerUnit: 980 },
-    { category: 'Air Conditioning Units', description: 'Cassette AC Unit (5.3 kW commercial ceiling type)', unit: 'set', pricePerUnit: 1450 },
-    { category: 'Air Conditioning Units', description: 'VRF Indoor Unit (Wall mounted)', unit: 'unit', pricePerUnit: 620 },
-    { category: 'Air Conditioning Units', description: 'VRF Outdoor Unit (20 kW system)', unit: 'unit', pricePerUnit: 4800 },
-    { category: 'Ventilation Equipment', description: 'Inline Duct Fan (250 mm)', unit: 'piece', pricePerUnit: 190 },
-    { category: 'Ventilation Equipment', description: 'Roof Ventilator (Commercial type)', unit: 'piece', pricePerUnit: 420 },
-    { category: 'Ventilation Equipment', description: 'Heat Recovery Unit HRV (800 m³/h)', unit: 'unit', pricePerUnit: 1350 },
-    { category: 'Ventilation Equipment', description: 'Air Handling Unit AHU (5,000 m³/h)', unit: 'unit', pricePerUnit: 6800 },
-    { category: 'Ducting & Distribution', description: 'Spiral Duct Ø200 (Galvanized)', unit: 'meter', pricePerUnit: 18 },
-    { category: 'Ducting & Distribution', description: 'Rectangular Duct (500x300 mm)', unit: 'meter', pricePerUnit: 32 },
-    { category: 'Ducting & Distribution', description: 'Flexible Insulated Duct (Ø160)', unit: 'meter', pricePerUnit: 9 },
-    { category: 'Ducting & Distribution', description: 'Air Diffuser (4-way ceiling)', unit: 'piece', pricePerUnit: 38 },
-    { category: 'Ducting & Distribution', description: 'Linear Slot Diffuser (1 meter)', unit: 'piece', pricePerUnit: 85 },
-    { category: 'Refrigeration Components', description: 'Copper Pipe 1/4" (Refrigerant line)', unit: 'meter', pricePerUnit: 6 },
-    { category: 'Refrigeration Components', description: 'Copper Pipe 3/8" (Refrigerant line)', unit: 'meter', pricePerUnit: 9 },
-    { category: 'Refrigeration Components', description: 'Insulation Tube (For copper pipes)', unit: 'meter', pricePerUnit: 3 },
-    { category: 'Refrigeration Components', description: 'Condensate Pump (Mini pump)', unit: 'piece', pricePerUnit: 95 },
-    { category: 'Heating Equipment', description: 'Gas Boiler (35 kW commercial)', unit: 'unit', pricePerUnit: 2600 },
-    { category: 'Heating Equipment', description: 'Electric Boiler (24 kW)', unit: 'unit', pricePerUnit: 950 },
-    { category: 'Heating Equipment', description: 'Circulation Pump (High efficiency)', unit: 'piece', pricePerUnit: 220 },
-    { category: 'Controls & Accessories', description: 'Wall Thermostat (Digital programmable)', unit: 'piece', pricePerUnit: 75 },
-    { category: 'Controls & Accessories', description: 'Smart Thermostat (WiFi enabled)', unit: 'piece', pricePerUnit: 180 },
-    { category: 'Controls & Accessories', description: 'Control Panel (For AHU systems)', unit: 'piece', pricePerUnit: 650 },
+    { category: 'Klima uređaji', description: 'Split klima (3,5 kW inverter, unutarnja + vanjska)', unit: 'set', pricePerUnit: 780 },
+    { category: 'Klima uređaji', description: 'Split klima (5,0 kW inverter)', unit: 'set', pricePerUnit: 980 },
+    { category: 'Klima uređaji', description: 'Kazetna klima (5,3 kW komercijalna, stropna)', unit: 'set', pricePerUnit: 1450 },
+    { category: 'Klima uređaji', description: 'VRF unutarnja jedinica (Zidna)', unit: 'komad', pricePerUnit: 620 },
+    { category: 'Klima uređaji', description: 'VRF vanjska jedinica (Sustav 20 kW)', unit: 'komad', pricePerUnit: 4800 },
+    { category: 'Ventilacijska oprema', description: 'Kanalni ventilator (250 mm)', unit: 'komad', pricePerUnit: 190 },
+    { category: 'Ventilacijska oprema', description: 'Krovni ventilator (Komercijalni)', unit: 'komad', pricePerUnit: 420 },
+    { category: 'Ventilacijska oprema', description: 'Rekuperator topline HRV (800 m³/h)', unit: 'komad', pricePerUnit: 1350 },
+    { category: 'Ventilacijska oprema', description: 'Klimatizacijska jedinica AHU (5.000 m³/h)', unit: 'komad', pricePerUnit: 6800 },
+    { category: 'Kanali i distribucija', description: 'Spiralni kanal Ø200 (Pocinčani)', unit: 'metar', pricePerUnit: 18 },
+    { category: 'Kanali i distribucija', description: 'Pravokutni kanal (500x300 mm)', unit: 'metar', pricePerUnit: 32 },
+    { category: 'Kanali i distribucija', description: 'Fleksibilni izolirani kanal (Ø160)', unit: 'metar', pricePerUnit: 9 },
+    { category: 'Kanali i distribucija', description: 'Stropna rešetka (4-smjerna)', unit: 'komad', pricePerUnit: 38 },
+    { category: 'Kanali i distribucija', description: 'Linearna rešetka (1 metar)', unit: 'komad', pricePerUnit: 85 },
+    { category: 'Rashladne komponente', description: 'Bakrena cijev 1/4" (Rashladni vod)', unit: 'metar', pricePerUnit: 6 },
+    { category: 'Rashladne komponente', description: 'Bakrena cijev 3/8" (Rashladni vod)', unit: 'metar', pricePerUnit: 9 },
+    { category: 'Rashladne komponente', description: 'Izolacijska cijev (Za bakrene cijevi)', unit: 'metar', pricePerUnit: 3 },
+    { category: 'Rashladne komponente', description: 'Kondenzatna pumpa (Mini pumpa)', unit: 'komad', pricePerUnit: 95 },
+    { category: 'Grijanje', description: 'Plinski kotao (35 kW komercijalni)', unit: 'komad', pricePerUnit: 2600 },
+    { category: 'Grijanje', description: 'Električni bojler (24 kW)', unit: 'komad', pricePerUnit: 950 },
+    { category: 'Grijanje', description: 'Cirkulacijska pumpa (Visoka učinkovitost)', unit: 'komad', pricePerUnit: 220 },
+    { category: 'Upravljanje i pribor', description: 'Zidni termostat (Digitalni programabilni)', unit: 'komad', pricePerUnit: 75 },
+    { category: 'Upravljanje i pribor', description: 'Pametni termostat (WiFi)', unit: 'komad', pricePerUnit: 180 },
+    { category: 'Upravljanje i pribor', description: 'Upravljačka ploča (Za AHU sustave)', unit: 'komad', pricePerUnit: 650 },
   ];
   for (const row of thermacorePriceListData) {
     await prisma.vendorPriceListItem.create({
@@ -292,13 +313,13 @@ async function main() {
       },
     });
   }
-  // ThermaCore billing rules: not selectable in UI; applied automatically per intervention
+  // Termoklima Projekt billing rules: not selectable in UI; applied automatically per intervention
   await prisma.vendorPriceListItem.create({
     data: {
       vendorId: thermacore.id,
-      category: 'Fixed Fees',
-      description: 'Arrival to location',
-      unit: 'arrival',
+      category: 'Fiksne naknade',
+      description: 'Dolazak na lokaciju',
+      unit: 'dolazak',
       pricePerUnit: 55,
       active: true,
       selectableInUI: false,
@@ -308,13 +329,76 @@ async function main() {
   await prisma.vendorPriceListItem.create({
     data: {
       vendorId: thermacore.id,
-      category: 'Labor',
-      description: 'Service time (15 min units)',
-      unit: '15 min',
-      pricePerUnit: 11,
+      category: 'Radni sat',
+      description: 'Radni sat',
+      unit: 'sat',
+      pricePerUnit: 44,
       active: true,
       selectableInUI: false,
-      unitMinutes: 15,
+      unitMinutes: 60,
+    },
+  });
+
+  console.log('Creating vendor price list (Frigo Tehnika Adriatik d.o.o.)...');
+
+  const frigoPriceListData = [
+    { category: 'Rashladni uređaji', description: 'Rashladni agregat (5 kW, zrak-voda)', unit: 'komad', pricePerUnit: 2200 },
+    { category: 'Rashladni uređaji', description: 'Kondenzatorska jedinica (10 kW)', unit: 'komad', pricePerUnit: 1800 },
+    { category: 'Rashladni uređaji', description: 'Isparivač (Stropni, 3 kW)', unit: 'komad', pricePerUnit: 650 },
+    { category: 'Rashladni uređaji', description: 'Hladnjak vode (Chiller 20 kW)', unit: 'komad', pricePerUnit: 8500 },
+    { category: 'Rashladni uređaji', description: 'Rashladna komora (10 m³, montažna)', unit: 'komad', pricePerUnit: 6200 },
+    { category: 'Kompresori i pumpe', description: 'Hermetički kompresor (1,5 kW)', unit: 'komad', pricePerUnit: 480 },
+    { category: 'Kompresori i pumpe', description: 'Scroll kompresor (5 kW)', unit: 'komad', pricePerUnit: 1200 },
+    { category: 'Kompresori i pumpe', description: 'Rashladna pumpa (Visoki tlak)', unit: 'komad', pricePerUnit: 380 },
+    { category: 'Rashladni medij i komponente', description: 'Rashladni medij R32 (Boca 10 kg)', unit: 'boca', pricePerUnit: 95 },
+    { category: 'Rashladni medij i komponente', description: 'Rashladni medij R410A (Boca 10 kg)', unit: 'boca', pricePerUnit: 110 },
+    { category: 'Rashladni medij i komponente', description: 'Ekspanzijski ventil (Termostatski)', unit: 'komad', pricePerUnit: 85 },
+    { category: 'Rashladni medij i komponente', description: 'Filter isušivač (Inline, 3/8")', unit: 'komad', pricePerUnit: 25 },
+    { category: 'Rashladni medij i komponente', description: 'Stakleno oko (Indikator vlage)', unit: 'komad', pricePerUnit: 18 },
+    { category: 'Izolacija i cijevi', description: 'Bakrena cijev 1/2" (Rashladni vod)', unit: 'metar', pricePerUnit: 12 },
+    { category: 'Izolacija i cijevi', description: 'Bakrena cijev 5/8" (Rashladni vod)', unit: 'metar', pricePerUnit: 16 },
+    { category: 'Izolacija i cijevi', description: 'Armaflex izolacija 19mm (Ø22)', unit: 'metar', pricePerUnit: 8 },
+    { category: 'Upravljanje i automatika', description: 'Elektronski regulator temperature', unit: 'komad', pricePerUnit: 145 },
+    { category: 'Upravljanje i automatika', description: 'Presostat niskog tlaka', unit: 'komad', pricePerUnit: 55 },
+    { category: 'Upravljanje i automatika', description: 'Presostat visokog tlaka', unit: 'komad', pricePerUnit: 55 },
+    { category: 'Upravljanje i automatika', description: 'Upravljačka ploča rashladnog sustava', unit: 'komad', pricePerUnit: 420 },
+  ];
+
+  for (const row of frigoPriceListData) {
+    await prisma.vendorPriceListItem.create({
+      data: {
+        vendorId: frigo.id,
+        category: row.category,
+        description: row.description,
+        unit: row.unit,
+        pricePerUnit: row.pricePerUnit,
+        active: true,
+      },
+    });
+  }
+
+  await prisma.vendorPriceListItem.create({
+    data: {
+      vendorId: frigo.id,
+      category: 'Fiksne naknade',
+      description: 'Dolazak na lokaciju',
+      unit: 'dolazak',
+      pricePerUnit: 60,
+      active: true,
+      selectableInUI: false,
+      unitMinutes: null,
+    },
+  });
+  await prisma.vendorPriceListItem.create({
+    data: {
+      vendorId: frigo.id,
+      category: 'Radni sat',
+      description: 'Radni sat',
+      unit: 'sat',
+      pricePerUnit: 48,
+      active: true,
+      selectableInUI: false,
+      unitMinutes: 60,
     },
   });
 

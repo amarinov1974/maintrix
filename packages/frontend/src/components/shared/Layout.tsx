@@ -5,6 +5,7 @@
 
 import { Link } from 'react-router-dom';
 import { useSession } from '../../contexts/SessionContext';
+import { MaintrixLogo } from './MaintrixLogo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -29,12 +30,7 @@ export function Layout({
       <header style={{ backgroundColor: 'var(--color-header)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="max-w-6xl mx-auto px-6 py-0 flex justify-between items-center" style={{ height: '56px' }}>
           <div className="flex items-center gap-4">
-            <img
-              src="/ntl-logo.png"
-              alt="Maintrix"
-              className="h-7 w-auto object-contain"
-              style={{ filter: 'brightness(0) invert(1)' }}
-            />
+            <MaintrixLogo size="sm" variant="light" />
             <div style={{ width: '1px', height: '20px', backgroundColor: 'rgba(255,255,255,0.15)' }} />
             {screenTitle != null && (
               <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.01em' }}>
