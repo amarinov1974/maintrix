@@ -72,7 +72,7 @@ export function S1WorkOrderList({
                 <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
               )}
               <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                <span>Category: {wo.category ? formatCategory(wo.category) : '—'}</span>
+                <span>Kategorija: {wo.category ? formatCategory(wo.category) : '—'}</span>
                 <span>•</span>
                 <span>Komentar VMO: {shortComment(wo.commentToVendor)}</span>
                 <span>•</span>

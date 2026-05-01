@@ -14,6 +14,15 @@ import { QRGenerationModal } from './QRGenerationModal';
 import { WorkOrderStatus } from '../../types/statuses';
 import type { WorkOrder } from '../../api/work-orders';
 
+/** Croatian plural: radni nalog / radna naloga / radnih naloga */
+function formatRadnihNaloga(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${n} radni nalog`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} radna naloga`;
+  return `${n} radnih naloga`;
+}
+
 export function SMQRRequiredPage() {
   const { session } = useSession();
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
@@ -93,27 +102,27 @@ export function SMQRRequiredPage() {
       : [];
 
   return (
-    <Layout screenTitle="QR Generation Required">
+    <Layout screenTitle="Potrebno generiranje QR koda">
       <div className="max-w-3xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              QR Generation Required
+              Potrebno generiranje QR koda
             </h1>
             <p className="text-sm text-gray-600 mt-0.5">
-              Work orders with technician assigned or follow-up visit needed — generate QR for check-in or check-out
+              Radni nalozi s dodijeljenim tehničarima ili s potrebnim ponovnim posjetom — generirajte QR za prijavu dolaska ili odjavu s posla.
             </p>
           </div>
           <Link to="/store-manager">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
 
         {qrTicketIds.length === 0 ? (
           <Card className="bg-gray-50 p-6 text-center text-gray-600">
-            No tickets requiring QR right now.
+            Trenutno nema prijava koje zahtijevaju QR.
           </Card>
         ) : (
           <div className="space-y-3">
@@ -125,13 +134,13 @@ export function SMQRRequiredPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="font-semibold text-gray-900">
-                          Ticket #{ticketId}
+                          Prijava #{ticketId}
                         </span>
                         {wos.some((wo) => wo.urgent) && (
-                          <Badge variant="danger">Urgent</Badge>
+                          <Badge variant="danger">Hitno</Badge>
                         )}
                         <span className="text-sm text-gray-500">
-                          {wos.length} work order{wos.length > 1 ? 's' : ''}
+                          {formatRadnihNaloga(wos.length)}
                         </span>
                       </div>
                       <ul className="space-y-1.5 text-sm text-gray-700">
@@ -162,7 +171,10 @@ export function SMQRRequiredPage() {
                           setQrMode('checkin');
                         }}
                       >
-                        Check-in{wos.some((wo) => wo.currentStatus === WorkOrderStatus.FOLLOW_UP_REQUESTED) ? ' (follow-up)' : ''}
+                        Prijava dolaska
+                        {wos.some((wo) => wo.currentStatus === WorkOrderStatus.FOLLOW_UP_REQUESTED)
+                          ? ' (ponovni posjet)'
+                          : ''}
                       </Button>
                       <Button
                         type="button"
@@ -173,7 +185,7 @@ export function SMQRRequiredPage() {
                           setQrMode('checkout');
                         }}
                       >
-                        Check-out
+                        Odjava s posla
                       </Button>
                     </div>
                   </div>

@@ -123,13 +123,13 @@ export function QRGenerationModal({
       <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-900">
-            Generate QR — Ticket #{ticketId}
+            Generiraj QR — Prijava #{ticketId}
           </h2>
           <button
             type="button"
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 text-2xl"
-            aria-label="Close"
+            aria-label="Zatvori"
           >
             ×
           </button>
@@ -139,7 +139,7 @@ export function QRGenerationModal({
           {workOrders.length > 1 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Vendor (Work Order)
+                Izvođač (radni nalog)
               </label>
               <select
                 value={selectedWorkOrderId ?? ''}
@@ -149,7 +149,7 @@ export function QRGenerationModal({
                 }}
                 className="w-full p-3 border border-gray-300 rounded-lg"
               >
-                <option value="">— Select vendor —</option>
+                <option value="">— Odaberite izvođača —</option>
                 {workOrders.map((w) => (
                   <option key={w.id} value={w.id}>
                     {w.vendorCompanyName} — WO #{w.id}
@@ -162,14 +162,14 @@ export function QRGenerationModal({
           {wo?.currentStatus !== 'Service In Progress' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of technicians arrived *
+                Broj tehničara koji su stigli *
               </label>
               <input
                 type="number"
                 min={1}
                 value={techCount}
                 onChange={(e) => setTechCount(e.target.value)}
-                placeholder="e.g. 2"
+                placeholder="npr. 2"
                 className="w-full p-3 border border-gray-300 rounded-lg"
               />
             </div>
@@ -181,22 +181,21 @@ export function QRGenerationModal({
               onClick={handleGenerate}
               disabled={!canGenerate}
             >
-              {generateMutation.isPending ? 'Generating...' : 'Generate QR Code'}
+              {generateMutation.isPending ? 'Generiranje...' : 'Generiraj QR kod'}
             </Button>
           ) : (
             <div className="space-y-4 pt-2">
               <p className="text-sm text-green-700 font-medium">
                 {wo?.currentStatus === 'Service In Progress'
-                  ? 'QR for check-out. '
-                  : 'QR for check-in. '}
-                Refreshes every 5 minutes; invalid after use.
+                  ? 'QR za odjavu s posla. Osvježava se svakih 5 minuta; nevažeći nakon upotrebe.'
+                  : 'QR za prijavu dolaska. Osvježava se svakih 5 minuta; nevažeći nakon upotrebe.'}
               </p>
               <div className="flex justify-center p-4 bg-gray-50 rounded-lg">
                 <QRCodeSVG value={generated.qrToken} size={200} level="M" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Text version (copy &amp; paste)
+                  Tekstualna verzija (kopiraj i zalijepi)
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -211,15 +210,15 @@ export function QRGenerationModal({
                     size="sm"
                     onClick={handleCopyToken}
                   >
-                    {copyFeedback ? 'Copied!' : 'Copy'}
+                    {copyFeedback ? 'Kopirano!' : 'Kopiraj'}
                   </Button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Technician can scan the QR or paste this token manually.
+                  Tehničar može skenirati QR ili ručno unijeti token.
                 </p>
               </div>
               <p className="text-xs text-gray-500">
-                Expires:{' '}
+                Istječe:{' '}
                 {new Date(generated.expirationTs).toLocaleString()}
               </p>
               <Button
@@ -227,7 +226,7 @@ export function QRGenerationModal({
                 variant="secondary"
                 onClick={() => setGenerated(null)}
               >
-                Generate another
+                Generiraj novi
               </Button>
             </div>
           )}
@@ -236,14 +235,14 @@ export function QRGenerationModal({
             <p className="text-sm text-red-600">
               {generateMutation.error instanceof Error
                 ? generateMutation.error.message
-                : 'Failed to generate QR'}
+                : 'Generiranje QR koda nije uspjelo'}
             </p>
           )}
         </div>
 
         <div className="p-6 border-t border-gray-200">
           <Button type="button" variant="secondary" onClick={handleClose} className="w-full">
-            Close
+            Zatvori
           </Button>
         </div>
       </div>

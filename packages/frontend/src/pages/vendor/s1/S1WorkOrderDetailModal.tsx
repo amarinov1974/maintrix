@@ -81,9 +81,9 @@ export function S1WorkOrderDetailModal({
           <div className="p-6 border-b border-gray-200">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Work Order Detail</h1>
+                <h1 className="text-xl font-bold text-gray-900">Detalji radnog naloga</h1>
                 <p className="text-sm text-gray-600 mt-1">
-                  WO #{wo.id} • Ticket #{wo.ticketId}
+                  WO #{wo.id} • Prijava #{wo.ticketId}
                 </p>
                 <Badge
                   variant={wo.urgent ? 'danger' : 'secondary'}
@@ -100,20 +100,20 @@ export function S1WorkOrderDetailModal({
 
           <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Details</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Detalji</h2>
               <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
                 <div>
-                  <span className="text-gray-600">Store:</span>{' '}
+                  <span className="text-gray-600">Poslovnica:</span>{' '}
                   {wo.storeName ?? '—'}
                 </div>
                 {wo.storeAddress != null && wo.storeAddress !== '' && (
                   <div>
-                    <span className="text-gray-600">Address:</span>{' '}
+                    <span className="text-gray-600">Adresa:</span>{' '}
                     {wo.storeAddress}
                   </div>
                 )}
                 <div>
-                  <span className="text-gray-600">Category:</span>{' '}
+                  <span className="text-gray-600">Kategorija:</span>{' '}
                   {wo.category ? formatCategory(wo.category) : '—'}
                 </div>
                 <div>
@@ -122,13 +122,13 @@ export function S1WorkOrderDetailModal({
                 </div>
                 {wo.assetDescription != null && wo.assetDescription !== '' && (
                   <div>
-                    <span className="text-gray-600">Asset:</span>{' '}
+                    <span className="text-gray-600">Oprema:</span>{' '}
                     {wo.assetDescription}
                   </div>
                 )}
                 {wo.attachments != null && wo.attachments.length > 0 && (
                   <div>
-                    <span className="text-gray-600">Attachments:</span>
+                    <span className="text-gray-600">Privici:</span>
                     <ul className="list-disc list-inside mt-1">
                       {wo.attachments.map((a) => (
                         <li key={a.id}>{a.fileName}</li>
@@ -137,12 +137,12 @@ export function S1WorkOrderDetailModal({
                   </div>
                 )}
                 <div>
-                  <span className="text-gray-600">Current status:</span>{' '}
+                  <span className="text-gray-600">Trenutni status:</span>{' '}
                   <strong>{formatStatus(wo.currentStatus)}</strong>
                 </div>
                 {wo.assignedTechnicianId != null && (
                   <div>
-                    <span className="text-gray-600">Assigned to (owner):</span>{' '}
+                    <span className="text-gray-600">Dodijeljeno (vlasnik):</span>{' '}
                     <strong>{wo.assignedTechnicianName ?? 'Tehničar'}</strong>
                   </div>
                 )}
@@ -151,7 +151,7 @@ export function S1WorkOrderDetailModal({
 
             {canAct && (
               <section className="space-y-4 border-t pt-4">
-                <h2 className="font-semibold text-gray-900">Actions</h2>
+                <h2 className="font-semibold text-gray-900">Akcije</h2>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <Button
                     type="button"
@@ -222,7 +222,7 @@ export function S1WorkOrderDetailModal({
                   ) : (
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-red-900">
-                        Reason (mandatory)
+                        Razlog (obavezno)
                       </label>
                       <textarea
                         value={rejectReason}
@@ -264,7 +264,7 @@ export function S1WorkOrderDetailModal({
             {/* History — work order workflow (statuses + comments) */}
             {wo.auditLog != null && wo.auditLog.length > 0 && (
               <section>
-                <h3 className="font-semibold text-gray-900 mb-2">History</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
                 <div className="space-y-2">
                   {wo.auditLog.map((entry) => (
                     <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
@@ -275,7 +275,7 @@ export function S1WorkOrderDetailModal({
                         <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                       )}
                       <p className="mt-1 text-gray-600">
-                        Performed by {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
+                        Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                       </p>
                       {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
                     </div>
@@ -289,7 +289,7 @@ export function S1WorkOrderDetailModal({
                 <p className="text-sm text-red-700">
                   {(returnMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
                     (rejectMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                    'Action failed'}
+                    'Radnja nije uspjela'}
                 </p>
               </div>
             )}

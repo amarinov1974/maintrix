@@ -185,7 +185,7 @@ export function S2WorkOrderDetailModal({
                     </ul>
                   </div>
                 )}
-                <div><span className="text-gray-600">Status:</span> <strong>{formatStatus(wo.currentStatus)}</strong></div>
+                <div><span className="text-gray-600">Trenutni status:</span> <strong>{formatStatus(wo.currentStatus)}</strong></div>
               </div>
             </section>
 
@@ -214,7 +214,7 @@ export function S2WorkOrderDetailModal({
                         <tr className="border-b border-gray-200">
                           <th className="text-left p-2">#</th>
                           <th className="text-left p-2">Opis *</th>
-                          <th className="text-left p-2">Unit *</th>
+                          <th className="text-left p-2">Jedinica *</th>
                           <th className="text-left p-2">Količina *</th>
                         </tr>
                       </thead>

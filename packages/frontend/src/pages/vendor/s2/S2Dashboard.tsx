@@ -85,7 +85,7 @@ export function S2Dashboard() {
                           <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
                         )}
                         <p className="text-sm text-gray-600">
-                          Category: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
+                          Kategorija: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
                         </p>
                       </Card>
                     ))}
@@ -114,7 +114,7 @@ export function S2Dashboard() {
                         <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
                       )}
                       <p className="text-sm text-gray-600">
-                        Category: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
+                        Kategorija: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
                       </p>
                     </Card>
                   ))}

@@ -91,18 +91,6 @@ export function S3Dashboard() {
   return (
     <Layout screenTitle="Nadzorna ploča">
       <div className="space-y-6">
-        <Card className="bg-blue-50 border-blue-200">
-          <div className="flex items-start gap-3">
-            <div className="text-blue-600 text-2xl">💰</div>
-            <div>
-              <h3 className="font-medium text-blue-900 mb-1">Vaša uloga</h3>
-              <p className="text-sm text-blue-700">
-                Pripremite ponude troška (rad + materijal), ponovo pošaljite nakon revizije, pregledajte odobrene ili zatvorene naloge.
-              </p>
-            </div>
-          </div>
-        </Card>
-
         {isLoading ? (
           <Card>
             <p className="text-gray-600">Učitavanje radnih naloga...</p>

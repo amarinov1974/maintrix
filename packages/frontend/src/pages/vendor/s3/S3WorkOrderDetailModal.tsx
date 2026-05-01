@@ -498,7 +498,7 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-xl font-bold text-gray-900">Detalji radnog naloga</h1>
-              <p className="text-sm text-gray-600 mt-1">WO #{wo.id} • Ticket #{wo.ticketId}</p>
+              <p className="text-sm text-gray-600 mt-1">WO #{wo.id} • Prijava #{wo.ticketId}</p>
               <Badge variant={wo.urgent ? 'danger' : 'secondary'} className="mt-2">
                 {wo.urgent ? 'Hitno' : 'Nije hitno'}
               </Badge>

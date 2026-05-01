@@ -93,18 +93,6 @@ export function S1Dashboard() {
   return (
     <Layout screenTitle="Nadzorna ploča">
       <div className="space-y-6">
-        <Card className="bg-blue-50 border-blue-200">
-          <div className="flex items-start gap-3">
-            <div className="text-blue-600 text-2xl">👷</div>
-            <div>
-              <h3 className="font-medium text-blue-900 mb-1">Vaša uloga</h3>
-              <p className="text-sm text-blue-700">
-                Dodijelite tehničare novim radnim nalozima, postavite ETA ili odbijte. Aktivni i arhivirani su samo za pregled.
-              </p>
-            </div>
-          </div>
-        </Card>
-
         {listMode != null ? (
           <S1WorkOrderList
             items={listItems}
