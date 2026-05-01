@@ -12,6 +12,7 @@ import { Layout, Card, Badge, Button } from '../../components/shared';
 import { DirectorTicketDetailModal } from './DirectorTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
+import { formatCategory } from '../../utils/formatters';
 
 function getRoleLabel(role: string) {
   if (role === 'D') return 'Direktor prodaje';
@@ -135,7 +136,7 @@ export function DirectorDashboard() {
                     <div className="flex gap-4 text-sm text-gray-600 flex-wrap">
                       <span>Poslovnica: {ticket.storeName}</span>
                       <span>•</span>
-                      <span>Kategorija: {ticket.category}</span>
+                      <span>Kategorija: {formatCategory(ticket.category)}</span>
                       <span>•</span>
                       <span>Kreirao: {ticket.createdByUserName}</span>
                     </div>

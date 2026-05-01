@@ -12,6 +12,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Card, Badge } from '../../components/shared';
 import { TicketDetailModal } from './TicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
+import { formatCategory } from '../../utils/formatters';
 
 function getStatusBadgeVariant(
   status: string
@@ -347,7 +348,7 @@ export function StoreManagerDashboard() {
                       <Badge variant="urgent">URGENT</Badge>
                     )}
                     <span className="text-sm text-gray-600">
-                      {ticket.category}
+                      {formatCategory(ticket.category)}
                     </span>
                     <span className="text-sm text-gray-500">
                       Zadnja izmjena{' '}

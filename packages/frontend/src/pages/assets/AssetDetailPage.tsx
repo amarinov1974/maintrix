@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { Layout } from '../../components/shared/Layout';
 import { apiClient } from '../../api/client';
+import { formatCategory } from '../../utils/formatters';
 
 type AssetStatus = 'ACTIVE' | 'FAULTY' | 'IN_SERVICE' | 'DECOMMISSIONED';
 
@@ -274,7 +275,7 @@ export function AssetDetailPage() {
                     {asset.tickets.map((ticket) => (
                       <tr key={ticket.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-gray-900 font-medium">#{ticket.id}</td>
-                        <td className="px-4 py-3 text-gray-600">{ticket.category}</td>
+                        <td className="px-4 py-3 text-gray-600">{formatCategory(ticket.category)}</td>
                         <td className="px-4 py-3">
                           <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700">
                             {ticket.currentStatus}
@@ -307,7 +308,7 @@ export function AssetDetailPage() {
                   {asset.workOrders.map((workOrder) => (
                     <tr key={workOrder.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-gray-900 font-medium">#{workOrder.id}</td>
-                      <td className="px-4 py-3 text-gray-600">{workOrder.ticket.category}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatCategory(workOrder.ticket.category)}</td>
                       <td className="px-4 py-3 text-gray-600">{workOrder.vendorCompany.name}</td>
                       <td className="px-4 py-3">
                         <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700">

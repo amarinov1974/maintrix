@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { workOrdersAPI } from '../../api/work-orders';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
+import { formatCategory, formatHistoryAction } from '../../utils/formatters';
 
 interface AMMWorkOrderDetailModalProps {
   workOrderId: number;
@@ -168,7 +169,7 @@ export function AMMWorkOrderDetailModal({
               {wo.storeAddress != null && wo.storeAddress !== '' && (
                 <div><span className="text-gray-600">Address:</span> {wo.storeAddress}</div>
               )}
-              <div><span className="text-gray-600">Category:</span> {wo.category ?? '—'}</div>
+              <div><span className="text-gray-600">Category:</span> {wo.category ? formatCategory(wo.category) : '—'}</div>
               <div><span className="text-gray-600">AMM comment:</span> {wo.commentToVendor ?? '—'}</div>
               {wo.assetDescription != null && wo.assetDescription !== '' && (
                 <div><span className="text-gray-600">Asset:</span> {wo.assetDescription}</div>
@@ -472,7 +473,7 @@ export function AMMWorkOrderDetailModal({
                   <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
                     <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{entry.actionType}</span>
+                    <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
                       <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}

@@ -11,6 +11,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Badge } from '../../components/shared';
 import { TicketDetailModal } from './TicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
+import { formatCategory } from '../../utils/formatters';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
 
@@ -94,7 +95,7 @@ export function SMActionRequiredPage() {
                       {ticket.currentStatus}
                     </Badge>
                     {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-                    <span className="text-sm text-gray-600">{ticket.category}</span>
+                    <span className="text-sm text-gray-600">{formatCategory(ticket.category)}</span>
                     <span className="text-sm text-gray-500">
                       {new Date(ticket.createdAt).toLocaleDateString()}
                     </span>

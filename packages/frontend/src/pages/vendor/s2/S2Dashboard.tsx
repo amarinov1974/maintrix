@@ -11,6 +11,7 @@ import { workOrdersAPI } from '../../../api/work-orders';
 import { useSession } from '../../../contexts/SessionContext';
 import { Layout, Card, Badge } from '../../../components/shared';
 import { S2WorkOrderDetailModal } from './S2WorkOrderDetailModal';
+import { formatCategory } from '../../../utils/formatters';
 
 function shortComment(comment: string | null | undefined, maxLen: number = 60): string {
   if (comment == null || comment === '') return '—';
@@ -84,7 +85,7 @@ export function S2Dashboard() {
                           <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
                         )}
                         <p className="text-sm text-gray-600">
-                          Category: {wo.category ?? '—'} • AMM: {shortComment(wo.commentToVendor)}
+                          Category: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
                         </p>
                       </Card>
                     ))}
@@ -113,7 +114,7 @@ export function S2Dashboard() {
                         <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
                       )}
                       <p className="text-sm text-gray-600">
-                        Category: {wo.category ?? '—'} • AMM: {shortComment(wo.commentToVendor)}
+                        Category: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
                       </p>
                     </Card>
                   ))}

@@ -8,6 +8,7 @@ import { ticketsAPI } from '../../api/tickets';
 import type { ApprovalRecord } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
+import { formatCategory } from '../../utils/formatters';
 
 interface DirectorTicketDetailModalProps {
   ticketId: number;
@@ -130,7 +131,7 @@ export function DirectorTicketDetailModal({
                 <span className="text-sm font-medium text-gray-600">
                   Kategorija:
                 </span>{' '}
-                <span className="text-sm text-gray-900">{ticket.category}</span>
+                <span className="text-sm text-gray-900">{formatCategory(ticket.category)}</span>
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-600">

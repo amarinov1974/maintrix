@@ -14,18 +14,18 @@ interface CreateTicketModalProps {
 
 // Must match Prisma TicketCategory enum keys exactly
 const CATEGORIES: { value: string; label: string }[] = [
-  { value: 'ELECTRICAL_INSTALLATIONS', label: 'Electrical Installations' },
-  { value: 'HEATING_VENTILATION_AIR_CONDITIONING', label: 'Heating, Ventilation and Air Conditioning' },
-  { value: 'REFRIGERATION', label: 'Refrigeration' },
-  { value: 'KITCHEN_EQUIPMENT', label: 'Kitchen Equipment' },
-  { value: 'ELEVATORS', label: 'Elevators' },
-  { value: 'AUTOMATIC_DOORS', label: 'Automatic Doors' },
-  { value: 'FIRE_PROTECTION_SYSTEM', label: 'Fire Protection System' },
-  { value: 'WATER_AND_SEWAGE', label: 'Water and Sewage' },
-  { value: 'CONSTRUCTION_WORKS', label: 'Construction Works' },
-  { value: 'HYGIENE', label: 'Hygiene' },
-  { value: 'ENVIRONMENTAL', label: 'Environmental' },
-  { value: 'OTHER', label: 'Other' },
+  { value: 'ELECTRICAL_INSTALLATIONS', label: 'Elektroinstalacije' },
+  { value: 'HEATING_VENTILATION_AIR_CONDITIONING', label: 'Grijanje, ventilacija i klima' },
+  { value: 'REFRIGERATION', label: 'Rashlađivanje' },
+  { value: 'KITCHEN_EQUIPMENT', label: 'Kuhinjska oprema' },
+  { value: 'ELEVATORS', label: 'Liftovi' },
+  { value: 'AUTOMATIC_DOORS', label: 'Automatska vrata' },
+  { value: 'FIRE_PROTECTION_SYSTEM', label: 'Zaštita od požara' },
+  { value: 'WATER_AND_SEWAGE', label: 'Vodoopskrba i kanalizacija' },
+  { value: 'CONSTRUCTION_WORKS', label: 'Građevinski radovi' },
+  { value: 'HYGIENE', label: 'Higijena' },
+  { value: 'ENVIRONMENTAL', label: 'Okoliš' },
+  { value: 'OTHER', label: 'Ostalo' },
 ];
 
 export function CreateTicketModal({ onClose }: CreateTicketModalProps) {

@@ -5,6 +5,7 @@
 
 import type { WorkOrder } from '../../../api/work-orders';
 import { Card, Badge, Button } from '../../../components/shared';
+import { formatCategory } from '../../../utils/formatters';
 
 interface S1WorkOrderListProps {
   items: WorkOrder[];
@@ -71,7 +72,7 @@ export function S1WorkOrderList({
                 <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
               )}
               <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                <span>Category: {wo.category ?? '—'}</span>
+                <span>Category: {wo.category ? formatCategory(wo.category) : '—'}</span>
                 <span>•</span>
                 <span>AMM comment: {shortComment(wo.commentToVendor)}</span>
                 <span>•</span>

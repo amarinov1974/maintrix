@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
+import { formatCategory, formatHistoryAction } from '../../utils/formatters';
 
 interface AMTicketDetailModalProps {
   ticketId: number;
@@ -167,7 +168,7 @@ export function AMTicketDetailModal({
             <div className="bg-gray-50 rounded-lg p-4 space-y-2">
               <div>
                 <span className="text-sm font-medium text-gray-600">Kategorija:</span>{' '}
-                <span className="text-sm text-gray-900">{ticket.category}</span>
+                <span className="text-sm text-gray-900">{formatCategory(ticket.category)}</span>
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-600">Trenutni vlasnik:</span>{' '}
@@ -441,7 +442,7 @@ export function AMTicketDetailModal({
                   <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
                     <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{entry.actionType}</span>
+                    <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
                       <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}

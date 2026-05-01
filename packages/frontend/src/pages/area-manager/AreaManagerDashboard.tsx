@@ -10,6 +10,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Card, Badge, Button } from '../../components/shared';
 import { AMTicketDetailModal } from './AMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
+import { formatCategory } from '../../utils/formatters';
 
 function getStatusBadgeVariant(
   status: string
@@ -134,7 +135,7 @@ export function AreaManagerDashboard() {
                     <div className="flex gap-4 text-sm text-gray-600 flex-wrap">
                       <span>Poslovnica: {ticket.storeName}</span>
                       <span>•</span>
-                      <span>Kategorija: {ticket.category}</span>
+                      <span>Kategorija: {formatCategory(ticket.category)}</span>
                       <span>•</span>
                       <span>Kreirao: {ticket.createdByUserName}</span>
                       <span>•</span>
@@ -209,7 +210,7 @@ export function AreaManagerDashboard() {
                       {ticket.currentStatus}
                     </Badge>
                     {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-                    <span className="text-sm text-gray-600">{ticket.category}</span>
+                    <span className="text-sm text-gray-600">{formatCategory(ticket.category)}</span>
                     <span className="text-sm text-gray-500">
                       Zadnja izmjena {new Date(ticket.updatedAt).toLocaleDateString()}
                     </span>

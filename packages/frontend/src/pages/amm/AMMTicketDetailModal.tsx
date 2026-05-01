@@ -11,6 +11,7 @@ import { authAPI } from '../../api/auth';
 import { useSession } from '../../contexts/SessionContext';
 import { TicketStatus } from '../../types/statuses';
 import { Button, Badge } from '../../components/shared';
+import { formatCategory, formatHistoryAction } from '../../utils/formatters';
 
 interface AMMTicketDetailModalProps {
   ticketId: number;
@@ -275,7 +276,7 @@ export function AMMTicketDetailModal({
                 <span><strong>Kreirao:</strong> {ticket.createdByUserName}{ticket.createdByUserRole != null ? ` (${ticket.createdByUserRole})` : ''}</span>
                 <span><strong>Trenutni vlasnik:</strong> {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</span>
                 <span><strong>Poslovnica:</strong> {ticket.storeName}</span>
-                <span><strong>Kategorija:</strong> {ticket.category}</span>
+                <span><strong>Kategorija:</strong> {formatCategory(ticket.category)}</span>
                 <span>
                   <strong>Hitnost:</strong>{' '}
                   {ticket.urgent ? <Badge variant="urgent">HITNO</Badge> : <Badge variant="default">Nije hitno</Badge>}
@@ -601,7 +602,7 @@ export function AMMTicketDetailModal({
                   <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
                     <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{entry.actionType}</span>
+                    <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
                       <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}

@@ -11,6 +11,7 @@ import { useSession } from '../../../contexts/SessionContext';
 import { Button, Badge } from '../../../components/shared';
 import { WorkOrderStatus } from '../../../types/statuses';
 import { AssignTechnicianModal } from './AssignTechnicianModal';
+import { formatCategory, formatHistoryAction } from '../../../utils/formatters';
 
 interface S1WorkOrderDetailModalProps {
   workOrderId: number;
@@ -113,7 +114,7 @@ export function S1WorkOrderDetailModal({
                 )}
                 <div>
                   <span className="text-gray-600">Category:</span>{' '}
-                  {wo.category ?? '—'}
+                  {wo.category ? formatCategory(wo.category) : '—'}
                 </div>
                 <div>
                   <span className="text-gray-600">AMM comment:</span>{' '}
@@ -269,7 +270,7 @@ export function S1WorkOrderDetailModal({
                     <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
                       <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
                       {' — '}
-                      <span className="font-medium">{entry.actionType}</span>
+                      <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                       {entry.prevStatus != null && (
                         <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                       )}
