@@ -169,10 +169,10 @@ export function StoreManagerDashboard() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Store Manager Dashboard
+            Nadzorna ploča — Voditelj poslovnice
           </h1>
           <p className="text-gray-600">
-            {session?.storeName ?? 'Store'}
+            {session?.storeName ?? 'Poslovnica'}
           </p>
         </div>
 
@@ -181,14 +181,14 @@ export function StoreManagerDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                Create Ticket
+                Nova prijava kvara
               </h2>
               <p className="text-sm text-gray-600">
-                Submit a new maintenance request for your store.
+                Prijavite novi kvar ili zahtjev za održavanje.
               </p>
             </div>
             <Link to="/store-manager/submit">
-              <Button type="button">Submit New Ticket</Button>
+              <Button type="button">Nova prijava</Button>
             </Link>
           </div>
         </Card>
@@ -196,13 +196,13 @@ export function StoreManagerDashboard() {
         {/* Section 2 — Ticket Drafts */}
         <Card className="bg-gray-50 border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Ticket Drafts
+            Nacrti prijava
           </h2>
           <p className="text-sm text-gray-600 mb-3">
-            Tickets you saved as draft — open to continue editing and submit when ready.
+            Prijave koje ste spremili kao nacrt.
           </p>
           {draftTickets.length === 0 ? (
-            <p className="text-sm text-gray-500">No drafts.</p>
+            <p className="text-sm text-gray-500">Nema nacrta.</p>
           ) : (
             <ul className="space-y-2">
               {draftTickets
@@ -218,7 +218,7 @@ export function StoreManagerDashboard() {
                         <span className="font-medium text-gray-900">
                           Ticket #{ticket.id}
                         </span>
-                        <Badge variant="default">Draft</Badge>
+                        <Badge variant="default">Nacrt</Badge>
                         {ticket.urgent && (
                           <Badge variant="urgent">URGENT</Badge>
                         )}
@@ -245,10 +245,10 @@ export function StoreManagerDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    Action Required
+                    Potrebna akcija
                   </h2>
                   <p className="text-sm text-gray-600">
-                    Tickets returned for your clarification (newest first).
+                    Prijave vraćene na pojašnjenje.
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -263,10 +263,10 @@ export function StoreManagerDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Action Required
+                  Potrebna akcija
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Tickets returned for your clarification (newest first).
+                  Prijave vraćene na pojašnjenje.
                 </p>
               </div>
               <Badge variant="warning">0</Badge>
@@ -277,13 +277,13 @@ export function StoreManagerDashboard() {
         {/* Section 4 — QR Generation Required */}
         <Card className="bg-emerald-50 border-emerald-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            QR Generation Required
+            Potrebno generiranje QR koda
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Work orders with technician assigned or follow-up visit needed — generate QR for check-in or check-out.
+            Radni nalozi koji zahtijevaju QR kod za prijavu/odjavu tehničara.
           </p>
           {qrTicketIds.length === 0 ? (
-            <p className="text-sm text-gray-500">No tickets requiring QR right now.</p>
+            <p className="text-sm text-gray-500">Nema prijava koje zahtijevaju QR kod.</p>
           ) : (
             <Link to="/store-manager/qr-required">
               <div className="flex items-center justify-between p-3 rounded-lg border border-emerald-200 bg-white hover:bg-emerald-50/50 cursor-pointer transition">
@@ -300,7 +300,7 @@ export function StoreManagerDashboard() {
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <h2 className="text-lg font-semibold text-gray-900">
-              My Tickets
+              Moje prijave
             </h2>
             <div className="flex gap-2">
               <Button
@@ -308,26 +308,26 @@ export function StoreManagerDashboard() {
                 variant={myTicketsFilter === 'active' ? 'primary' : 'secondary'}
                 onClick={() => setMyTicketsFilter('active')}
               >
-                Active tickets
+                Aktivne prijave
               </Button>
               <Button
                 type="button"
                 variant={myTicketsFilter === 'closed' ? 'primary' : 'secondary'}
                 onClick={() => setMyTicketsFilter('closed')}
               >
-                Closed tickets
+                Zatvorene prijave
               </Button>
             </div>
           </div>
           <p className="text-sm text-gray-600 mb-4">
             {myTicketsFilter === 'active'
-              ? 'Tickets you participated in (not current owner).'
-              : 'Tickets that finished their life (rejected, withdrawn, archived).'}
+              ? 'Prijave u kojima ste sudjelovali.'
+              : 'Zatvorene i arhivirane prijave.'}
           </p>
           {(myTicketsFilter === 'closed' && loadingMyTickets) || (myTicketsFilter === 'active' && loadingParticipated) ? (
             <p className="text-gray-600">Loading...</p>
           ) : myTicketsFiltered.length === 0 ? (
-            <p className="text-gray-500">No tickets to show.</p>
+            <p className="text-gray-500">Nema prijava za prikaz.</p>
           ) : (
             <div className="space-y-3">
               {myTicketsFiltered.map((ticket) => (
@@ -350,7 +350,7 @@ export function StoreManagerDashboard() {
                       {ticket.category}
                     </span>
                     <span className="text-sm text-gray-500">
-                      Last updated{' '}
+                      Zadnja izmjena{' '}
                       {new Date(ticket.updatedAt).toLocaleDateString()}
                     </span>
                   </div>

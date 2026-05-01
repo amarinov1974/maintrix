@@ -16,7 +16,7 @@ interface DirectorTicketDetailModalProps {
 
 function getThresholdInfo(amount: number) {
   if (amount <= 1000) {
-    return { chain: 'AM only', color: 'text-green-700' };
+    return { chain: 'Samo AM', color: 'text-green-700' };
   }
   if (amount <= 3000) {
     return { chain: 'AM → D → C2', color: 'text-yellow-700' };
@@ -72,7 +72,7 @@ export function DirectorTicketDetailModal({
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading ticket details...</p>
+          <p>Učitavanje detalja prijave...</p>
         </div>
       </div>
     );
@@ -100,12 +100,12 @@ export function DirectorTicketDetailModal({
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Ticket #{ticket.id}
+                  Prijava #{ticket.id}
                 </h2>
-                <Badge variant="warning">Cost Approval Needed</Badge>
+                <Badge variant="warning">Čeka odobrenje troška</Badge>
               </div>
               <p className="text-sm text-gray-600">
-                Store: {ticket.storeName} • Created by:{' '}
+                Poslovnica: {ticket.storeName} • Kreirao:{' '}
                 {ticket.createdByUserName}
               </p>
             </div>
@@ -113,7 +113,7 @@ export function DirectorTicketDetailModal({
               type="button"
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 text-2xl"
-              aria-label="Close"
+              aria-label="Zatvori"
             >
               ×
             </button>
@@ -122,19 +122,19 @@ export function DirectorTicketDetailModal({
 
         <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">
-              Ticket Details
-            </h3>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Detalji prijave
+              </h3>
             <div className="bg-gray-50 rounded-lg p-4 space-y-2">
               <div>
                 <span className="text-sm font-medium text-gray-600">
-                  Category:
+                  Kategorija:
                 </span>{' '}
                 <span className="text-sm text-gray-900">{ticket.category}</span>
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-600">
-                  Current Owner:
+                  Trenutni vlasnik:
                 </span>{' '}
                 <span className="text-sm text-gray-900">
                   {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}
@@ -142,7 +142,7 @@ export function DirectorTicketDetailModal({
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-600">
-                  Original Problem Description (locked):
+                  Originalni opis problema (zaključano):
                 </span>
                 <p className="text-sm text-gray-900 mt-1">
                   {ticket.originalDescription ?? ticket.description}
@@ -154,12 +154,12 @@ export function DirectorTicketDetailModal({
           {costEstimation != null && (
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">
-                Cost Estimation
+                Procjena troška
               </h3>
               <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-600">
-                    Estimated Amount:
+                    Procijenjeni iznos:
                   </span>
                   <span className="text-3xl font-bold text-blue-900">
                     €{amount.toLocaleString()}
@@ -168,7 +168,7 @@ export function DirectorTicketDetailModal({
                 {thresholdInfo != null && (
                   <div className="mt-3 pt-3 border-t border-blue-200">
                     <span className="text-sm font-medium text-gray-600">
-                      Approval Chain:
+                      Lanac odobrenja:
                     </span>{' '}
                     <span
                       className={`text-sm font-semibold ${thresholdInfo.color}`}
@@ -179,7 +179,7 @@ export function DirectorTicketDetailModal({
                 )}
                 <div className="mt-2">
                   <span className="text-sm font-medium text-gray-600">
-                    Submitted by:
+                    Predao:
                   </span>{' '}
                   <span className="text-sm text-gray-900">
                     {costEstimation.createdByUserName}
@@ -187,7 +187,7 @@ export function DirectorTicketDetailModal({
                 </div>
                 <div className="mt-1">
                   <span className="text-sm font-medium text-gray-600">
-                    Submitted:
+                    Predano:
                   </span>{' '}
                   <span className="text-sm text-gray-900">
                     {new Date(
@@ -202,7 +202,7 @@ export function DirectorTicketDetailModal({
           {ticket.currentStatus === 'Cost Estimation Approval Needed' && !isCurrentOwner && (
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-700">
-                You are not the current owner of this ticket. Only the current owner can approve, return for revision, or reject. This view is read-only.
+                Niste trenutni vlasnik ove prijave. Samo trenutni vlasnik može odobriti, vratiti na reviziju ili odbiti. Ovaj prikaz je samo za pregled.
               </p>
             </div>
           )}
@@ -211,17 +211,17 @@ export function DirectorTicketDetailModal({
             <div className="space-y-4">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <h4 className="font-medium text-green-900 mb-2">
-                  Approve Cost Estimation
+                  Odobrenje procjene troška
                 </h4>
                 <p className="text-sm text-green-700 mb-3">
-                  Approving will either escalate to the next approver in the
-                  chain or, if you&apos;re the final approver, return the
-                  ticket to AMM for work order creation.
+                  Odobravanje će eskalirati sljedećem odobravatelju ili, ako
+                  ste zadnji u lancu, vratit će prijavu VMO-u za kreiranje
+                  radnog naloga.
                 </p>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Optional comment..."
+                  placeholder="Komentar (opcionalno)..."
                   rows={2}
                   className="w-full p-3 border border-gray-300 rounded-lg mb-2"
                 />
@@ -230,7 +230,7 @@ export function DirectorTicketDetailModal({
                   onClick={() => approveMutation.mutate()}
                   disabled={approveMutation.isPending}
                 >
-                  {approveMutation.isPending ? 'Approving...' : 'Approve'}
+                  {approveMutation.isPending ? 'Odobravanje...' : 'Odobri'}
                 </Button>
               </div>
 
@@ -238,11 +238,11 @@ export function DirectorTicketDetailModal({
                 {!showReturnForm ? (
                   <div>
                     <h4 className="font-medium text-yellow-900 mb-2">
-                      Return to AMM
+                      Povrat na VMO
                     </h4>
                     <p className="text-sm text-yellow-700 mb-3">
-                      If the cost estimation needs revision, you can return it
-                      to the Area Maintenance Manager for adjustment.
+                      Ako procjena troška treba reviziju, možete je vratiti
+                      Voditelju održavanja.
                     </p>
                     <Button
                       type="button"
@@ -250,20 +250,20 @@ export function DirectorTicketDetailModal({
                       size="sm"
                       variant="secondary"
                     >
-                      Return for Revision
+                      Vrati na reviziju
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <h4 className="font-medium text-yellow-900">
-                      Return to AMM for Revision
+                      Povrat na VMO
                     </h4>
                     <textarea
                       value={returnComment}
                       onChange={(e) =>
                         setReturnComment(e.target.value)
                       }
-                      placeholder="Explain what needs to be revised (required)..."
+                      placeholder="Opišite što treba revidirati (obavezno)..."
                       rows={3}
                       className="w-full p-3 border border-gray-300 rounded-lg"
                       autoFocus
@@ -279,8 +279,8 @@ export function DirectorTicketDetailModal({
                         size="sm"
                       >
                         {returnMutation.isPending
-                          ? 'Returning...'
-                          : 'Confirm Return'}
+                          ? 'Vraćanje...'
+                          : 'Potvrdi povrat'}
                       </Button>
                       <Button
                         type="button"
@@ -291,7 +291,7 @@ export function DirectorTicketDetailModal({
                         }}
                         size="sm"
                       >
-                        Cancel
+                        Odustani
                       </Button>
                     </div>
                   </div>
@@ -302,11 +302,11 @@ export function DirectorTicketDetailModal({
                 {!showRejectForm ? (
                   <div>
                     <h4 className="font-medium text-red-900 mb-2">
-                      Reject Ticket
+                      Odbijanje prijave
                     </h4>
                     <p className="text-sm text-red-700 mb-3">
-                      If this cost estimation is not acceptable, you can reject
-                      the entire ticket.
+                      Ako procjena troška nije prihvatljiva, možete odbiti
+                      cijelu prijavu.
                     </p>
                     <Button
                       type="button"
@@ -314,20 +314,20 @@ export function DirectorTicketDetailModal({
                       onClick={() => setShowRejectForm(true)}
                       size="sm"
                     >
-                      Reject Ticket
+                      Odbij prijavu
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <h4 className="font-medium text-red-900">
-                      Reject Ticket
+                      Odbijanje prijave
                     </h4>
                     <textarea
                       value={rejectReason}
                       onChange={(e) =>
                         setRejectReason(e.target.value)
                       }
-                      placeholder="Reason for rejection (required)..."
+                      placeholder="Razlog odbijanja (obavezno)..."
                       rows={3}
                       className="w-full p-3 border border-gray-300 rounded-lg"
                     />
@@ -345,8 +345,8 @@ export function DirectorTicketDetailModal({
                         size="sm"
                       >
                         {rejectMutation.isPending
-                          ? 'Rejecting...'
-                          : 'Confirm Rejection'}
+                          ? 'Odbijanje...'
+                          : 'Potvrdi odbijanje'}
                       </Button>
                       <Button
                         type="button"
@@ -357,7 +357,7 @@ export function DirectorTicketDetailModal({
                         }}
                         size="sm"
                       >
-                        Cancel
+                        Odustani
                       </Button>
                     </div>
                   </div>
@@ -370,7 +370,7 @@ export function DirectorTicketDetailModal({
             ticket.approvalRecords.length > 0 && (
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">
-                  Approval History
+                  Povijest odobrenja
                 </h3>
                 <div className="space-y-2">
                   {ticket.approvalRecords.map((approval: ApprovalRecord) => (
@@ -394,7 +394,7 @@ export function DirectorTicketDetailModal({
                                 : 'warning'
                           }
                         >
-                          {approval.decision}
+                          {approval.decision === 'APPROVED' ? 'ODOBRENO' : approval.decision === 'REJECTED' ? 'ODBIJENO' : approval.decision}
                         </Badge>
                       </div>
                       {approval.comment != null && (
@@ -415,7 +415,7 @@ export function DirectorTicketDetailModal({
 
           {ticket.comments != null && ticket.comments.length > 0 && (
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Comments</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">Komentari</h3>
               <div className="space-y-3">
                 {[...ticket.comments]
                   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -439,9 +439,9 @@ export function DirectorTicketDetailModal({
           {approveMutation.isError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">
-                Error:{' '}
+                Greška:{' '}
                 {(approveMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                  'Failed to approve'}
+                  'Odobravanje nije uspjelo'}
               </p>
             </div>
           )}
@@ -449,9 +449,9 @@ export function DirectorTicketDetailModal({
           {returnMutation.isError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">
-                Error:{' '}
+                Greška:{' '}
                 {(returnMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                  'Failed to return'}
+                  'Vraćanje nije uspjelo'}
               </p>
             </div>
           )}
@@ -459,9 +459,9 @@ export function DirectorTicketDetailModal({
           {rejectMutation.isError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">
-                Error:{' '}
+                Greška:{' '}
                 {(rejectMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                  'Failed to reject'}
+                  'Odbijanje nije uspjelo'}
               </p>
             </div>
           )}
@@ -474,7 +474,7 @@ export function DirectorTicketDetailModal({
             onClick={onClose}
             className="w-full"
           >
-            Close
+            Zatvori
           </Button>
         </div>
       </div>

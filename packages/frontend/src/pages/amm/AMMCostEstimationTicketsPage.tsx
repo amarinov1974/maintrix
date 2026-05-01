@@ -45,7 +45,7 @@ export function AMMCostEstimationTicketsPage() {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
-    <Layout screenTitle="Tickets Awaiting Cost Estimation">
+    <Layout screenTitle="Prijave — čeka procjena troška">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -56,7 +56,7 @@ export function AMMCostEstimationTicketsPage() {
           </div>
           <Link to="/amm">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
@@ -65,7 +65,7 @@ export function AMMCostEstimationTicketsPage() {
           <p className="text-gray-500">Loading…</p>
         ) : costEstimationTickets.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
-            No tickets awaiting cost estimation.
+            Nema prijava koje čekaju procjenu troška.
           </div>
         ) : (
           <ul className="space-y-2">

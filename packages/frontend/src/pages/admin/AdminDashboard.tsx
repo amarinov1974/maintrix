@@ -480,11 +480,11 @@ export function AdminDashboard() {
         <div className="border-b border-gray-200">
           <nav className="flex gap-6">
             {[
-              { key: 'users', label: 'Internal Users' },
-              { key: 'vendors', label: 'Vendor Users' },
-              { key: 'stores', label: 'Stores' },
-              { key: 'assets', label: 'Assets' },
-              { key: 'pm', label: 'PM Plans' },
+              { key: 'users', label: 'Interni korisnici' },
+              { key: 'vendors', label: 'Izvođači' },
+              { key: 'stores', label: 'Poslovnice' },
+              { key: 'assets', label: 'Oprema' },
+              { key: 'pm', label: 'PM planovi' },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -505,13 +505,13 @@ export function AdminDashboard() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">
-                Internal Users ({internalUsers.filter(u => u.active).length} active)
+                Interni korisnici ({internalUsers.filter(u => u.active).length} aktivnih)
               </h2>
               <button
                 onClick={() => setShowAddInternal(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
               >
-                + Add User
+                + Dodaj korisnika
               </button>
             </div>
 
@@ -520,38 +520,38 @@ export function AdminDashboard() {
                 <h3 className="font-medium text-gray-900 mb-3">New Internal User</h3>
                 <form onSubmit={handleAddInternalSubmit} className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Name *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Ime *</label>
                     <input name="name" required className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">E-mail *</label>
                     <input name="email" type="email" className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Role *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Uloga *</label>
                     <select name="role" required className="w-full border rounded px-3 py-2 text-sm">
-                      <option value="">-- Select --</option>
+                      <option value="">-- Odaberite --</option>
                       {INTERNAL_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Store</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Poslovnica *</label>
                     <select name="storeId" className="w-full border rounded px-3 py-2 text-sm">
                       <option value="">-- Not assigned --</option>
                       {(stores as Store[]).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Region</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Regija *</label>
                     <select name="regionId" className="w-full border rounded px-3 py-2 text-sm">
                       <option value="">-- Not assigned --</option>
                       {(regions as Region[]).map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                     </select>
                   </div>
                   <div className="col-span-2 flex gap-2 justify-end">
-                    <button type="button" onClick={() => setShowAddInternal(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                    <button type="button" onClick={() => setShowAddInternal(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                     <button type="submit" disabled={createInternalUser.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                      {createInternalUser.isPending ? 'Saving...' : 'Add'}
+                      {createInternalUser.isPending ? 'Spremanje...' : 'Dodaj'}
                     </button>
                   </div>
                 </form>
@@ -559,7 +559,7 @@ export function AdminDashboard() {
             )}
 
             {loadingInternal ? (
-              <p className="text-gray-500">Loading...</p>
+              <p className="text-gray-500">Učitavanje...</p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <table className="min-w-full text-sm">
@@ -578,7 +578,7 @@ export function AdminDashboard() {
                       <tr key={user.id} className={!user.active ? 'bg-red-50 opacity-75' : ''}>
                         <td className="px-4 py-3 font-medium">
                           {user.name}
-                          {!user.active && <span className="ml-2 text-xs text-red-600 font-normal">(inactive)</span>}
+                          {!user.active && <span className="ml-2 text-xs text-red-600 font-normal">(neaktivno)</span>}
                         </td>
                         <td className="px-4 py-3 text-gray-600">{user.email || '—'}</td>
                         <td className="px-4 py-3">
@@ -589,26 +589,26 @@ export function AdminDashboard() {
                         </td>
                         <td className="px-4 py-3">
                           {!user.active ? (
-                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Neaktivno</span>
                           ) : (
-                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Active</span>
+                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Aktivno</span>
                           )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
-                          <button onClick={() => setEditingUser(user)} className="text-blue-600 hover:underline text-xs">Edit</button>
+                          <button onClick={() => setEditingUser(user)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {user.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deactivate ${user.name}?`)) deactivateInternalUser.mutate(user.id); }}
+                              onClick={() => { if (confirm(`Deaktiviraj ${user.name}?`)) deactivateInternalUser.mutate(user.id); }}
                               className="text-red-600 hover:underline text-xs"
                             >
-                              Deactivate
+                              Deaktiviraj
                             </button>
                           ) : (
                             <button
                               onClick={() => updateInternalUser.mutate({ id: user.id, data: { active: true } })}
                               className="text-green-600 hover:underline text-xs"
                             >
-                              Activate
+                              Aktiviraj
                             </button>
                           )}
                         </td>
@@ -653,9 +653,9 @@ export function AdminDashboard() {
                       </select>
                     </div>
                     <div className="flex gap-2 justify-end pt-2">
-                      <button type="button" onClick={() => setEditingUser(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                      <button type="button" onClick={() => setEditingUser(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                       <button type="submit" disabled={updateInternalUser.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                        {updateInternalUser.isPending ? 'Saving...' : 'Save'}
+                        {updateInternalUser.isPending ? 'Spremanje...' : 'Spremi'}
                       </button>
                     </div>
                   </form>
@@ -669,13 +669,13 @@ export function AdminDashboard() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">
-                Vendor Users ({vendorUsers.filter(u => u.active).length} active)
+                Izvođači ({vendorUsers.filter(u => u.active).length} aktivnih)
               </h2>
               <button
                 onClick={() => setShowAddVendor(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
               >
-                + Add Vendor User
+                + Dodaj izvođača
               </button>
             </div>
 
@@ -699,16 +699,16 @@ export function AdminDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Vendor Company *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Tvrtka izvođača *</label>
                     <select name="vendorCompanyId" required className="w-full border rounded px-3 py-2 text-sm">
-                      <option value="">-- Select --</option>
+                      <option value="">-- Odaberite --</option>
                       {(vendorCompanies as VendorCompany[]).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div className="col-span-2 flex gap-2 justify-end">
-                    <button type="button" onClick={() => setShowAddVendor(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                    <button type="button" onClick={() => setShowAddVendor(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                     <button type="submit" disabled={createVendorUser.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                      {createVendorUser.isPending ? 'Saving...' : 'Add'}
+                      {createVendorUser.isPending ? 'Spremanje...' : 'Dodaj'}
                     </button>
                   </div>
                 </form>
@@ -716,7 +716,7 @@ export function AdminDashboard() {
             )}
 
             {loadingVendors ? (
-              <p className="text-gray-500">Loading...</p>
+              <p className="text-gray-500">Učitavanje...</p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <table className="min-w-full text-sm">
@@ -735,7 +735,7 @@ export function AdminDashboard() {
                       <tr key={user.id} className={!user.active ? 'bg-red-50 opacity-75' : ''}>
                         <td className="px-4 py-3 font-medium">
                           {user.name}
-                          {!user.active && <span className="ml-2 text-xs text-red-600 font-normal">(inactive)</span>}
+                          {!user.active && <span className="ml-2 text-xs text-red-600 font-normal">(neaktivno)</span>}
                         </td>
                         <td className="px-4 py-3 text-gray-600">{user.email || '—'}</td>
                         <td className="px-4 py-3">
@@ -744,26 +744,26 @@ export function AdminDashboard() {
                         <td className="px-4 py-3 text-gray-600">{user.vendorCompany.name}</td>
                         <td className="px-4 py-3">
                           {!user.active ? (
-                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Neaktivno</span>
                           ) : (
-                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Active</span>
+                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Aktivno</span>
                           )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
-                          <button onClick={() => setEditingVendor(user)} className="text-blue-600 hover:underline text-xs">Edit</button>
+                          <button onClick={() => setEditingVendor(user)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {user.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deactivate ${user.name}?`)) deactivateVendorUser.mutate(user.id); }}
+                              onClick={() => { if (confirm(`Deaktiviraj ${user.name}?`)) deactivateVendorUser.mutate(user.id); }}
                               className="text-red-600 hover:underline text-xs"
                             >
-                              Deactivate
+                              Deaktiviraj
                             </button>
                           ) : (
                             <button
                               onClick={() => updateVendorUser.mutate({ id: user.id, data: { active: true } })}
                               className="text-green-600 hover:underline text-xs"
                             >
-                              Activate
+                              Aktiviraj
                             </button>
                           )}
                         </td>
@@ -794,9 +794,9 @@ export function AdminDashboard() {
                       </select>
                     </div>
                     <div className="flex gap-2 justify-end pt-2">
-                      <button type="button" onClick={() => setEditingVendor(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                      <button type="button" onClick={() => setEditingVendor(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                       <button type="submit" disabled={updateVendorUser.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                        {updateVendorUser.isPending ? 'Saving...' : 'Save'}
+                        {updateVendorUser.isPending ? 'Spremanje...' : 'Spremi'}
                       </button>
                     </div>
                   </form>
@@ -810,13 +810,13 @@ export function AdminDashboard() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">
-                Stores ({stores2.filter(s => s.active).length} active)
+                Poslovnice ({stores2.filter(s => s.active).length} aktivnih)
               </h2>
               <button
                 onClick={() => setShowAddStore(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
               >
-                + Add Store
+                + Dodaj poslovnicu
               </button>
             </div>
 
@@ -835,14 +835,14 @@ export function AdminDashboard() {
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Region *</label>
                     <select name="regionId" required className="w-full border rounded px-3 py-2 text-sm">
-                      <option value="">-- Select --</option>
+                      <option value="">-- Odaberite --</option>
                       {(regions as Region[]).map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                     </select>
                   </div>
                   <div className="col-span-2 flex gap-2 justify-end">
-                    <button type="button" onClick={() => setShowAddStore(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                    <button type="button" onClick={() => setShowAddStore(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                     <button type="submit" disabled={createStore.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                      {createStore.isPending ? 'Saving...' : 'Add'}
+                      {createStore.isPending ? 'Spremanje...' : 'Dodaj'}
                     </button>
                   </div>
                 </form>
@@ -850,7 +850,7 @@ export function AdminDashboard() {
             )}
 
             {loadingStores ? (
-              <p className="text-gray-500">Loading...</p>
+              <p className="text-gray-500">Učitavanje...</p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <table className="min-w-full text-sm">
@@ -871,26 +871,26 @@ export function AdminDashboard() {
                         <td className="px-4 py-3 text-gray-600">{store.region?.name || '—'}</td>
                         <td className="px-4 py-3">
                           {!store.active ? (
-                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Neaktivno</span>
                           ) : (
-                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Active</span>
+                            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Aktivno</span>
                           )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
-                          <button onClick={() => setEditingStore(store)} className="text-blue-600 hover:underline text-xs">Edit</button>
+                          <button onClick={() => setEditingStore(store)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {store.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deactivate ${store.name}?`)) deactivateStore.mutate(store.id); }}
+                              onClick={() => { if (confirm(`Deaktiviraj ${store.name}?`)) deactivateStore.mutate(store.id); }}
                               className="text-red-600 hover:underline text-xs"
                             >
-                              Deactivate
+                              Deaktiviraj
                             </button>
                           ) : (
                             <button
                               onClick={() => updateStore.mutate({ id: store.id, data: { active: true } })}
                               className="text-green-600 hover:underline text-xs"
                             >
-                              Activate
+                              Aktiviraj
                             </button>
                           )}
                         </td>
@@ -922,9 +922,9 @@ export function AdminDashboard() {
                       </select>
                     </div>
                     <div className="flex gap-2 justify-end pt-2">
-                      <button type="button" onClick={() => setEditingStore(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                      <button type="button" onClick={() => setEditingStore(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                       <button type="submit" disabled={updateStore.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                        {updateStore.isPending ? 'Saving...' : 'Save'}
+                        {updateStore.isPending ? 'Spremanje...' : 'Spremi'}
                       </button>
                     </div>
                   </form>
@@ -938,53 +938,53 @@ export function AdminDashboard() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">
-                Assets ({adminAssets.filter(a => a.active).length} active)
+                Oprema ({adminAssets.filter(a => a.active).length} aktivnih)
               </h2>
               <button
                 onClick={() => setShowAddAsset(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
               >
-                + Add Asset
+                + Dodaj opremu
               </button>
             </div>
 
             {showAddAsset && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-3">New Asset</h3>
+                <h3 className="font-medium text-gray-900 mb-3">Nova oprema</h3>
                 <form onSubmit={handleAddAssetSubmit} className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Name *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Naziv *</label>
                     <input name="name" required className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Store *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Poslovnica *</label>
                     <select name="storeId" required className="w-full border rounded px-3 py-2 text-sm">
-                      <option value="">-- Select --</option>
+                      <option value="">-- Odaberite --</option>
                       {stores2.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
                     <select name="categoryId" className="w-full border rounded px-3 py-2 text-sm">
-                      <option value="">-- None --</option>
+                      <option value="">-- Bez kategorije --</option>
                       {adminCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
                     <select name="status" className="w-full border rounded px-3 py-2 text-sm">
-                      <option value="ACTIVE">Active</option>
-                      <option value="FAULTY">Faulty</option>
-                      <option value="IN_SERVICE">In Service</option>
-                      <option value="DECOMMISSIONED">Decommissioned</option>
+                      <option value="ACTIVE">Aktivno</option>
+                      <option value="FAULTY">Kvar</option>
+                      <option value="IN_SERVICE">Na servisu</option>
+                      <option value="DECOMMISSIONED">Otpisano</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Serial Number</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Serijski broj</label>
                     <input name="serialNumber" className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Manufacturer</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Proizvođač</label>
                     <input name="manufacturer" className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
@@ -992,15 +992,15 @@ export function AdminDashboard() {
                     <input name="model" className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Value (€)</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Nabavna vrijednost (€)</label>
                     <input name="purchaseValue" type="number" step="0.01" className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Date</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Datum nabave</label>
                     <input name="purchaseDate" type="date" className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Warranty Expiry</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Istek jamstva</label>
                     <input name="warrantyExpiry" type="date" className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div className="col-span-2">
@@ -1008,9 +1008,9 @@ export function AdminDashboard() {
                     <textarea name="notes" rows={2} className="w-full border rounded px-3 py-2 text-sm" />
                   </div>
                   <div className="col-span-2 flex gap-2 justify-end">
-                    <button type="button" onClick={() => setShowAddAsset(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                    <button type="button" onClick={() => setShowAddAsset(false)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                     <button type="submit" disabled={createAsset.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                      {createAsset.isPending ? 'Saving...' : 'Add'}
+                      {createAsset.isPending ? 'Spremanje...' : 'Dodaj'}
                     </button>
                   </div>
                 </form>
@@ -1018,18 +1018,18 @@ export function AdminDashboard() {
             )}
 
             {loadingAssets ? (
-              <p className="text-gray-500">Loading...</p>
+              <p className="text-gray-500">Učitavanje...</p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <table className="min-w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Name</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Store</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Naziv</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Poslovnica</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Category</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Serial</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Serijski br.</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Akcije</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -1037,7 +1037,7 @@ export function AdminDashboard() {
                       <tr key={asset.id} className={!asset.active ? 'bg-red-50 opacity-75' : ''}>
                         <td className="px-4 py-3 font-medium">
                           {asset.name}
-                          {!asset.active && <span className="ml-2 text-xs text-red-600 font-normal">(inactive)</span>}
+                          {!asset.active && <span className="ml-2 text-xs text-red-600 font-normal">(neaktivno)</span>}
                           {asset.manufacturer && <div className="text-xs text-gray-500">{asset.manufacturer} {asset.model}</div>}
                         </td>
                         <td className="px-4 py-3 text-gray-600">{asset.store.name}</td>
@@ -1045,7 +1045,7 @@ export function AdminDashboard() {
                         <td className="px-4 py-3 text-gray-500 font-mono text-xs">{asset.serialNumber ?? '—'}</td>
                         <td className="px-4 py-3">
                           {!asset.active ? (
-                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Inactive</span>
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">Neaktivno</span>
                           ) : (
                             <span className={`text-xs px-2 py-1 rounded ${
                               asset.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
@@ -1056,17 +1056,17 @@ export function AdminDashboard() {
                           )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
-                          <button onClick={() => setEditingAsset(asset)} className="text-blue-600 hover:underline text-xs">Edit</button>
+                          <button onClick={() => setEditingAsset(asset)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {asset.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deactivate ${asset.name}?`)) deactivateAsset.mutate(asset.id); }}
+                              onClick={() => { if (confirm(`Deaktiviraj ${asset.name}?`)) deactivateAsset.mutate(asset.id); }}
                               className="text-red-600 hover:underline text-xs"
-                            >Deactivate</button>
+                            >Deaktiviraj</button>
                           ) : (
                             <button
                               onClick={() => updateAsset.mutate({ id: asset.id, data: { active: true } })}
                               className="text-green-600 hover:underline text-xs"
-                            >Activate</button>
+                            >Aktiviraj</button>
                           )}
                         </td>
                       </tr>
@@ -1079,14 +1079,14 @@ export function AdminDashboard() {
             {editingAsset && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                  <h3 className="font-semibold text-gray-900 mb-4">Edit Asset — {editingAsset.name}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">Uredi opremu — {editingAsset.name}</h3>
                   <form onSubmit={handleEditAssetSubmit} className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Name *</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Naziv *</label>
                       <input name="name" defaultValue={editingAsset.name} required className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Store *</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Poslovnica *</label>
                       <select name="storeId" defaultValue={editingAsset.store.id} required className="w-full border rounded px-3 py-2 text-sm">
                         {stores2.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                       </select>
@@ -1094,25 +1094,25 @@ export function AdminDashboard() {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
                       <select name="categoryId" defaultValue={editingAsset.category?.id ?? ''} className="w-full border rounded px-3 py-2 text-sm">
-                        <option value="">-- None --</option>
+                        <option value="">-- Bez kategorije --</option>
                         {adminCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
                       <select name="status" defaultValue={editingAsset.status} className="w-full border rounded px-3 py-2 text-sm">
-                        <option value="ACTIVE">Active</option>
-                        <option value="FAULTY">Faulty</option>
-                        <option value="IN_SERVICE">In Service</option>
-                        <option value="DECOMMISSIONED">Decommissioned</option>
+                        <option value="ACTIVE">Aktivno</option>
+                        <option value="FAULTY">Kvar</option>
+                        <option value="IN_SERVICE">Na servisu</option>
+                        <option value="DECOMMISSIONED">Otpisano</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Serial Number</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Serijski broj</label>
                       <input name="serialNumber" defaultValue={editingAsset.serialNumber ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Manufacturer</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Proizvođač</label>
                       <input name="manufacturer" defaultValue={editingAsset.manufacturer ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div>
@@ -1120,15 +1120,15 @@ export function AdminDashboard() {
                       <input name="model" defaultValue={editingAsset.model ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Value (€)</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Nabavna vrijednost (€)</label>
                       <input name="purchaseValue" type="number" step="0.01" defaultValue={editingAsset.purchaseValue ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Date</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Datum nabave</label>
                       <input name="purchaseDate" type="date" defaultValue={editingAsset.purchaseDate ? editingAsset.purchaseDate.slice(0,10) : ''} className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Warranty Expiry</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Istek jamstva</label>
                       <input name="warrantyExpiry" type="date" defaultValue={editingAsset.warrantyExpiry ? editingAsset.warrantyExpiry.slice(0,10) : ''} className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div className="col-span-2">
@@ -1136,9 +1136,9 @@ export function AdminDashboard() {
                       <textarea name="notes" rows={2} defaultValue={editingAsset.notes ?? ''} className="w-full border rounded px-3 py-2 text-sm" />
                     </div>
                     <div className="col-span-2 flex gap-2 justify-end pt-2">
-                      <button type="button" onClick={() => setEditingAsset(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Cancel</button>
+                      <button type="button" onClick={() => setEditingAsset(null)} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">Odustani</button>
                       <button type="submit" disabled={updateAsset.isPending} className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                        {updateAsset.isPending ? 'Saving...' : 'Save'}
+                        {updateAsset.isPending ? 'Spremanje...' : 'Spremi'}
                       </button>
                     </div>
                   </form>
@@ -1153,7 +1153,7 @@ export function AdminDashboard() {
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
               <h2 className="text-lg font-semibold text-gray-900 mb-2">Upload Preventive Maintenance Plan</h2>
               <p className="text-sm text-gray-600 mb-4">
-                Upload an Excel (.xlsx) or CSV file with columns: asset_name, task_description,
+                Učitajte Excel (.xlsx) ili CSV datoteku s kolonama: asset_name, task_description,
                 vendor_company_id, vendor_user_id (optional), schedule_type (INTERVAL or SPECIFIC_DATES),
                 interval_days (if INTERVAL), specific_dates (if SPECIFIC_DATES, comma-separated)
               </p>
@@ -1225,7 +1225,7 @@ export function AdminDashboard() {
                       {importMutation.isPending ? 'Importing...' : 'Confirm Import'}
                     </button>
                     <button type="button" onClick={handlePmReset} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">
-                      Cancel
+                      Odustani
                     </button>
                   </div>
                 </div>
@@ -1235,7 +1235,7 @@ export function AdminDashboard() {
                 <div>
                   <p className="text-green-700 font-medium mb-2">{importSummary}</p>
                   <button type="button" onClick={handlePmReset} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
-                    Upload Another File
+                    Učitaj drugu datoteku
                   </button>
                 </div>
               )}

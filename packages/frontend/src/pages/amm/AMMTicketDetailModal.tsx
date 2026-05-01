@@ -18,12 +18,12 @@ interface AMMTicketDetailModalProps {
 }
 
 const INTERNAL_ROLE_LABELS: Record<string, string> = {
-  SM: 'Store Manager (creator)',
-  AM: 'Area Manager',
-  AMM: 'Area Maintenance Manager',
-  D: 'Sales Director',
-  C2: 'Maintenance Director',
-  BOD: 'Board of Directors',
+  SM: 'Voditelj poslovnice (kreator)',
+  AM: 'Voditelj regije',
+  AMM: 'Voditelj održavanja',
+  D: 'Direktor prodaje',
+  C2: 'Direktor održavanja',
+  BOD: 'Upravni odbor',
 };
 
 export function AMMTicketDetailModal({
@@ -181,7 +181,7 @@ export function AMMTicketDetailModal({
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading ticket details...</p>
+          <p>Učitavanje detalja prijave...</p>
         </div>
       </div>
     );
@@ -240,11 +240,11 @@ export function AMMTicketDetailModal({
         <div className="p-6 border-b border-gray-200 sticky top-0 bg-white shrink-0">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Ticket Detail</h1>
-              <p className="text-sm text-gray-500 mt-0.5">Ticket #{ticket.id}</p>
+              <h1 className="text-xl font-bold text-gray-900">Detalji prijave</h1>
+              <p className="text-sm text-gray-500 mt-0.5">Prijava #{ticket.id}</p>
             </div>
             <Button type="button" variant="secondary" onClick={onClose}>
-              Back
+              Natrag
             </Button>
           </div>
         </div>
@@ -254,10 +254,10 @@ export function AMMTicketDetailModal({
             <div className="flex flex-col items-center justify-center py-8">
               <div className="bg-green-100 border-2 border-green-500 rounded-lg p-6 max-w-md w-full text-center">
                 <p className="text-green-800 font-semibold text-xl mb-2">
-                  ✓ Cost estimation sent to Area Manager for approval.
+                  ✓ Procjena troška poslana voditelju regije na odobrenje.
                 </p>
                 <p className="text-green-700 text-sm">
-                  Returning to dashboard in 2 seconds...
+                  Povratak na nadzornu ploču za 2 sekunde...
                 </p>
               </div>
             </div>
@@ -265,30 +265,30 @@ export function AMMTicketDetailModal({
           <>
           {/* 11.2 Ticket Core Information (Read-Only Block) */}
           <section>
-            <h2 className="font-semibold text-gray-900 mb-2">Ticket information</h2>
+            <h2 className="font-semibold text-gray-900 mb-2">Informacije o prijavi</h2>
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-                <span><strong>Ticket ID:</strong> {ticket.id}</span>
+                <span><strong>ID prijave:</strong> {ticket.id}</span>
                 {submittedAt != null && (
-                  <span><strong>Date &amp; Time Submitted:</strong> {new Date(submittedAt).toLocaleString()}</span>
+                  <span><strong>Datum i vrijeme prijave:</strong> {new Date(submittedAt).toLocaleString()}</span>
                 )}
-                <span><strong>Created By:</strong> {ticket.createdByUserName}{ticket.createdByUserRole != null ? ` (${ticket.createdByUserRole})` : ''}</span>
-                <span><strong>Current Owner:</strong> {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</span>
-                <span><strong>Store:</strong> {ticket.storeName}</span>
-                <span><strong>Category:</strong> {ticket.category}</span>
+                <span><strong>Kreirao:</strong> {ticket.createdByUserName}{ticket.createdByUserRole != null ? ` (${ticket.createdByUserRole})` : ''}</span>
+                <span><strong>Trenutni vlasnik:</strong> {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</span>
+                <span><strong>Poslovnica:</strong> {ticket.storeName}</span>
+                <span><strong>Kategorija:</strong> {ticket.category}</span>
                 <span>
-                  <strong>Urgency:</strong>{' '}
-                  {ticket.urgent ? <Badge variant="urgent">URGENT</Badge> : <Badge variant="default">Non-Urgent</Badge>}
+                  <strong>Hitnost:</strong>{' '}
+                  {ticket.urgent ? <Badge variant="urgent">HITNO</Badge> : <Badge variant="default">Nije hitno</Badge>}
                 </span>
-                <span><strong>Current Status:</strong> <Badge variant={ticket.currentStatus.includes('Approved') ? 'success' : 'warning'}>{ticket.currentStatus}</Badge></span>
+                <span><strong>Trenutni status:</strong> <Badge variant={ticket.currentStatus.includes('Approved') ? 'success' : 'warning'}>{ticket.currentStatus}</Badge></span>
               </div>
               <div>
-                <strong className="text-sm text-gray-600">Original Problem Description (locked)</strong>
+                <strong className="text-sm text-gray-600">Originalni opis problema (zaključano)</strong>
                 <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{ticket.originalDescription ?? ticket.description}</p>
               </div>
               {(ticket.assetId != null || ticket.assetDescription != null) && (
                 <div>
-                  <strong className="text-sm text-gray-600">Asset</strong>
+                  <strong className="text-sm text-gray-600">Oprema</strong>
                   <p className="text-sm text-gray-900">
                     {ticket.assetId != null && `ID: ${ticket.assetId}`}
                     {ticket.assetDescription != null && ` — ${ticket.assetDescription}`}
@@ -297,7 +297,7 @@ export function AMMTicketDetailModal({
               )}
               {visibleAttachments.length > 0 && (
                 <div>
-                  <strong className="text-sm text-gray-600">Attachments</strong>
+                  <strong className="text-sm text-gray-600">Privici</strong>
                   <ul className="mt-1 text-sm text-gray-900 list-disc list-inside">
                     {visibleAttachments.map((a) => (
                       <li key={a.id}>{a.fileName}</li>
@@ -311,18 +311,18 @@ export function AMMTicketDetailModal({
           {/* 11.4 / 11.5 Action Section — Urgent flow: Create WO, Request Clarification, Reject */}
           {woSuccessState === 'sent' && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="font-medium text-green-800 mb-2">Work Order successfully sent.</p>
-              <p className="text-sm text-green-700 mb-3">Create another Work Order?</p>
+              <p className="font-medium text-green-800 mb-2">Radni nalog uspješno poslan.</p>
+              <p className="text-sm text-green-700 mb-3">Kreirati još jedan radni nalog?</p>
               <div className="flex gap-2">
-                <Button type="button" variant="primary" onClick={() => handleCreateAnotherWO(false)} size="sm">No</Button>
-                <Button type="button" variant="secondary" onClick={() => handleCreateAnotherWO(true)} size="sm">Yes</Button>
+                <Button type="button" variant="primary" onClick={() => handleCreateAnotherWO(false)} size="sm">Ne</Button>
+                <Button type="button" variant="secondary" onClick={() => handleCreateAnotherWO(true)} size="sm">Da</Button>
               </div>
             </div>
           )}
 
           {workOrdersForTicket.length > 0 && (
             <section className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Work orders for this ticket</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Radni nalozi za ovu prijavu</h3>
               <ul className="space-y-2">
                 {workOrdersForTicket.map((wo) => (
                   <li key={wo.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm bg-white rounded-lg p-3 border border-gray-200">
@@ -337,9 +337,9 @@ export function AMMTicketDetailModal({
 
           {woSuccessState !== 'sent' && canCreateWO && (
             <section className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Create Work Order</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Kreiranje radnog naloga</h3>
               {ticket.urgent && (
-                <p className="text-sm text-green-800 mb-2">Urgent: create work order(s) directly — no cost estimation or approval required.</p>
+                <p className="text-sm text-green-800 mb-2">Hitno: kreirajte radni nalog direktno — bez procjene troška.</p>
               )}
               {createWOMutation.isError && (
                 <p className="text-sm text-red-600 bg-red-50 p-2 rounded mb-2">
@@ -350,28 +350,28 @@ export function AMMTicketDetailModal({
                 </p>
               )}
               {!showWorkOrderForm ? (
-                <Button type="button" onClick={() => setShowWorkOrderForm(true)}>Create Work Order</Button>
+                <Button type="button" onClick={() => setShowWorkOrderForm(true)}>Kreiraj radni nalog</Button>
               ) : (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Vendor *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Odabir izvođača *</label>
                     <select
                       value={selectedVendorId}
                       onChange={(e) => setSelectedVendorId(e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-lg"
                     >
-                      <option value="">— Select Vendor —</option>
+                      <option value="">— Odaberite izvođača —</option>
                       {vendorCompanies.map((v) => (
                         <option key={v.id} value={v.id}>{v.name}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Comment to Vendor *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Komentar izvođaču *</label>
                     <textarea
                       value={commentToVendor}
                       onChange={(e) => setCommentToVendor(e.target.value)}
-                      placeholder="Explain the issue and provide instructions for the vendor..."
+                      placeholder="Opišite problem i dajte upute izvođaču..."
                       rows={4}
                       className="w-full p-3 border border-gray-300 rounded-lg"
                     />
@@ -386,9 +386,9 @@ export function AMMTicketDetailModal({
                         createWOMutation.isPending
                       }
                     >
-                      {createWOMutation.isPending ? 'Sending...' : 'Send Work Order'}
+                      {createWOMutation.isPending ? 'Slanje...' : 'Pošalji radni nalog'}
                     </Button>
-                    <Button type="button" variant="secondary" onClick={() => setShowWorkOrderForm(false)}>Cancel</Button>
+                    <Button type="button" variant="secondary" onClick={() => setShowWorkOrderForm(false)}>Odustani</Button>
                   </div>
                 </div>
               )}
@@ -397,17 +397,17 @@ export function AMMTicketDetailModal({
 
           {canReturnToRequester && (
             <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Respond to clarification</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Odgovor na zahtjev za pojašnjenje</h3>
               <p className="text-sm text-blue-900 mb-2">
                 {ticket.clarificationRequestedByUserName != null || ticket.clarificationRequestedByUserRole != null
-                  ? `${ticket.clarificationRequestedByUserName ?? 'Requester'}${ticket.clarificationRequestedByUserRole != null ? ` (${INTERNAL_ROLE_LABELS[ticket.clarificationRequestedByUserRole] ?? ticket.clarificationRequestedByUserRole})` : ''} requested clarification. You can only return the ticket to them.`
-                  : 'Return the ticket to the role that requested clarification.'}
+                  ? `${ticket.clarificationRequestedByUserName ?? 'Requester'}${ticket.clarificationRequestedByUserRole != null ? ` (${INTERNAL_ROLE_LABELS[ticket.clarificationRequestedByUserRole] ?? ticket.clarificationRequestedByUserRole})` : ''} zatražio pojašnjenje. Možete vratiti prijavu samo njima.`
+                  : 'Vratite prijavu ulozi koja je zatražila pojašnjenje.'}
               </p>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Optional comment</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Komentar (opcionalno)</label>
               <textarea
                 value={clarificationComment}
                 onChange={(e) => setClarificationComment(e.target.value)}
-                placeholder="Add a comment (optional)..."
+                placeholder="Dodajte komentar (opcionalno)..."
                 rows={3}
                 className="w-full p-3 border border-gray-300 rounded-lg mb-3"
               />
@@ -416,15 +416,15 @@ export function AMMTicketDetailModal({
                 onClick={() => submitResponseToRequesterMutation.mutate(clarificationComment.trim() || undefined)}
                 disabled={submitResponseToRequesterMutation.isPending}
               >
-                {submitResponseToRequesterMutation.isPending ? 'Sending...' : `Return to ${ticket.clarificationRequestedByUserName ?? 'requester'}`}
+                {submitResponseToRequesterMutation.isPending ? 'Slanje...' : `Vrati na ${ticket.clarificationRequestedByUserName ?? 'podnositelja'}`}
               </Button>
             </section>
           )}
 
           {canRequestClarification && (
             <section className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Request Ticket Clarification</h3>
-              <p className="text-sm text-gray-700 mb-2">Send the ticket to a role that has been involved in this ticket. After they update it, the ticket will return to you.</p>
+              <h3 className="font-semibold text-gray-900 mb-2">Zahtjev za pojašnjenje</h3>
+              <p className="text-sm text-gray-700 mb-2">Pošaljite prijavu ulozi koja je bila uključena. Nakon ažuriranja, prijava se vraća Vama.</p>
               {clarifyMutation.isError && (
                 <p className="text-sm text-red-600 bg-red-50 p-2 rounded mb-2">
                   {(() => {
@@ -434,10 +434,10 @@ export function AMMTicketDetailModal({
                 </p>
               )}
               {!showClarificationPopup ? (
-                <Button type="button" onClick={() => { const baseRoles = ticket.involvedInternalRoles ?? ['SM']; const options = baseRoles.filter((r) => r !== ticket.currentOwnerUserRole); const targetOptions = options.length > 0 ? options : ['SM']; setAssignToRole(targetOptions[0] ?? 'SM'); setShowClarificationPopup(true); }}>Request Ticket Clarification</Button>
+                <Button type="button" onClick={() => { const baseRoles = ticket.involvedInternalRoles ?? ['SM']; const options = baseRoles.filter((r) => r !== ticket.currentOwnerUserRole); const targetOptions = options.length > 0 ? options : ['SM']; setAssignToRole(targetOptions[0] ?? 'SM'); setShowClarificationPopup(true); }}>Zatraži pojašnjenje</Button>
               ) : (
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">Send clarification request to</label>
+                  <label className="block text-sm font-medium text-gray-700">Pošalji zahtjev za pojašnjenje prema</label>
                   <select
                     value={assignToRole}
                     onChange={(e) => setAssignToRole(e.target.value)}
@@ -445,11 +445,11 @@ export function AMMTicketDetailModal({
                   >
                     {(() => { const baseRoles = ticket.involvedInternalRoles ?? ['SM']; const options = baseRoles.filter((r) => r !== ticket.currentOwnerUserRole); const targetOptions = options.length > 0 ? options : ['SM']; return targetOptions.map((r) => (<option key={r} value={r}>{INTERNAL_ROLE_LABELS[r] ?? r}</option>)); })()}
                   </select>
-                  <label className="block text-sm font-medium text-gray-700">Clarification text (mandatory)</label>
+                  <label className="block text-sm font-medium text-gray-700">Tekst pojašnjenja (obavezno)</label>
                   <textarea
                     value={clarificationComment}
                     onChange={(e) => setClarificationComment(e.target.value)}
-                    placeholder="Explain what needs clarification..."
+                    placeholder="Opišite što treba pojasniti..."
                     rows={4}
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
@@ -459,9 +459,9 @@ export function AMMTicketDetailModal({
                       onClick={() => clarifyMutation.mutate({ comment: clarificationComment, role: assignToRole })}
                       disabled={!clarificationComment.trim() || clarifyMutation.isPending}
                     >
-                      {clarifyMutation.isPending ? 'Sending...' : 'Submit'}
+                      {clarifyMutation.isPending ? 'Slanje...' : 'Pošalji'}
                     </Button>
-                    <Button type="button" variant="secondary" onClick={() => setShowClarificationPopup(false)}>Cancel</Button>
+                    <Button type="button" variant="secondary" onClick={() => setShowClarificationPopup(false)}>Odustani</Button>
                   </div>
                 </div>
               )}
@@ -470,16 +470,16 @@ export function AMMTicketDetailModal({
 
           {canReject && (
             <section className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Reject Ticket</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Odbijanje prijave</h3>
               {!showRejectForm ? (
-                <Button type="button" variant="danger" onClick={() => setShowRejectForm(true)}>Reject Ticket</Button>
+                <Button type="button" variant="danger" onClick={() => setShowRejectForm(true)}>Odbij prijavu</Button>
               ) : (
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-red-900">Reason (mandatory)</label>
+                  <label className="block text-sm font-medium text-red-900">Razlog (obavezno)</label>
                   <textarea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Reason for rejection..."
+                    placeholder="Razlog odbijanja..."
                     rows={3}
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
@@ -490,9 +490,9 @@ export function AMMTicketDetailModal({
                       onClick={() => rejectMutation.mutate(rejectReason)}
                       disabled={!rejectReason.trim() || rejectMutation.isPending}
                     >
-                      {rejectMutation.isPending ? 'Rejecting...' : 'Confirm Rejection'}
+                      {rejectMutation.isPending ? 'Odbijanje...' : 'Potvrdi odbijanje'}
                     </Button>
-                    <Button type="button" variant="secondary" onClick={() => setShowRejectForm(false)}>Cancel</Button>
+                    <Button type="button" variant="secondary" onClick={() => setShowRejectForm(false)}>Odustani</Button>
                   </div>
                 </div>
               )}
@@ -501,24 +501,24 @@ export function AMMTicketDetailModal({
 
           {canSubmitCost && (
             <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Submit Cost Estimation</h3>
-              <p className="text-sm text-blue-700 mb-3">Enter the estimated cost and optionally attach documents. This will route the ticket through the approval chain.</p>
+              <h3 className="font-semibold text-gray-900 mb-2">Predaja procjene troška</h3>
+              <p className="text-sm text-blue-700 mb-3">Unesite procijenjeni trošak i opcijski priložite dokumentaciju. Prijava će proći kroz lanac odobrenja.</p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Estimated amount (EUR)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Procijenjeni iznos (EUR)</label>
                   <input
                     type="number"
                     value={costAmount}
                     onChange={(e) => setCostAmount(e.target.value)}
-                    placeholder="Amount in EUR"
+                    placeholder="Iznos u EUR"
                     min="0"
                     step="0.01"
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Documents (optional)</label>
-                  <p className="text-xs text-gray-600 mb-2">Attach supporting documents for the cost estimation.</p>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Dokumenti (opcionalno)</label>
+                  <p className="text-xs text-gray-600 mb-2">Priložite prateću dokumentaciju za procjenu troška.</p>
                   <input
                     ref={costEstimationFileInputRef}
                     type="file"
@@ -534,7 +534,7 @@ export function AMMTicketDetailModal({
                     onClick={() => costEstimationFileInputRef.current?.click()}
                     disabled={uploadingAttachment}
                   >
-                    {uploadingAttachment ? 'Uploading...' : 'Add document(s)'}
+                    {uploadingAttachment ? 'Učitavanje...' : 'Dodaj dokument(e)'}
                   </Button>
                   {ticket.attachments != null && ticket.attachments.length > 0 && (
                     <ul className="mt-2 text-sm text-gray-600 list-disc list-inside">
@@ -550,7 +550,7 @@ export function AMMTicketDetailModal({
                     onClick={() => submitCostMutation.mutate(parseFloat(costAmount))}
                     disabled={!costAmount || parseFloat(costAmount) <= 0 || submitCostMutation.isPending}
                   >
-                    {submitCostMutation.isPending ? 'Submitting...' : 'Submit for Approval'}
+                    {submitCostMutation.isPending ? 'Slanje...' : 'Pošalji na odobrenje'}
                   </Button>
                 </div>
               </div>
@@ -559,7 +559,7 @@ export function AMMTicketDetailModal({
 
           {canArchive && (
             <section className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700 mb-2">Ticket is approved. Archive when all work orders are complete.</p>
+              <p className="text-sm text-gray-700 mb-2">Prijava je odobrena. Arhivirajte kada su svi radni nalozi završeni.</p>
               {archiveMutation.isError && (
                 <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
                   {(archiveMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
@@ -567,7 +567,7 @@ export function AMMTicketDetailModal({
                 </div>
               )}
               <Button type="button" variant="secondary" onClick={() => archiveMutation.mutate()} disabled={archiveMutation.isPending}>
-                {archiveMutation.isPending ? 'Archiving...' : 'Archive Ticket'}
+                {archiveMutation.isPending ? 'Arhiviranje...' : 'Arhiviraj prijavu'}
               </Button>
             </section>
           )}
@@ -575,7 +575,7 @@ export function AMMTicketDetailModal({
           {/* 11.3 Comments (internal; AMM sees all ticket comments) — newest first */}
           {ticket.comments != null && ticket.comments.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">Comments</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Komentari</h3>
               <div className="space-y-3">
                 {[...ticket.comments]
                   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -595,7 +595,7 @@ export function AMMTicketDetailModal({
           {/* 11.10 History Log — newest on top */}
           {ticket.auditLog != null && ticket.auditLog.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">History</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
               <div className="space-y-2">
                 {ticket.auditLog.map((entry) => (
                   <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
@@ -606,7 +606,7 @@ export function AMMTicketDetailModal({
                       <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}
                     <p className="mt-1 text-gray-600">
-                      Performed by {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
+                      Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                     </p>
                     {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
                   </div>
@@ -619,7 +619,7 @@ export function AMMTicketDetailModal({
         </div>
 
         <div className="p-6 border-t border-gray-200 sticky bottom-0 bg-white shrink-0">
-          <Button type="button" variant="secondary" onClick={onClose} className="w-full">Back</Button>
+          <Button type="button" variant="secondary" onClick={onClose} className="w-full">Natrag</Button>
         </div>
       </div>
     </div>

@@ -76,10 +76,10 @@ export function AreaManagerDashboard() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Area Manager Dashboard
+              Nadzorna ploča — Voditelj regije
             </h1>
             <p className="text-gray-600">
-              {session?.regionName ?? 'Regional Approval'}
+              {session?.regionName ?? 'Regionalno odobrenje'}
             </p>
           </div>
           <Link
@@ -94,11 +94,10 @@ export function AreaManagerDashboard() {
           <div className="flex items-start gap-3">
             <div className="text-blue-600 text-2xl">ℹ️</div>
             <div>
-              <h3 className="font-medium text-blue-900 mb-1">Your Role</h3>
+              <h3 className="font-medium text-blue-900 mb-1">Vaša uloga</h3>
               <p className="text-sm text-blue-700">
-                You approve non-urgent tickets before they proceed to cost
-                estimation. Review each ticket and either approve for processing
-                or reject if not applicable.
+                Odobravate ne-hitne prijave prije procjene troška. Pregledajte
+                svaku prijavu i odobrite ili odbijte.
               </p>
             </div>
           </div>
@@ -106,12 +105,12 @@ export function AreaManagerDashboard() {
 
         {isLoading ? (
           <Card>
-            <p className="text-gray-600">Loading tickets...</p>
+            <p className="text-gray-600">Učitavanje prijava...</p>
           </Card>
         ) : tickets != null && tickets.length > 0 ? (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              {tickets.length} ticket(s) awaiting approval
+              {tickets.length} prijava čeka odobrenje
             </p>
             {tickets.map((ticket) => (
               <Card
@@ -133,11 +132,11 @@ export function AreaManagerDashboard() {
                     </div>
                     <p className="text-gray-700 mb-2">{ticket.originalDescription ?? ticket.description}</p>
                     <div className="flex gap-4 text-sm text-gray-600 flex-wrap">
-                      <span>Store: {ticket.storeName}</span>
+                      <span>Poslovnica: {ticket.storeName}</span>
                       <span>•</span>
-                      <span>Category: {ticket.category}</span>
+                      <span>Kategorija: {ticket.category}</span>
                       <span>•</span>
-                      <span>Created by: {ticket.createdByUserName}</span>
+                      <span>Kreirao: {ticket.createdByUserName}</span>
                       <span>•</span>
                       <span>
                         {new Date(ticket.createdAt).toLocaleDateString()}
@@ -153,10 +152,10 @@ export function AreaManagerDashboard() {
             <div className="text-center py-8">
               <div className="text-4xl mb-4">✅</div>
               <p className="text-gray-600 text-lg font-medium mb-2">
-                All Caught Up!
+                Sve odrađeno!
               </p>
               <p className="text-sm text-gray-500">
-                No tickets awaiting your approval at the moment.
+                Nema prijava koje čekaju odobrenje.
               </p>
             </div>
           </Card>
@@ -165,12 +164,12 @@ export function AreaManagerDashboard() {
         {/* Active tickets (participated) & Closed tickets */}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Tickets
+            Prijave
           </h2>
           <p className="text-sm text-gray-600 mb-4">
             {sectionFilter === 'active'
-              ? 'Tickets you participated in (not current owner).'
-              : 'Tickets that finished their life (rejected, withdrawn, archived).'}
+              ? 'Prijave u kojima ste sudjelovali.'
+              : 'Zatvorene i arhivirane prijave.'}
           </p>
           <div className="flex gap-2 mb-4">
             <Button
@@ -179,7 +178,7 @@ export function AreaManagerDashboard() {
               size="sm"
               onClick={() => setSectionFilter('active')}
             >
-              Active tickets
+              Aktivne prijave
             </Button>
             <Button
               type="button"
@@ -187,13 +186,13 @@ export function AreaManagerDashboard() {
               size="sm"
               onClick={() => setSectionFilter('closed')}
             >
-              Closed tickets
+              Zatvorene prijave
             </Button>
           </div>
           {sectionLoading ? (
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500">Učitavanje...</p>
           ) : sectionTickets.length === 0 ? (
-            <p className="text-gray-600">No tickets in this list.</p>
+            <p className="text-gray-600">Nema prijava za prikaz.</p>
           ) : (
             <div className="space-y-3">
               {sectionTickets.map((ticket) => (
@@ -212,7 +211,7 @@ export function AreaManagerDashboard() {
                     {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
                     <span className="text-sm text-gray-600">{ticket.category}</span>
                     <span className="text-sm text-gray-500">
-                      Last updated {new Date(ticket.updatedAt).toLocaleDateString()}
+                      Zadnja izmjena {new Date(ticket.updatedAt).toLocaleDateString()}
                     </span>
                   </div>
                   <p className="text-sm text-gray-700 line-clamp-2">

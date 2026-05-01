@@ -9,18 +9,26 @@ interface BadgeProps {
 }
 
 export function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
-  const variants = {
-    default: 'bg-gray-100 text-gray-800',
-    secondary: 'bg-gray-200 text-gray-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    danger: 'bg-red-100 text-red-800',
-    urgent: 'bg-red-600 text-white',
+  const variantStyles: Record<string, React.CSSProperties> = {
+    default: { backgroundColor: '#F5F5F7', color: '#1D1D1F', border: '1px solid #D2D2D7' },
+    secondary: { backgroundColor: '#E8E8ED', color: '#6E6E73', border: '1px solid #D2D2D7' },
+    success: { backgroundColor: '#E8F8EC', color: '#1A7F37', border: '1px solid #B5DFC1' },
+    warning: { backgroundColor: '#FFF5E6', color: '#B45309', border: '1px solid #FDD8A0' },
+    danger: { backgroundColor: '#FFF0EE', color: '#CC2200', border: '1px solid #FFBBB5' },
+    urgent: { backgroundColor: 'var(--color-danger)', color: '#FFFFFF', border: 'none' },
   };
 
   return (
     <span
-      className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`.trim()}
+      className={`inline-flex items-center font-medium ${className}`}
+      style={{
+        ...variantStyles[variant],
+        fontSize: '11px',
+        padding: '2px 8px',
+        borderRadius: 'var(--radius-badge)',
+        letterSpacing: '0.01em',
+        lineHeight: '18px',
+      }}
     >
       {children}
     </span>

@@ -71,7 +71,7 @@ export function EntryScreen() {
     },
     onError: (err: { response?: { data?: { error?: string } } }) => {
       setGateError(
-        err?.response?.data?.error ?? 'Login failed. Please try again.'
+        err?.response?.data?.error ?? 'Prijava neuspješna. Pokušajte ponovo.'
       );
     },
   });
@@ -181,8 +181,8 @@ export function EntryScreen() {
               className="h-16 w-auto object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">CMMS System</h1>
-          <p className="text-gray-600 mb-6">Sign in to continue</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Maintrix</h1>
+          <p className="text-gray-600 mb-6">Prijavite se za nastavak</p>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -191,7 +191,7 @@ export function EntryScreen() {
           >
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
+                Korisničko ime
               </label>
               <input
                 type="text"
@@ -204,7 +204,7 @@ export function EntryScreen() {
             </div>
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                Lozinka
               </label>
               <input
                 type="password"
@@ -223,7 +223,7 @@ export function EntryScreen() {
               disabled={gateLoginMutation.isPending}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {gateLoginMutation.isPending ? 'Signing in...' : 'Sign in'}
+              {gateLoginMutation.isPending ? 'Prijava u tijeku...' : 'Prijava'}
             </button>
           </form>
         </div>
@@ -238,12 +238,12 @@ export function EntryScreen() {
             className="h-16 w-auto object-contain"
           />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">CMMS System</h1>
-        <p className="text-gray-600 mb-8">Demo Login - Select User</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Maintrix</h1>
+        <p className="text-gray-600 mb-8">Demo način — odabir korisnika</p>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            User Type
+            Vrsta korisnika
           </label>
           <div className="flex gap-4">
             <button
@@ -258,7 +258,7 @@ export function EntryScreen() {
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              Internal User
+              Interni korisnik
             </button>
             <button
               type="button"
@@ -272,23 +272,23 @@ export function EntryScreen() {
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              Vendor User
+              Izvođač
             </button>
           </div>
         </div>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select User
+            Odabir korisnika
           </label>
           {usersLoading && (
             <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">
-              Loading users…
+              Učitavanje korisnika...
             </p>
           )}
           {usersError && (
             <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 mb-2">
-              <p>Could not load users. Is the backend running at the API URL?</p>
+              <p>Nije moguće učitati korisnike. Provjeri je li backend pokrenut.</p>
               <p className="mt-1 text-xs opacity-90">
                 {(usersErrorDetail as { response?: { data?: { error?: string } }; message?: string })?.response?.data?.error ??
                   (usersErrorDetail as { message?: string })?.message ??
@@ -299,13 +299,13 @@ export function EntryScreen() {
                 onClick={() => refetchUsers()}
                 className="mt-2 text-sm font-medium text-red-800 underline hover:no-underline"
               >
-                Retry
+                Pokušaj ponovo
               </button>
             </div>
           )}
           {!usersLoading && !usersError && Array.isArray(users) && users.length === 0 && (
             <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">
-              No users in database. Run: <code className="bg-amber-100 px-1 rounded">npm run db:seed</code> in the backend package.
+              Nema korisnika u bazi. Pokreni: <code className="bg-amber-100 px-1 rounded">npm run db:seed</code> in the backend package.
             </p>
           )}
           <select
@@ -316,7 +316,7 @@ export function EntryScreen() {
             disabled={usersLoading || usersError}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           >
-            <option value="">-- Select a user --</option>
+            <option value="">-- Odaberi korisnika --</option>
             {users?.map((user) => (
               <option key={user.id} value={user.id}>
                 {user.name} ({user.role})
@@ -336,17 +336,17 @@ export function EntryScreen() {
           disabled={selectedUserId == null || loginMutation.isPending}
           className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
         >
-          {loginMutation.isPending ? 'Logging in...' : 'Login'}
+          {loginMutation.isPending ? 'Prijava u tijeku...' : 'Prijava'}
         </button>
 
         {loginMutation.isError && (
           <p className="mt-4 text-red-600 text-sm text-center">
-            Login failed. Please try again.
+            Prijava neuspješna. Pokušajte ponovo.
           </p>
         )}
 
         <p className="mt-6 text-xs text-gray-500 text-center">
-          Demo Mode - No password required
+          Demo način — bez lozinke
         </p>
         {gateEnabled && gateAuthenticated && (
           <button
@@ -354,7 +354,7 @@ export function EntryScreen() {
             onClick={handleGateLogout}
             className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700 underline"
           >
-            Sign out (gate)
+            Odjava
           </button>
         )}
       </div>

@@ -28,7 +28,23 @@ export function Card({
             }
           : undefined
       }
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${onClick != null ? 'cursor-pointer' : ''} ${className}`}
+      className={`${onClick != null ? 'cursor-pointer' : ''} ${className}`}
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderRadius: 'var(--radius-card)',
+        boxShadow: 'var(--shadow-card)',
+        border: '1px solid var(--color-border-light)',
+        padding: '20px 24px',
+        transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+      }}
+      onMouseEnter={onClick != null ? e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-card-hover)';
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-1px)';
+      } : undefined}
+      onMouseLeave={onClick != null ? e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-card)';
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+      } : undefined}
     >
       {children}
     </div>

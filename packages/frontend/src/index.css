@@ -1,3 +1,24 @@
+:root {
+  --color-bg: #F5F5F7;
+  --color-surface: #FFFFFF;
+  --color-header: #1D1D1F;
+  --color-text-primary: #1D1D1F;
+  --color-text-secondary: #6E6E73;
+  --color-text-tertiary: #AEAEB2;
+  --color-accent: #0071E3;
+  --color-accent-hover: #0077ED;
+  --color-border: #D2D2D7;
+  --color-border-light: #E8E8ED;
+  --color-danger: #FF3B30;
+  --color-success: #34C759;
+  --color-warning: #FF9500;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.06);
+  --radius-card: 12px;
+  --radius-button: 8px;
+  --radius-badge: 6px;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,6 +28,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

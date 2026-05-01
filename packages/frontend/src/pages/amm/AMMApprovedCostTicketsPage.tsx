@@ -42,7 +42,7 @@ export function AMMApprovedCostTicketsPage() {
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
   return (
-    <Layout screenTitle="Tickets with Approved Cost">
+    <Layout screenTitle="Prijave s odobrenom procjenom">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -53,7 +53,7 @@ export function AMMApprovedCostTicketsPage() {
           </div>
           <Link to="/amm">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
@@ -62,7 +62,7 @@ export function AMMApprovedCostTicketsPage() {
           <p className="text-gray-500">Loading…</p>
         ) : approvedCostTickets.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
-            No tickets with approved cost.
+            Nema prijava s odobrenom procjenom.
           </div>
         ) : (
           <ul className="space-y-2">

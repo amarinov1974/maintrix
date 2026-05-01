@@ -43,12 +43,12 @@ export function AMMFollowUpWorkOrdersPage() {
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
   return (
-    <Layout screenTitle="Follow-Up / Exception Work Orders">
+    <Layout screenTitle="Radni nalozi — iznimke">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Follow-Up / Exception Work Orders
+              Radni nalozi — iznimke
             </h1>
             <p className="text-sm text-gray-600 mt-0.5">
               Follow-Up Requested, Repair Unsuccessful, or New WO Needed — newest first
@@ -56,7 +56,7 @@ export function AMMFollowUpWorkOrdersPage() {
           </div>
           <Link to="/amm">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
@@ -65,7 +65,7 @@ export function AMMFollowUpWorkOrdersPage() {
           <p className="text-gray-500">Loading…</p>
         ) : followUpWOs.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
-            No follow-up or exception work orders.
+            Nema radnih naloga iznimki.
           </div>
         ) : (
           <ul className="space-y-2">

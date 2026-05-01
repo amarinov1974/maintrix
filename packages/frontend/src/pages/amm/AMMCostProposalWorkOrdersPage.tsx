@@ -37,12 +37,12 @@ export function AMMCostProposalWorkOrdersPage() {
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
   return (
-    <Layout screenTitle="Work Orders Awaiting Cost Proposal Review">
+    <Layout screenTitle="Radni nalozi — odobrenje ponude">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Work Orders Awaiting Cost Proposal Review
+              Radni nalozi — odobrenje ponude
             </h1>
             <p className="text-sm text-gray-600 mt-0.5">
               Approve / Request Revision / Close Without Cost — newest first
@@ -50,7 +50,7 @@ export function AMMCostProposalWorkOrdersPage() {
           </div>
           <Link to="/amm">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
@@ -59,7 +59,7 @@ export function AMMCostProposalWorkOrdersPage() {
           <p className="text-gray-500">Loading…</p>
         ) : costProposalWOs.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
-            No work orders awaiting cost proposal review.
+            Nema radnih naloga koji čekaju odobrenje ponude.
           </div>
         ) : (
           <ul className="space-y-2">

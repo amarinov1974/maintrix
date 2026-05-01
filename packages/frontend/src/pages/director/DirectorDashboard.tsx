@@ -14,9 +14,9 @@ import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
 
 function getRoleLabel(role: string) {
-  if (role === 'D') return 'Sales Director';
-  if (role === 'C2') return 'Maintenance Director';
-  if (role === 'BOD') return 'Board of Directors';
+  if (role === 'D') return 'Direktor prodaje';
+  if (role === 'C2') return 'Direktor održavanja';
+  if (role === 'BOD') return 'Upravni odbor';
   return role;
 }
 
@@ -73,7 +73,7 @@ export function DirectorDashboard() {
             <h1 className="text-2xl font-bold text-gray-900">
               {getRoleLabel(session?.role ?? '')} Dashboard
             </h1>
-            <p className="text-gray-600">Cost Estimation Approvals</p>
+            <p className="text-gray-600">Odobrenje procjena troška</p>
           </div>
           <Link
             to="/assets"
@@ -88,15 +88,14 @@ export function DirectorDashboard() {
             <div className="text-blue-600 text-2xl">💰</div>
             <div>
               <h3 className="font-medium text-blue-900 mb-1">
-                Your Role in Approval Chain
+                Vaša uloga u lancu odobrenja
               </h3>
               <p className="text-sm text-blue-700 mb-2">
-                You review cost estimations for maintenance tickets based on
-                approval thresholds:
+                Pregledavate procjene troška na temelju pragova odobrenja:
               </p>
               <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
                 <li>
-                  <strong>≤ €1,000:</strong> AM only (you won&apos;t see these)
+                  <strong>≤ €1,000:</strong> Samo AM (nećete vidjeti ove prijave)
                 </li>
                 <li>
                   <strong>€1,001 - €3,000:</strong> AM → D → C2
@@ -111,12 +110,12 @@ export function DirectorDashboard() {
 
         {isLoading ? (
           <Card>
-            <p className="text-gray-600">Loading tickets...</p>
+            <p className="text-gray-600">Učitavanje prijava...</p>
           </Card>
         ) : tickets != null && tickets.length > 0 ? (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              {tickets.length} ticket(s) awaiting your approval
+              {tickets.length} prijava čeka Vaše odobrenje
             </p>
             {tickets.map((ticket) => (
               <Card
@@ -130,15 +129,15 @@ export function DirectorDashboard() {
                       <h3 className="text-lg font-semibold text-gray-900">
                         Ticket #{ticket.id}
                       </h3>
-                      <Badge variant="warning">Awaiting Approval</Badge>
+                      <Badge variant="warning">Čeka odobrenje</Badge>
                     </div>
                     <p className="text-gray-700 mb-2">{ticket.originalDescription ?? ticket.description}</p>
                     <div className="flex gap-4 text-sm text-gray-600 flex-wrap">
-                      <span>Store: {ticket.storeName}</span>
+                      <span>Poslovnica: {ticket.storeName}</span>
                       <span>•</span>
-                      <span>Category: {ticket.category}</span>
+                      <span>Kategorija: {ticket.category}</span>
                       <span>•</span>
-                      <span>Created by: {ticket.createdByUserName}</span>
+                      <span>Kreirao: {ticket.createdByUserName}</span>
                     </div>
                   </div>
                 </div>
@@ -150,10 +149,10 @@ export function DirectorDashboard() {
             <div className="text-center py-8">
               <div className="text-4xl mb-4">✅</div>
               <p className="text-gray-600 text-lg font-medium mb-2">
-                All Caught Up!
+                Sve odrađeno!
               </p>
               <p className="text-sm text-gray-500">
-                No cost estimations awaiting your approval at the moment.
+                Nema procjena troška koje čekaju Vaše odobrenje.
               </p>
             </div>
           </Card>
@@ -161,9 +160,9 @@ export function DirectorDashboard() {
 
         {/* My tickets — read-only, participated but not current owner */}
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">My tickets</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Moje prijave</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Tickets you participated in (e.g. in the approval chain) but are not currently owning. Read-only.
+            Prijave u kojima ste sudjelovali (npr. u lancu odobrenja). Samo pregled.
           </p>
           <div className="flex gap-2 mb-4">
             <Button
@@ -172,7 +171,7 @@ export function DirectorDashboard() {
               size="sm"
               onClick={() => setTicketReadOnlyFilter('active')}
             >
-              Active tickets ({myActiveTickets.length})
+              Aktivne prijave ({myActiveTickets.length})
             </Button>
             <Button
               type="button"
@@ -180,13 +179,13 @@ export function DirectorDashboard() {
               size="sm"
               onClick={() => setTicketReadOnlyFilter('closed')}
             >
-              Closed tickets ({myClosedTickets.length})
+              Zatvorene prijave ({myClosedTickets.length})
             </Button>
           </div>
           {loadingParticipated ? (
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500">Učitavanje...</p>
           ) : readOnlyTicketsFiltered.length === 0 ? (
-            <p className="text-gray-500">No tickets in this group.</p>
+            <p className="text-gray-500">Nema prijava u ovoj grupi.</p>
           ) : (
             <div className="space-y-2">
               {readOnlyTicketsFiltered.map((t) => (

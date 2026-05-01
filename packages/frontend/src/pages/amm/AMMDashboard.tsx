@@ -146,12 +146,12 @@ export function AMMDashboard() {
       : sortNewestFirst(myClosedWOs);
 
   return (
-    <Layout screenTitle="Dashboard">
+    <Layout screenTitle="Nadzorna ploča">
       <div className="space-y-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Area Maintenance Manager</h1>
-            <p className="text-gray-600">{session?.regionName ?? 'Dashboard'}</p>
+            <h1 className="text-2xl font-bold text-gray-900">Voditelj održavanja</h1>
+            <p className="text-gray-600">{session?.regionName ?? 'Nadzorna ploča'}</p>
           </div>
           <Link
             to="/assets"
@@ -163,15 +163,15 @@ export function AMMDashboard() {
 
         {/* Tickets — Create Ticket + Ticket action groups */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Tickets</h2>
+          <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Prijave</h2>
           <Card className="bg-slate-50 border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Create Ticket</h2>
-              <p className="text-sm text-gray-600">Create a ticket for any store in your region.</p>
+              <h2 className="text-lg font-semibold text-gray-900">Nova prijava</h2>
+              <p className="text-sm text-gray-600">Kreirajte prijavu za bilo koju poslovnicu u regiji.</p>
             </div>
             <Link to="/amm/submit">
-              <Button type="button">Submit New Ticket</Button>
+              <Button type="button">Nova prijava</Button>
             </Link>
           </div>
         </Card>
@@ -185,10 +185,10 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Urgent Tickets</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Hitne prijave</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="warning">{openUrgentTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
                 <p className="text-sm text-gray-600 mt-1">Submitted, updated (after clarification), or awaiting cost estimation — urgent, owned by you</p>
@@ -197,7 +197,7 @@ export function AMMDashboard() {
           ) : (
             <Card className="border-amber-200 bg-amber-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Urgent Tickets</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Hitne prijave</h2>
                 <Badge variant="warning">0</Badge>
               </div>
               <p className="text-sm text-gray-600 mt-1">Submitted, updated (after clarification), or awaiting cost estimation — urgent, owned by you</p>
@@ -210,22 +210,22 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Tickets Awaiting Cost Estimation</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Prijave — čeka procjena troška</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="warning">{costEstimationNeededTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Non-urgent tickets in Cost Estimation Needed, owned by you</p>
+                <p className="text-sm text-gray-600 mt-1">Prijave koje čekaju procjenu troška</p>
               </Card>
             </Link>
           ) : (
             <Card className="border-blue-200 bg-blue-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Tickets Awaiting Cost Estimation</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Prijave — čeka procjena troška</h2>
                 <Badge variant="warning">0</Badge>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Non-urgent tickets in Cost Estimation Needed, owned by you</p>
+              <p className="text-sm text-gray-600 mt-1">Prijave koje čekaju procjenu troška</p>
             </Card>
           )}
           {approvedCostTickets.length > 0 ? (
@@ -235,22 +235,22 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Tickets with Approved Cost</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Prijave s odobrenom procjenom</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="success">{approvedCostTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Cost estimation approved — create first work order or archive</p>
+                <p className="text-sm text-gray-600 mt-1">Procjena odobrena — kreirati radni nalog</p>
               </Card>
             </Link>
           ) : (
             <Card className="border-green-200 bg-green-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Tickets with Approved Cost</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Prijave s odobrenom procjenom</h2>
                 <Badge variant="success">0</Badge>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Cost estimation approved — create first work order or archive</p>
+              <p className="text-sm text-gray-600 mt-1">Procjena odobrena — kreirati radni nalog</p>
             </Card>
           )}
           {workInProgressTickets.length > 0 ? (
@@ -260,22 +260,22 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Tickets — Work in Progress</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Prijave — rad u tijeku</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="default">{workInProgressTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Work order(s) sent — create extra work orders or archive when all done</p>
+                <p className="text-sm text-gray-600 mt-1">Radni nalog poslan izvođaču</p>
               </Card>
             </Link>
           ) : (
             <Card className="border-teal-200 bg-teal-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Tickets — Work in Progress</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Prijave — rad u tijeku</h2>
                 <Badge variant="default">0</Badge>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Work order(s) sent — create extra work orders or archive when all done</p>
+              <p className="text-sm text-gray-600 mt-1">Radni nalog poslan izvođaču</p>
             </Card>
           )}
         </div>
@@ -283,7 +283,7 @@ export function AMMDashboard() {
 
         {/* Work Orders — WO action groups */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Work Orders</h2>
+          <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Radni nalozi</h2>
           <div className="grid gap-4 sm:grid-cols-2">
           {returnedWorkOrders.length > 0 ? (
             <Link to="/amm/returned-work-orders">
@@ -292,22 +292,22 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Work orders — returned</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Vraćeni radni nalozi</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="warning">{returnedWorkOrders.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Returned or rejected by service provider (S1) — review and resend or close</p>
+                <p className="text-sm text-gray-600 mt-1">Vraćeni ili odbijeni od izvođača</p>
               </Card>
             </Link>
           ) : (
             <Card className="border-rose-200 bg-rose-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Work orders — returned</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Vraćeni radni nalozi</h2>
                 <Badge variant="warning">0</Badge>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Returned or rejected by service provider (S1) — review and resend or close</p>
+              <p className="text-sm text-gray-600 mt-1">Vraćeni ili odbijeni od izvođača</p>
             </Card>
           )}
           {workOrdersWithVendor.length > 0 ? (
@@ -317,22 +317,22 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Work orders sent to vendors</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Radni nalozi kod izvođača</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="default">{workOrdersWithVendor.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">View status and details</p>
+                <p className="text-sm text-gray-600 mt-1">Pregled statusa i detalja</p>
               </Card>
             </Link>
           ) : (
             <Card className="border-sky-200 bg-sky-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Work orders sent to vendors</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Radni nalozi kod izvođača</h2>
                 <Badge variant="default">0</Badge>
               </div>
-              <p className="text-sm text-gray-600 mt-1">View status and details</p>
+              <p className="text-sm text-gray-600 mt-1">Pregled statusa i detalja</p>
             </Card>
           )}
           {costProposalPreparedWOs.length > 0 ? (
@@ -342,22 +342,22 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Work Orders Awaiting Cost Proposal Review</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — odobrenje ponude</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="warning">{costProposalPreparedWOs.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Approve / Request Revision / Close Without Cost</p>
+                <p className="text-sm text-gray-600 mt-1">Odobrenje ponude troška</p>
               </Card>
             </Link>
           ) : (
             <Card className="border-emerald-200 bg-emerald-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Work Orders Awaiting Cost Proposal Review</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — odobrenje ponude</h2>
                 <Badge variant="warning">0</Badge>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Approve / Request Revision / Close Without Cost</p>
+              <p className="text-sm text-gray-600 mt-1">Odobrenje ponude troška</p>
             </Card>
           )}
           {followUpExceptionWOs.length > 0 ? (
@@ -367,22 +367,22 @@ export function AMMDashboard() {
                 onClick={undefined}
               >
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Follow-Up / Exception Work Orders</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — iznimke</h2>
                   <div className="flex items-center gap-3">
                     <Badge variant="warning">{followUpExceptionWOs.length}</Badge>
-                    <span className="text-sm text-gray-500">Click to open list</span>
+                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Follow-Up Requested, Repair Unsuccessful, or New WO Needed</p>
+                <p className="text-sm text-gray-600 mt-1">Radni nalozi koji trebaju pažnju</p>
               </Card>
             </Link>
           ) : (
             <Card className="border-orange-200 bg-orange-50/50 opacity-90">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Follow-Up / Exception Work Orders</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — iznimke</h2>
                 <Badge variant="warning">0</Badge>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Follow-Up Requested, Repair Unsuccessful, or New WO Needed</p>
+              <p className="text-sm text-gray-600 mt-1">Radni nalozi koji trebaju pažnju</p>
             </Card>
           )}
           </div>
@@ -390,9 +390,9 @@ export function AMMDashboard() {
 
         {/* 10.6 Read-Only — My Tickets */}
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">My tickets</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Moje prijave</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Tickets in your region you participated in (active) or that are closed.
+            Prijave u regiji u kojima ste sudjelovali.
           </p>
           <div className="flex gap-2 mb-4">
             <Button
@@ -401,7 +401,7 @@ export function AMMDashboard() {
               size="sm"
               onClick={() => setTicketReadOnlyFilter('active')}
             >
-              Active tickets ({myActiveTickets.length})
+              Aktivne prijave ({myActiveTickets.length})
             </Button>
             <Button
               type="button"
@@ -409,14 +409,14 @@ export function AMMDashboard() {
               size="sm"
               onClick={() => setTicketReadOnlyFilter('closed')}
             >
-              Closed tickets ({myClosedTickets.length})
+              Zatvorene prijave ({myClosedTickets.length})
             </Button>
           </div>
           {(ticketReadOnlyFilter === 'active' && loadingParticipatedTickets) ||
           (ticketReadOnlyFilter === 'closed' && loadingRegionTickets) ? (
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500">Učitavanje...</p>
           ) : readOnlyTicketsFiltered.length === 0 ? (
-            <p className="text-gray-500">No tickets in this group.</p>
+            <p className="text-gray-500">Nema prijava u ovoj grupi.</p>
           ) : (
             <div className="space-y-2">
               {readOnlyTicketsFiltered.map((t) => (
@@ -432,9 +432,9 @@ export function AMMDashboard() {
 
         {/* 10.7 Read-Only — My Work Orders */}
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">My work orders</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Moji radni nalozi</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Work orders in your region — active (in progress) or closed.
+            Radni nalozi u regiji — aktivni ili zatvoreni.
           </p>
           <div className="flex gap-2 mb-4">
             <Button
@@ -443,7 +443,7 @@ export function AMMDashboard() {
               size="sm"
               onClick={() => setWoReadOnlyFilter('active')}
             >
-              Active work orders ({myActiveWOs.length})
+              Aktivni radni nalozi ({myActiveWOs.length})
             </Button>
             <Button
               type="button"
@@ -451,13 +451,13 @@ export function AMMDashboard() {
               size="sm"
               onClick={() => setWoReadOnlyFilter('closed')}
             >
-              Closed work orders ({myClosedWOs.length})
+              Zatvoreni radni nalozi ({myClosedWOs.length})
             </Button>
           </div>
           {loadingRegionWOs ? (
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500">Učitavanje...</p>
           ) : readOnlyWOsFiltered.length === 0 ? (
-            <p className="text-gray-500">No work orders in this group.</p>
+            <p className="text-gray-500">Nema radnih naloga u ovoj grupi.</p>
           ) : (
             <div className="space-y-2">
               {readOnlyWOsFiltered.map((wo) => (
