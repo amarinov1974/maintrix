@@ -10,7 +10,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Card, Badge, Button } from '../../components/shared';
 import { AMTicketDetailModal } from './AMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
-import { formatCategory } from '../../utils/formatters';
+import { formatCategory, formatStatus } from '../../utils/formatters';
 
 function BucketCard({
   title,
@@ -187,12 +187,12 @@ export function AreaManagerDashboard() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        Ticket #{ticket.id}
+                        Prijava #{ticket.id}
                       </h3>
                       <Badge
                         variant={getStatusBadgeVariant(ticket.currentStatus)}
                       >
-                        {ticket.currentStatus}
+                        {formatStatus(ticket.currentStatus)}
                       </Badge>
                     </div>
                     <p className="text-gray-700 mb-2">{ticket.originalDescription ?? ticket.description}</p>
@@ -268,10 +268,10 @@ export function AreaManagerDashboard() {
                 >
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="font-semibold text-gray-900">
-                      Ticket #{ticket.id}
+                      Prijava #{ticket.id}
                     </span>
                     <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>
-                      {ticket.currentStatus}
+                      {formatStatus(ticket.currentStatus)}
                     </Badge>
                     {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
                     <span className="text-sm text-gray-600">{formatCategory(ticket.category)}</span>

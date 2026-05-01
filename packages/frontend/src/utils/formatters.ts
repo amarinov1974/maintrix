@@ -43,3 +43,18 @@ export function formatAssetStatus(value: string): string {
   };
   return map[value] ?? value;
 }
+
+export function formatStatus(value: string): string {
+  const map: Record<string, string> = {
+    'Cost Estimation Needed': 'Potrebna procjena troška',
+    'Awaiting Ticket Creator Response': 'Čeka odgovor podnositelja',
+    'Updated Ticket Submitted': 'Ažurirana prijava podnesena',
+    'Work Order In Progress': 'Radni nalog u tijeku',
+    'Ticket Cost Estimation Approved': 'Procjena troška odobrena',
+    'Ticket Archived': 'Prijava arhivirana',
+    'Ticket Rejected': 'Prijava odbijena',
+    'Ticket Submitted': 'Prijava podnesena',
+    Draft: 'Nacrt',
+  };
+  return map[value] ?? value;
+}

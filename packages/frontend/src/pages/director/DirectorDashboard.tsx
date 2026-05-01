@@ -12,7 +12,7 @@ import { Layout, Card, Badge, Button } from '../../components/shared';
 import { DirectorTicketDetailModal } from './DirectorTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
-import { formatCategory } from '../../utils/formatters';
+import { formatCategory, formatStatus } from '../../utils/formatters';
 
 function BucketCard({
   title,
@@ -183,7 +183,7 @@ export function DirectorDashboard() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        Ticket #{ticket.id}
+                        Prijava #{ticket.id}
                       </h3>
                       <Badge variant="warning">Čeka odobrenje</Badge>
                     </div>
@@ -277,9 +277,9 @@ function TicketRow({ ticket, onClick }: { ticket: Ticket; onClick: () => void })
         onClick();
       }}
     >
-      <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
+      <span className="font-semibold text-gray-900">Prijava #{ticket.id}</span>
       {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{ticket.currentStatus}</Badge>
+      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
       <span className="text-sm text-gray-600">{ticket.storeName}</span>
       <span className="text-sm text-gray-500">{new Date(ticket.createdAt).toLocaleDateString()}</span>
     </button>

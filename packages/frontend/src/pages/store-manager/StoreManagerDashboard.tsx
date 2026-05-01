@@ -12,7 +12,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Card, Badge } from '../../components/shared';
 import { TicketDetailModal } from './TicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
-import { formatCategory } from '../../utils/formatters';
+import { formatCategory, formatStatus } from '../../utils/formatters';
 
 function BucketCard({
   title,
@@ -328,10 +328,10 @@ export function StoreManagerDashboard() {
                 >
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="font-semibold text-gray-900">
-                      Ticket #{ticket.id}
+                      Prijava #{ticket.id}
                     </span>
                     <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>
-                      {ticket.currentStatus}
+                      {formatStatus(ticket.currentStatus)}
                     </Badge>
                     {ticket.urgent && (
                       <Badge variant="urgent">URGENT</Badge>

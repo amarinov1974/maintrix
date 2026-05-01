@@ -15,6 +15,7 @@ import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import { TicketStatus, WorkOrderStatus, TerminalWorkOrderStatuses } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
 import type { WorkOrder } from '../../api/work-orders';
+import { formatStatus } from '../../utils/formatters';
 
 function BucketCard({
   title,
@@ -420,9 +421,9 @@ function TicketRow({ ticket, onClick }: { ticket: Ticket; onClick: () => void })
         onClick();
       }}
     >
-      <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
+      <span className="font-semibold text-gray-900">Prijava #{ticket.id}</span>
       {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{ticket.currentStatus}</Badge>
+      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
       <span className="text-sm text-gray-600">{ticket.storeName}</span>
       <span className="text-sm text-gray-500">{new Date(ticket.createdAt).toLocaleDateString()}</span>
     </button>
@@ -441,7 +442,7 @@ function WorkOrderRow({ workOrder, onSelect }: { workOrder: WorkOrder; onSelect:
       }}
     >
       <span className="font-semibold text-gray-900">Work Order #{workOrder.id}</span>
-      <span className="text-sm text-gray-600">Ticket #{workOrder.ticketId}</span>
+      <span className="text-sm text-gray-600">Prijava #{workOrder.ticketId}</span>
       <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>{workOrder.currentStatus}</Badge>
       <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>
       <span className="text-sm text-gray-500">{new Date(workOrder.updatedAt).toLocaleDateString()}</span>
