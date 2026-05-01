@@ -1101,6 +1101,7 @@ export class WorkOrderService {
    */
   async listWorkOrders(params: {
     companyId?: number;
+    userType: 'INTERNAL' | 'VENDOR';
     vendorCompanyId?: number;
     currentOwnerId?: number;
     ticketId?: number;
@@ -1118,11 +1119,20 @@ export class WorkOrderService {
       currentStatus?: PrismaWorkOrderStatus;
       currentOwnerType?: 'INTERNAL' | 'VENDOR';
     } = {};
-    if (params.vendorCompanyId != null) where.vendorCompanyId = params.vendorCompanyId;
+    if (params.userType === 'VENDOR') {
+      if (params.companyId == null) {
+        throw new Error('Vendor scope requires vendor company id in session');
+      }
+      where.vendorCompanyId = params.companyId;
+    } else if (params.vendorCompanyId != null) {
+      where.vendorCompanyId = params.vendorCompanyId;
+    }
     if (params.currentOwnerId != null) where.currentOwnerId = params.currentOwnerId;
     if (params.ticketId != null) where.ticketId = params.ticketId;
     const ticketWhere: { companyId?: number; storeId?: number; store?: { regionId: number }; urgent?: boolean } = {};
-    if (params.companyId != null) ticketWhere.companyId = params.companyId;
+    if (params.userType !== 'VENDOR' && params.companyId != null) {
+      ticketWhere.companyId = params.companyId;
+    }
     if (params.storeId != null) ticketWhere.storeId = params.storeId;
     if (params.regionId != null) ticketWhere.store = { regionId: params.regionId };
     if (params.urgent != null) ticketWhere.urgent = params.urgent;
@@ -1160,9 +1170,22 @@ export class WorkOrderService {
   /**
    * Get work order by ID (includes S1 detail: store, category, urgent, commentToVendor, attachments, asset)
    */
-  async getWorkOrder(workOrderId: number, companyId?: number): Promise<WorkOrderDetailResponse> {
+  async getWorkOrder(
+    workOrderId: number,
+    scope: { companyId?: number; userType: 'INTERNAL' | 'VENDOR' }
+  ): Promise<WorkOrderDetailResponse> {
+    const where =
+      scope?.userType === 'VENDOR'
+        ? {
+            id: workOrderId,
+            ...(scope.companyId != null ? { vendorCompanyId: scope.companyId } : {}),
+          }
+        : {
+            id: workOrderId,
+            ...(scope?.companyId != null ? { ticket: { companyId: scope.companyId } } : {}),
+          };
     const wo = await prisma.workOrder.findUnique({
-      where: { id: workOrderId, ...(companyId != null ? { ticket: { companyId } } : {}) },
+      where,
       include: {
         vendorCompany: true,
         assignedTechnician: true,
