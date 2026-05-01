@@ -36,11 +36,11 @@ export function S1WorkOrderList({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-900">{title}</h2>
         <Button type="button" variant="secondary" onClick={onBack}>
-          Back
+          Natrag
         </Button>
       </div>
       {items.length === 0 ? (
-        <p className="text-gray-600">No work orders in this group.</p>
+        <p className="text-gray-600">Nema radnih naloga.</p>
       ) : (
         <div className="space-y-2">
           {items.map((wo) => (
@@ -62,7 +62,7 @@ export function S1WorkOrderList({
                   {wo.storeName ?? 'Store'}
                 </span>
                 <Badge variant={wo.urgent ? 'danger' : 'secondary'}>
-                  {wo.urgent ? 'Urgent' : 'Non-Urgent'}
+                  {wo.urgent ? 'Hitno' : 'Nije hitno'}
                 </Badge>
                 <span className="text-sm text-gray-500">
                   ETA: {formatEta(wo.eta)}
@@ -74,13 +74,13 @@ export function S1WorkOrderList({
               <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                 <span>Category: {wo.category ? formatCategory(wo.category) : '—'}</span>
                 <span>•</span>
-                <span>AMM comment: {shortComment(wo.commentToVendor)}</span>
+                <span>Komentar VMO: {shortComment(wo.commentToVendor)}</span>
                 <span>•</span>
                 <span className="font-medium">{formatStatus(wo.currentStatus)}</span>
                 {wo.assignedTechnicianName != null && wo.assignedTechnicianName !== '' && (
                   <>
                     <span>•</span>
-                    <span>Owner: <strong>{wo.assignedTechnicianName}</strong></span>
+                    <span>Vlasnik: <strong>{wo.assignedTechnicianName}</strong></span>
                   </>
                 )}
               </div>

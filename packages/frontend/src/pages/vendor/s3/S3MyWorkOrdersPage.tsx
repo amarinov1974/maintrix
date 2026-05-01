@@ -44,19 +44,19 @@ export function S3MyWorkOrdersPage() {
     : myWorkOrders.filter((wo) => TerminalWorkOrderStatuses.includes(wo.currentStatus));
 
   const listTitle = isActive
-    ? 'Active work orders (you are not owner)'
-    : 'Closed work orders (you are not owner)';
+    ? 'Aktivni radni nalozi (niste vlasnik)'
+    : 'Zatvoreni radni nalozi (niste vlasnik)';
 
   return (
-    <Layout screenTitle={listTitle}>
+    <Layout screenTitle="Moji radni nalozi">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <Button type="button" variant="secondary" onClick={() => navigate('/vendor/s3')}>
-            Back to dashboard
+            Natrag na nadzornu ploču
           </Button>
         </div>
         {isLoading ? (
-          <p className="text-gray-600">Loading work orders...</p>
+          <p className="text-gray-600">Učitavanje radnih naloga...</p>
         ) : (
           <S3WorkOrderList
             items={listItems}

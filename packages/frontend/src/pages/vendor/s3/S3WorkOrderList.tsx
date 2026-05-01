@@ -69,7 +69,7 @@ export function S3WorkOrderList({
             </Button>
           )}
           <Button type="button" variant="secondary" onClick={onBack}>
-            Back
+            Natrag
           </Button>
         </div>
       </div>
@@ -84,7 +84,7 @@ export function S3WorkOrderList({
         </div>
       )}
       {items.length === 0 ? (
-        <p className="text-gray-600">No work orders in this group.</p>
+        <p className="text-gray-600">Nema radnih naloga.</p>
       ) : (
         <div className="space-y-2">
           {isApprovedList && (

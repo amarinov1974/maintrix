@@ -91,15 +91,15 @@ export function S1Dashboard() {
                 : [];
 
   return (
-    <Layout screenTitle="Dashboard">
+    <Layout screenTitle="Nadzorna ploča">
       <div className="space-y-6">
         <Card className="bg-blue-50 border-blue-200">
           <div className="flex items-start gap-3">
             <div className="text-blue-600 text-2xl">👷</div>
             <div>
-              <h3 className="font-medium text-blue-900 mb-1">Your Role</h3>
+              <h3 className="font-medium text-blue-900 mb-1">Vaša uloga</h3>
               <p className="text-sm text-blue-700">
-                Assign technicians to new work orders, set ETA, or return/reject. Active and archived are read-only.
+                Dodijelite tehničare novim radnim nalozima, postavite ETA ili odbijte. Aktivni i arhivirani su samo za pregled.
               </p>
             </div>
           </div>
@@ -110,23 +110,23 @@ export function S1Dashboard() {
             items={listItems}
             title={
               listMode === 'urgent'
-                ? 'New Work Orders — Urgent'
+                ? 'Novi radni nalozi — Hitno'
                 : listMode === 'non-urgent'
-                  ? 'New Work Orders — Non-Urgent'
+                  ? 'Novi radni nalozi — Nije hitno'
                   : listMode === 'active'
-                    ? 'Active Work Orders'
+                    ? 'Aktivni radni nalozi'
                     : listMode === 'archived'
-                      ? 'Archived Work Orders'
+                      ? 'Arhivirani radni nalozi'
                       : listMode === 'other-active'
-                        ? 'Active work orders (you are not owner)'
-                        : 'Closed work orders (you are not owner)'
+                        ? 'Aktivni radni nalozi (niste vlasnik)'
+                        : 'Zatvoreni radni nalozi (niste vlasnik)'
             }
             onBack={() => setListMode(null)}
             onSelectWo={(id) => setSelectedWorkOrderId(id)}
           />
         ) : isLoading ? (
           <Card>
-            <p className="text-gray-600">Loading work orders...</p>
+            <p className="text-gray-600">Učitavanje...</p>
           </Card>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -134,42 +134,42 @@ export function S1Dashboard() {
               className="bg-amber-50 border-amber-200 cursor-pointer hover:shadow-md transition"
               onClick={() => setListMode('urgent')}
             >
-              <h3 className="font-medium text-amber-900 mb-1">New Work Orders — Urgent</h3>
+              <h3 className="font-medium text-amber-900 mb-1">Novi radni nalozi — Hitno</h3>
               <p className="text-3xl font-bold text-amber-700">{countNewUrgent}</p>
-              <p className="text-xs text-amber-600 mt-1">Status: Awaiting Service Provider, Urgent</p>
+              <p className="text-xs text-amber-600 mt-1">Status: Čeka izvođača, Hitno</p>
             </Card>
             <Card
               className="bg-slate-50 border-slate-200 cursor-pointer hover:shadow-md transition"
               onClick={() => setListMode('non-urgent')}
             >
-              <h3 className="font-medium text-slate-900 mb-1">New Work Orders — Non-Urgent</h3>
+              <h3 className="font-medium text-slate-900 mb-1">Novi radni nalozi — Nije hitno</h3>
               <p className="text-3xl font-bold text-slate-700">{countNewNonUrgent}</p>
-              <p className="text-xs text-slate-600 mt-1">Status: Awaiting Service Provider, Non-Urgent</p>
+              <p className="text-xs text-slate-600 mt-1">Status: Čeka izvođača, Nije hitno</p>
             </Card>
             <Card
               className="bg-green-50 border-green-200 cursor-pointer hover:shadow-md transition"
               onClick={() => setListMode('active')}
             >
-              <h3 className="font-medium text-green-900 mb-1">Active Work Orders</h3>
+              <h3 className="font-medium text-green-900 mb-1">Aktivni radni nalozi</h3>
               <p className="text-3xl font-bold text-green-700">{countActive}</p>
-              <p className="text-xs text-green-600 mt-1">Read-only</p>
+              <p className="text-xs text-green-600 mt-1">Samo pregled</p>
             </Card>
             <Card
               className="bg-gray-100 border-gray-200 cursor-pointer hover:shadow-md transition"
               onClick={() => setListMode('archived')}
             >
-              <h3 className="font-medium text-gray-900 mb-1">Archived Work Orders</h3>
+              <h3 className="font-medium text-gray-900 mb-1">Arhivirani radni nalozi</h3>
               <p className="text-3xl font-bold text-gray-600">{countArchived}</p>
-              <p className="text-xs text-gray-500 mt-1">Read-only</p>
+              <p className="text-xs text-gray-500 mt-1">Samo pregled</p>
             </Card>
           </div>
         )}
 
         {!isLoading && (
           <Card className="bg-slate-50 border-slate-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">My work orders</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">Moji radni nalozi</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Work orders from your company that you participated in but are not currently owning. Read-only.
+              Radni nalozi iz vaše tvrtke u kojima ste sudjelovali, ali trenutno niste vlasnik. Samo pregled.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button
@@ -177,14 +177,14 @@ export function S1Dashboard() {
                 variant="secondary"
                 onClick={() => setListMode('other-active')}
               >
-                Active work orders ({otherActive.length})
+                Aktivni radni nalozi ({otherActive.length})
               </Button>
               <Button
                 type="button"
                 variant="secondary"
                 onClick={() => setListMode('other-closed')}
               >
-                Closed work orders ({otherClosed.length})
+                Zatvoreni radni nalozi ({otherClosed.length})
               </Button>
             </div>
           </Card>

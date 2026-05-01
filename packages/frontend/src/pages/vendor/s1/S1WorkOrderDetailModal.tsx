@@ -68,7 +68,7 @@ export function S1WorkOrderDetailModal({
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading work order...</p>
+          <p>Učitavanje radnog naloga...</p>
         </div>
       </div>
     );
@@ -89,11 +89,11 @@ export function S1WorkOrderDetailModal({
                   variant={wo.urgent ? 'danger' : 'secondary'}
                   className="mt-2"
                 >
-                  {wo.urgent ? 'Urgent' : 'Non-Urgent'}
+                  {wo.urgent ? 'Hitno' : 'Nije hitno'}
                 </Badge>
               </div>
               <Button type="button" variant="secondary" onClick={onClose}>
-                Back
+                Natrag
               </Button>
             </div>
           </div>
@@ -117,7 +117,7 @@ export function S1WorkOrderDetailModal({
                   {wo.category ? formatCategory(wo.category) : '—'}
                 </div>
                 <div>
-                  <span className="text-gray-600">AMM comment:</span>{' '}
+                  <span className="text-gray-600">Komentar VMO:</span>{' '}
                   {wo.commentToVendor ?? '—'}
                 </div>
                 {wo.assetDescription != null && wo.assetDescription !== '' && (
@@ -143,7 +143,7 @@ export function S1WorkOrderDetailModal({
                 {wo.assignedTechnicianId != null && (
                   <div>
                     <span className="text-gray-600">Assigned to (owner):</span>{' '}
-                    <strong>{wo.assignedTechnicianName ?? 'Technician'}</strong>
+                    <strong>{wo.assignedTechnicianName ?? 'Tehničar'}</strong>
                   </div>
                 )}
               </div>
@@ -158,7 +158,7 @@ export function S1WorkOrderDetailModal({
                     onClick={() => setShowAssign(true)}
                     className="w-full"
                   >
-                    Assign Technician
+                    Dodijeli tehničara
                   </Button>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -169,17 +169,17 @@ export function S1WorkOrderDetailModal({
                       onClick={() => setShowReturnForm(true)}
                       className="w-full"
                     >
-                      Return for Clarification
+                      Vrati na pojašnjenje
                     </Button>
                   ) : (
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">
-                        Comment (mandatory)
+                        Komentar (obavezan)
                       </label>
                       <textarea
                         value={returnComment}
                         onChange={(e) => setReturnComment(e.target.value)}
-                        placeholder="Clarification needed..."
+                        placeholder="Opišite što treba pojasniti..."
                         rows={3}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                       />
@@ -192,8 +192,8 @@ export function S1WorkOrderDetailModal({
                           }
                         >
                           {returnMutation.isPending
-                            ? 'Submitting...'
-                            : 'Confirm Return'}
+                            ? 'Slanje...'
+                            : 'Potvrdi povrat'}
                         </Button>
                         <Button
                           type="button"
@@ -203,7 +203,7 @@ export function S1WorkOrderDetailModal({
                             setReturnComment('');
                           }}
                         >
-                          Cancel
+                          Odustani
                         </Button>
                       </div>
                     </div>
@@ -217,7 +217,7 @@ export function S1WorkOrderDetailModal({
                       onClick={() => setShowRejectForm(true)}
                       className="w-full"
                     >
-                      Reject Work Order
+                      Odbij radni nalog
                     </Button>
                   ) : (
                     <div className="space-y-2">
@@ -227,7 +227,7 @@ export function S1WorkOrderDetailModal({
                       <textarea
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
-                        placeholder="Reason for rejection..."
+                        placeholder="Razlog odbijanja..."
                         rows={3}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                       />
@@ -241,8 +241,8 @@ export function S1WorkOrderDetailModal({
                           }
                         >
                           {rejectMutation.isPending
-                            ? 'Rejecting...'
-                            : 'Confirm Rejection'}
+                            ? 'Odbijanje...'
+                            : 'Potvrdi odbijanje'}
                         </Button>
                         <Button
                           type="button"
@@ -252,7 +252,7 @@ export function S1WorkOrderDetailModal({
                             setRejectReason('');
                           }}
                         >
-                          Cancel
+                          Odustani
                         </Button>
                       </div>
                     </div>

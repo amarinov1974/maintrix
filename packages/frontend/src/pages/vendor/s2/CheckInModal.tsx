@@ -73,42 +73,42 @@ export function CheckInModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-md w-full">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Check In</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Prijava dolaska</h2>
           <p className="text-sm text-gray-600">WO #{workOrderId}</p>
         </div>
 
         <div className="p-6 space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-700">
-              <strong>Steps:</strong> The store has declared the number of technicians. You can <strong>confirm</strong> (scan QR and check in) or <strong>return to store</strong> so they can generate a new QR with the correct number.
+              <strong>Koraci:</strong> Poslovnica je odredila broj tehničara. Možete <strong>potvrditi</strong> (skenirajte QR i prijavite se) ili <strong>vratiti poslovnici</strong> za novi QR s ispravnim brojem.
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Number of technicians (declared by store)
+              Broj tehničara (odredio voditelj poslovnice)
             </label>
             {declaredTechCount != null && declaredTechCount >= 1 ? (
               <p className="p-3 bg-gray-100 rounded-lg text-gray-800 font-medium">
-                {declaredTechCount} — cannot be changed here. Return to store if incorrect.
+                {declaredTechCount} — ne može se mijenjati ovdje. Vratite poslovnici ako je netočno.
               </p>
             ) : (
               <p className="text-sm text-amber-700">
-                Store has not generated a QR yet. Ask the store to generate the check-in QR code (with technician count) first.
+                Poslovnica još nije generirala QR kod. Zatražite od poslovnice da generira QR kod za prijavu (s brojem tehničara).
               </p>
             )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              QR Code Token * (scan or paste)
+              QR kod * (skenirajte ili unesite)
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={qrToken}
                 onChange={(e) => setQrToken(e.target.value)}
-                placeholder="Scan QR or paste token from store..."
+                placeholder="Skenirajte QR ili unesite token..."
                 className="flex-1 min-w-0 p-3 border border-gray-300 rounded-lg"
                 autoFocus
               />
@@ -116,17 +116,17 @@ export function CheckInModal({
                 type="button"
                 variant="secondary"
                 onClick={() => setShowScanner(true)}
-                title="Open camera to scan QR on store's phone"
+                title="Otvorite kameru za skeniranje QR koda"
               >
-                Scan
+                Skeniraj
               </Button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Scan the QR on the store&apos;s phone or paste the token. Expires in 5 minutes.</p>
+            <p className="text-xs text-gray-500 mt-1">Skenirajte QR na telefonu poslovnice ili unesite token. Istječe za 5 minuta.</p>
           </div>
 
           {showScanner && (
             <QrScannerModal
-              title="Scan Check-In QR"
+              title="Skeniraj QR za prijavu"
               onScan={(token) => {
                 setQrToken(token);
                 setShowScanner(false);
@@ -139,7 +139,7 @@ export function CheckInModal({
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">
                 {((checkInMutation.error || returnMutation.error) as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                  'Action failed'}
+                  'Akcija nije uspjela'}
               </p>
             </div>
           )}
@@ -147,7 +147,7 @@ export function CheckInModal({
 
         <div className="p-6 border-t border-gray-200 flex flex-wrap gap-3">
           <Button type="button" variant="secondary" onClick={onClose}>
-            Cancel
+            Odustani
           </Button>
           {declaredTechCount != null && declaredTechCount >= 1 && (
             <Button
@@ -156,7 +156,7 @@ export function CheckInModal({
               onClick={handleReturnToStore}
               disabled={returnMutation.isPending || checkInMutation.isPending}
             >
-              {returnMutation.isPending ? 'Returning...' : 'Return to store (correct number)'}
+              {returnMutation.isPending ? 'Vraćanje...' : 'Vrati poslovnici'}
             </Button>
           )}
           <Button
@@ -165,7 +165,7 @@ export function CheckInModal({
             disabled={!canConfirm || checkInMutation.isPending}
             className="flex-1 min-w-0"
           >
-            {checkInMutation.isPending ? 'Checking In...' : 'Confirm & Check In'}
+            {checkInMutation.isPending ? 'Prijava u tijeku...' : 'Potvrdi prijavu dolaska'}
           </Button>
         </div>
       </div>

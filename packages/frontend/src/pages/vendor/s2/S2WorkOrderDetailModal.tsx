@@ -133,7 +133,7 @@ export function S2WorkOrderDetailModal({
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading work order...</p>
+          <p>Učitavanje...</p>
         </div>
       </div>
     );
@@ -148,36 +148,36 @@ export function S2WorkOrderDetailModal({
           <div className="p-6 border-b border-gray-200">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Work Order Detail</h1>
+                <h1 className="text-xl font-bold text-gray-900">Detalji radnog naloga</h1>
                 <p className="text-sm text-gray-600 mt-1">
-                  WO #{wo.id} • Ticket #{wo.ticketId}
+                  WO #{wo.id} • Prijava #{wo.ticketId}
                 </p>
                 <Badge variant={wo.urgent ? 'danger' : 'secondary'} className="mt-2">
-                  {wo.urgent ? 'Urgent' : 'Non-Urgent'}
+                  {wo.urgent ? 'Hitno' : 'Nije hitno'}
                 </Badge>
               </div>
               <Button type="button" variant="secondary" onClick={saveDraftAndClose}>
-                Back
+                Natrag
               </Button>
             </div>
           </div>
 
           <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Details</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Detalji</h2>
               <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
-                <div><span className="text-gray-600">Store:</span> {wo.storeName ?? '—'}</div>
+                <div><span className="text-gray-600">Poslovnica:</span> {wo.storeName ?? '—'}</div>
                 {wo.storeAddress != null && wo.storeAddress !== '' && (
-                  <div><span className="text-gray-600">Address:</span> {wo.storeAddress}</div>
+                  <div><span className="text-gray-600">Adresa:</span> {wo.storeAddress}</div>
                 )}
-                <div><span className="text-gray-600">Category:</span> {wo.category ? formatCategory(wo.category) : '—'}</div>
-                <div><span className="text-gray-600">AMM comment:</span> {wo.commentToVendor ?? '—'}</div>
+                <div><span className="text-gray-600">Kategorija:</span> {wo.category ? formatCategory(wo.category) : '—'}</div>
+                <div><span className="text-gray-600">Komentar VMO:</span> {wo.commentToVendor ?? '—'}</div>
                 {wo.assetDescription != null && wo.assetDescription !== '' && (
-                  <div><span className="text-gray-600">Asset:</span> {wo.assetDescription}</div>
+                  <div><span className="text-gray-600">Oprema:</span> {wo.assetDescription}</div>
                 )}
                 {wo.attachments != null && wo.attachments.length > 0 && (
                   <div>
-                    <span className="text-gray-600">Attachments:</span>
+                    <span className="text-gray-600">Privici:</span>
                     <ul className="list-disc list-inside mt-1">
                       {wo.attachments.map((a) => (
                         <li key={a.id}>{a.fileName}</li>
@@ -191,12 +191,12 @@ export function S2WorkOrderDetailModal({
 
             {isOwner && isAssigned && (
               <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-medium text-blue-900 mb-2">Check in on site</h3>
+                <h3 className="font-medium text-blue-900 mb-2">Prijava dolaska na lokaciji</h3>
                 <p className="text-sm text-blue-700 mb-3">
-                  Scan the QR code at the store to register check-in. Number of technicians is confirmed when the store generated the QR.
+                  Skenirajte QR kod u poslovnici za prijavu dolaska. Broj tehničara potvrđuje se prema QR kodu koji je poslovnica generirala.
                 </p>
                 <Button type="button" onClick={() => setShowCheckIn(true)}>
-                  Scan QR Code
+                  Prijava dolaska
                 </Button>
               </section>
             )}
@@ -204,18 +204,18 @@ export function S2WorkOrderDetailModal({
             {isOwner && inProgress && (
               <>
                 <section className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2">Work Report</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Izvještaj rada</h3>
                   <p className="text-sm text-gray-600 mb-3">
-                    Add rows; all fields required. Complete the report before checkout.
+                    Dodajte stavke; sva polja su obavezna. Dovršite izvještaj prije odjave.
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm border-collapse">
                       <thead>
                         <tr className="border-b border-gray-200">
                           <th className="text-left p-2">#</th>
-                          <th className="text-left p-2">Description *</th>
+                          <th className="text-left p-2">Opis *</th>
                           <th className="text-left p-2">Unit *</th>
-                          <th className="text-left p-2">Quantity *</th>
+                          <th className="text-left p-2">Količina *</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -227,7 +227,7 @@ export function S2WorkOrderDetailModal({
                                 type="text"
                                 value={row.description}
                                 onChange={(e) => updateRow(index, 'description', e.target.value)}
-                                placeholder="Description"
+                                placeholder="Opis"
                                 disabled={reportCompleted}
                                 className="w-full p-2 border border-gray-300 rounded"
                               />
@@ -237,7 +237,7 @@ export function S2WorkOrderDetailModal({
                                 type="text"
                                 value={row.unit}
                                 onChange={(e) => updateRow(index, 'unit', e.target.value)}
-                                placeholder="e.g. hours, units"
+                                placeholder="npr. sati, kom"
                                 disabled={reportCompleted}
                                 className="w-full p-2 border border-gray-300 rounded"
                               />
@@ -260,13 +260,13 @@ export function S2WorkOrderDetailModal({
                   </div>
                   {!reportCompleted && (
                     <Button type="button" size="sm" variant="secondary" onClick={addRow} className="mt-2">
-                      + Add Row
+                      + Dodaj stavku
                     </Button>
                   )}
                   <div className="mt-3">
                     {reportCompleted ? (
                       <Button type="button" variant="secondary" size="sm" onClick={editReport}>
-                        Edit Work Report
+                        Uredi izvještaj rada
                       </Button>
                     ) : (
                       <Button
@@ -275,23 +275,23 @@ export function S2WorkOrderDetailModal({
                         onClick={markReportComplete}
                         disabled={!canCompleteReport}
                       >
-                        Complete Work Report
+                        Zaključi izvještaj rada
                       </Button>
                     )}
                   </div>
                 </section>
 
                 <section className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <h3 className="font-medium text-green-900 mb-2">Check out</h3>
+                  <h3 className="font-medium text-green-900 mb-2">Odjava</h3>
                   <p className="text-sm text-green-700 mb-3">
-                    Select outcome, add comment if required, then scan the checkout QR code. Report must be completed first.
+                    Odaberite ishod, dodajte komentar ako je obavezan, zatim skenirajte QR kod za odjavu. Izvještaj mora biti zaključen.
                   </p>
                   <Button
                     type="button"
                     onClick={() => setShowCheckOut(true)}
                     disabled={!reportCompleted}
                   >
-                    Check Out (Scan QR)
+                    Odjava s posla
                   </Button>
                 </section>
               </>
@@ -300,7 +300,7 @@ export function S2WorkOrderDetailModal({
             {/* History — work order workflow (statuses + comments) */}
             {wo.auditLog != null && wo.auditLog.length > 0 && (
               <section>
-                <h3 className="font-semibold text-gray-900 mb-2">History</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
                 <div className="space-y-2">
                   {wo.auditLog.map((entry) => (
                     <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
@@ -311,7 +311,7 @@ export function S2WorkOrderDetailModal({
                         <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                       )}
                       <p className="mt-1 text-gray-600">
-                        Performed by {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
+                        Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                       </p>
                       {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
                     </div>
