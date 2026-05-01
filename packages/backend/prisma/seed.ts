@@ -51,10 +51,10 @@ async function main() {
   });
 
   const northRegion = await prisma.region.create({
-    data: { companyId: retailA.id, name: 'North Region' },
+    data: { companyId: retailA.id, name: 'Regija Sjever' },
   });
   const southRegion = await prisma.region.create({
-    data: { companyId: retailA.id, name: 'South Region' },
+    data: { companyId: retailA.id, name: 'Regija Jug' },
   });
 
   const storesRetailA: { id: number; name: string; regionId: number }[] = [];
@@ -63,7 +63,7 @@ async function main() {
       data: {
         companyId: retailA.id,
         regionId: northRegion.id,
-        name: `Store ${i} North`,
+        name: `Poslovnica ${i} Sjever`,
         address: `North Address ${i}`,
         active: true,
       },
@@ -75,7 +75,7 @@ async function main() {
       data: {
         companyId: retailA.id,
         regionId: southRegion.id,
-        name: `Store ${i} South`,
+        name: `Poslovnica ${i} Jug`,
         address: `South Address ${i}`,
         active: true,
       },
