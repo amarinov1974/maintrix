@@ -185,13 +185,13 @@ export function EntryScreen() {
         <div style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          padding: '40px',
+          padding: '48px',
           width: '100%',
-          maxWidth: '400px',
+          maxWidth: '440px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
-            <MaintrixLogo size="md" variant="dark" />
+            <MaintrixLogo size="lg" variant="dark" />
             <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '8px' }}>Prijavite se za nastavak</p>
           </div>
           <form onSubmit={(e) => { e.preventDefault(); gateLoginMutation.mutate(); }}>
@@ -274,13 +274,13 @@ export function EntryScreen() {
         <div style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          padding: '40px',
+          padding: '48px',
           width: '100%',
-          maxWidth: '400px',
+          maxWidth: '440px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px' }}>
-            <MaintrixLogo size="md" variant="dark" />
+            <MaintrixLogo size="lg" variant="dark" />
             <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '8px' }}>Demo način — odabir korisnika</p>
           </div>
 

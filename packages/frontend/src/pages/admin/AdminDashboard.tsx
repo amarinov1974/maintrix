@@ -11,6 +11,7 @@ import {
   preventiveMaintenanceAPI,
   type ParsedPmRow,
 } from '../../api/preventive-maintenance';
+import { formatCategory, formatAssetStatus } from '../../utils/formatters';
 
 type Tab = 'users' | 'vendors' | 'stores' | 'assets' | 'pm';
 
@@ -1026,7 +1027,7 @@ export function AdminDashboard() {
                     <tr>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Naziv</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Poslovnica</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Category</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Kategorija</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Serijski br.</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Akcije</th>
@@ -1041,7 +1042,7 @@ export function AdminDashboard() {
                           {asset.manufacturer && <div className="text-xs text-gray-500">{asset.manufacturer} {asset.model}</div>}
                         </td>
                         <td className="px-4 py-3 text-gray-600">{asset.store.name}</td>
-                        <td className="px-4 py-3 text-gray-600">{asset.category?.name ?? '—'}</td>
+                        <td className="px-4 py-3 text-gray-600">{formatCategory(asset.category?.name ?? '') || '—'}</td>
                         <td className="px-4 py-3 text-gray-500 font-mono text-xs">{asset.serialNumber ?? '—'}</td>
                         <td className="px-4 py-3">
                           {!asset.active ? (
@@ -1052,7 +1053,7 @@ export function AdminDashboard() {
                               asset.status === 'FAULTY' ? 'bg-red-100 text-red-800' :
                               asset.status === 'IN_SERVICE' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-gray-100 text-gray-600'
-                            }`}>{asset.status.replace('_', ' ')}</span>
+                            }`}>{formatAssetStatus(asset.status)}</span>
                           )}
                         </td>
                         <td className="px-4 py-3 flex gap-2">
@@ -1151,7 +1152,7 @@ export function AdminDashboard() {
         {activeTab === 'pm' && (
           <div className="space-y-6">
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Upload Preventive Maintenance Plan</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">Učitavanje plana preventivnog održavanja</h2>
               <p className="text-sm text-gray-600 mb-4">
                 Učitajte Excel (.xlsx) ili CSV datoteku s kolonama: asset_name, task_description,
                 vendor_company_id, vendor_user_id (optional), schedule_type (INTERVAL or SPECIFIC_DATES),
@@ -1173,7 +1174,7 @@ export function AdminDashboard() {
                     disabled={parseMutation.isPending}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {parseMutation.isPending ? 'Parsing...' : 'Choose File'}
+                    {parseMutation.isPending ? 'Obrada u tijeku...' : 'Odaberi datoteku'}
                   </button>
                   {parseMutation.isError && (
                     <p className="mt-2 text-red-600 text-sm">Parse failed</p>
@@ -1222,7 +1223,7 @@ export function AdminDashboard() {
                       disabled={parsedRows.length === 0 || importMutation.isPending}
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
                     >
-                      {importMutation.isPending ? 'Importing...' : 'Confirm Import'}
+                      {importMutation.isPending ? 'Uvoz u tijeku...' : 'Uvezi odabrano'}
                     </button>
                     <button type="button" onClick={handlePmReset} className="px-4 py-2 text-sm border rounded hover:bg-gray-50">
                       Odustani
@@ -1244,7 +1245,7 @@ export function AdminDashboard() {
             <div className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Existing Plans ({(pmPlans as unknown[]).length})
+                  Postojeći planovi ({(pmPlans as unknown[]).length})
                 </h2>
                 <button
                   type="button"
@@ -1252,13 +1253,13 @@ export function AdminDashboard() {
                   disabled={selectedPlanIds.size === 0 || createWOMutation.isPending}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {createWOMutation.isPending ? 'Creating...' : `Create Work Orders (${selectedPlanIds.size} selected)`}
+                  {createWOMutation.isPending ? 'Kreiranje u tijeku...' : `Kreiraj radne naloge (${selectedPlanIds.size} odabrano)`}
                 </button>
               </div>
               {plansLoading ? (
                 <p className="text-gray-500">Loading...</p>
               ) : (pmPlans as unknown[]).length === 0 ? (
-                <p className="text-gray-500 text-sm">No plans yet. Upload a file above.</p>
+                <p className="text-gray-500 text-sm">Nema planova. Učitajte datoteku gore.</p>
               ) : (
                 <div className="overflow-x-auto max-h-80 border rounded-lg">
                   <table className="min-w-full text-sm">
