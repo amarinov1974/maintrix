@@ -9,7 +9,7 @@ import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
 import { authAPI } from '../../api/auth';
 import { useSession } from '../../contexts/SessionContext';
-import { TicketStatus } from '../../types/statuses';
+import { TicketStatus, WorkOrderStatus } from '../../types/statuses';
 import { Button, Badge } from '../../components/shared';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 
@@ -223,9 +223,20 @@ export function AMMTicketDetailModal({
       (ticket.currentStatus === 'Ticket Cost Estimation Approved' ||
         ticket.currentStatus === 'Work Order In Progress'));
 
-  const canArchive =
+  const archivableTicketStatus =
     ticket.currentStatus === 'Ticket Cost Estimation Approved' ||
     ticket.currentStatus === 'Work Order In Progress';
+  const hasWorkOrders = workOrdersForTicket.length > 0;
+  const terminalWorkOrderStatuses: string[] = [
+    WorkOrderStatus.COST_PROPOSAL_APPROVED,
+    WorkOrderStatus.CLOSED_WITHOUT_COST,
+    WorkOrderStatus.REJECTED,
+  ];
+  const allWorkOrdersTerminal = hasWorkOrders && workOrdersForTicket.every(
+    (wo) => wo.currentStatus != null && terminalWorkOrderStatuses.includes(wo.currentStatus)
+  );
+  const canArchive = archivableTicketStatus && hasWorkOrders && allWorkOrdersTerminal;
+  const showArchiveSection = archivableTicketStatus && hasWorkOrders;
 
   const submittedAt =
     ticket.submittedAt ??
@@ -579,18 +590,24 @@ export function AMMTicketDetailModal({
             </section>
           )}
 
-          {canArchive && (
+          {showArchiveSection && (
             <section className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700 mb-2">Prijava je odobrena. Arhivirajte kada su svi radni nalozi završeni.</p>
+              <p className="text-sm text-gray-700 mb-2">
+                {allWorkOrdersTerminal
+                  ? 'Prijava je odobrena. Arhivirajte kada su svi radni nalozi završeni.'
+                  : 'Nije moguće arhivirati — postoje aktivni radni nalozi.'}
+              </p>
               {archiveMutation.isError && (
                 <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
                   {(archiveMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
                     'Archive failed'}
                 </div>
               )}
-              <Button type="button" variant="secondary" onClick={() => archiveMutation.mutate()} disabled={archiveMutation.isPending}>
-                {archiveMutation.isPending ? 'Arhiviranje...' : 'Arhiviraj prijavu'}
-              </Button>
+              <div title={!allWorkOrdersTerminal ? 'Nije moguće arhivirati — postoje aktivni radni nalozi.' : undefined} style={{ display: 'inline-block' }}>
+                <Button type="button" variant="secondary" onClick={() => archiveMutation.mutate()} disabled={archiveMutation.isPending || !allWorkOrdersTerminal}>
+                  {archiveMutation.isPending ? 'Arhiviranje...' : 'Arhiviraj prijavu'}
+                </Button>
+              </div>
             </section>
           )}
 

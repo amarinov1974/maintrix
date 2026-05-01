@@ -1439,6 +1439,9 @@ export class TicketService {
       PrismaWorkOrderStatus.CLOSED_WITHOUT_COST,
       PrismaWorkOrderStatus.REJECTED,
     ];
+    if (ticket.workOrders.length === 0) {
+      throw new Error('Cannot archive: ticket has no work orders. Use REJECT to close a ticket without work.');
+    }
     const allComplete = ticket.workOrders.every((wo) =>
       terminalStatuses.includes(wo.currentStatus)
     );
