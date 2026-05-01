@@ -12,6 +12,70 @@ import { AMTicketDetailModal } from './AMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import { formatCategory } from '../../utils/formatters';
 
+function BucketCard({
+  title,
+  count,
+  description,
+  accentColor,
+  to,
+}: {
+  title: string;
+  count: number;
+  description?: string;
+  accentColor: string;
+  to?: string;
+}) {
+  const inner = (
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        border: '1px solid #E8E8ED',
+        borderLeft: `4px solid ${accentColor}`,
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        transition: 'box-shadow 0.2s ease',
+        cursor: to && count > 0 ? 'pointer' : 'default',
+        opacity: count === 0 ? 0.6 : 1,
+      }}
+      onMouseEnter={e => {
+        if (to && count > 0)
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
+      }}
+    >
+      <div>
+        <p style={{ fontSize: '13px', color: '#6E6E73', marginBottom: '2px', fontWeight: 500 }}>
+          {title}
+        </p>
+        {description && (
+          <p style={{ fontSize: '11px', color: '#AEAEB2', marginTop: '2px' }}>{description}</p>
+        )}
+      </div>
+      <span style={{
+        fontSize: '28px',
+        fontWeight: '600',
+        color: count > 0 ? accentColor : '#AEAEB2',
+        lineHeight: 1,
+        minWidth: '32px',
+        textAlign: 'right',
+      }}>
+        {count}
+      </span>
+    </div>
+  );
+
+  if (to && count > 0) {
+    return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
+  }
+  return inner;
+}
+
 function getStatusBadgeVariant(
   status: string
 ): 'default' | 'success' | 'warning' | 'danger' {
@@ -91,18 +155,18 @@ export function AreaManagerDashboard() {
           </Link>
         </div>
 
-        <Card className="bg-blue-50 border-blue-200">
-          <div className="flex items-start gap-3">
-            <div className="text-blue-600 text-2xl">ℹ️</div>
-            <div>
-              <h3 className="font-medium text-blue-900 mb-1">Vaša uloga</h3>
-              <p className="text-sm text-blue-700">
-                Odobravate ne-hitne prijave prije procjene troška. Pregledajte
-                svaku prijavu i odobrite ili odbijte.
-              </p>
-            </div>
-          </div>
-        </Card>
+        <div style={{
+          backgroundColor: '#F5F5F7',
+          borderRadius: '10px',
+          padding: '14px 18px',
+          borderLeft: '4px solid #0071E3',
+          marginBottom: '16px',
+        }}>
+          <p style={{ fontSize: '12px', fontWeight: 600, color: '#0071E3', marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Vaša uloga</p>
+          <p style={{ fontSize: '13px', color: '#3C3C43' }}>
+            Odobravate ne-hitne prijave prije procjene troška. Pregledajte svaku prijavu i odobrite ili odbijte.
+          </p>
+        </div>
 
         {isLoading ? (
           <Card>

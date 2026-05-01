@@ -105,8 +105,8 @@ export function AMTicketDetailModal({
 
   if (isLoading || ticket == null) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg p-6">
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px' }}>
           <p>Učitavanje detalja prijave...</p>
         </div>
       </div>
@@ -134,14 +134,14 @@ export function AMTicketDetailModal({
       : null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="bg-white rounded-lg max-w-4xl w-full my-8">
-        <div className="p-6 border-b border-gray-200 sticky top-0 bg-white">
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
+        <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Detalji prijave</h1>
+              <h1 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1F' }}>Detalji prijave</h1>
               <div className="flex items-center gap-3 mt-2">
-                <span className="text-sm text-gray-600">Prijava #{ticket.id}</span>
+                <span style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>Prijava #{ticket.id}</span>
                 <Badge
                   variant={
                     ticket.currentStatus.includes('Approved')
@@ -152,7 +152,7 @@ export function AMTicketDetailModal({
                   {ticket.currentStatus}
                 </Badge>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
+              <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>
                 Poslovnica: {ticket.storeName} • Kreirao: {ticket.createdByUserName}
               </p>
             </div>
@@ -164,27 +164,27 @@ export function AMTicketDetailModal({
 
         <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto">
           <section>
-            <h2 className="font-semibold text-gray-900 mb-2">Informacije o prijavi</h2>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <div>
-                <span className="text-sm font-medium text-gray-600">Kategorija:</span>{' '}
-                <span className="text-sm text-gray-900">{formatCategory(ticket.category)}</span>
+            <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h2>
+            <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Kategorija</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{formatCategory(ticket.category)}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni vlasnik</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>
+                    {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Datum i vrijeme prijave</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{new Date(ticket.createdAt).toLocaleString()}</p>
+                </div>
               </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Trenutni vlasnik:</span>{' '}
-                <span className="text-sm text-gray-900">
-                  {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}
-                </span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Originalni opis problema (zaključano):</span>
-                <p className="text-sm text-gray-900 mt-1">{ticket.originalDescription ?? ticket.description}</p>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Datum i vrijeme prijave:</span>{' '}
-                <span className="text-sm text-gray-900">
-                  {new Date(ticket.createdAt).toLocaleString()}
-                </span>
+              <div style={{ marginTop: '12px' }}>
+                <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Originalni opis problema (zaključano)</p>
+                <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.originalDescription ?? ticket.description}</p>
               </div>
             </div>
           </section>
@@ -192,20 +192,20 @@ export function AMTicketDetailModal({
           {/* When AM is assignee (owner) in Awaiting Creator Response: only option is to return to the role that requested clarification */}
           {canReturnToRequester && (
             <section className="space-y-4">
-              <h3 className="font-semibold text-gray-900">Odgovor na zahtjev za pojašnjenje</h3>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-900 mb-2">
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Odgovor na zahtjev za pojašnjenje</h3>
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
+                <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>
                   {ticket.clarificationRequestedByUserName != null || ticket.clarificationRequestedByUserRole != null
                     ? `${ticket.clarificationRequestedByUserName ?? 'Requester'}${ticket.clarificationRequestedByUserRole != null ? ` (${INTERNAL_ROLE_LABELS[ticket.clarificationRequestedByUserRole] ?? ticket.clarificationRequestedByUserRole})` : ''} requested clarification. You can only return the ticket to them.`
                     : 'Vratite prijavu ulozi koja je zatražila pojašnjenje.'}
                 </p>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Komentar (opcionalno)</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Komentar (opcionalno)</label>
                 <textarea
                   value={clarificationComment}
                   onChange={(e) => setClarificationComment(e.target.value)}
                   placeholder="Dodajte komentar (opcionalno)..."
                   rows={3}
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-3"
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box', marginBottom: '12px' }}
                 />
                 <Button
                   type="button"
@@ -221,10 +221,10 @@ export function AMTicketDetailModal({
           {/* 12.2 Initial review: Approve for Cost Estimation, Request Clarification, Reject */}
           {canInitialReview && (
             <section className="space-y-4">
-              <h3 className="font-semibold text-gray-900">Početni pregled</h3>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="font-medium text-green-900 mb-2">Odobrenje za procjenu troška</h4>
-                <p className="text-sm text-green-700 mb-3">
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Početni pregled</h3>
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #34C759' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Odobrenje za procjenu troška</h4>
+                <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>
                   Šalje prijavu Voditelju održavanja na procjenu troška.
                 </p>
                 <Button
@@ -236,9 +236,9 @@ export function AMTicketDetailModal({
                 </Button>
               </div>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h4 className="font-medium text-yellow-900 mb-2">Zahtjev za pojašnjenje</h4>
-                <p className="text-sm text-yellow-800 mb-2">Pošaljite prijavu ulozi koja je bila uključena. Nakon ažuriranja, prijava se vraća Vama.</p>
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF9500' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Zahtjev za pojašnjenje</h4>
+                <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Pošaljite prijavu ulozi koja je bila uključena. Nakon ažuriranja, prijava se vraća Vama.</p>
                 {!showClarificationForm ? (
                   <Button
                     type="button"
@@ -249,23 +249,23 @@ export function AMTicketDetailModal({
                   </Button>
                 ) : (
                   <div className="space-y-3">
-                    <label className="block text-sm font-medium text-gray-700">Pošalji zahtjev za pojašnjenje prema</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73' }}>Pošalji zahtjev za pojašnjenje prema</label>
                     <select
                       value={assignToRole}
                       onChange={(e) => setAssignToRole(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                     >
                       {((ticket.involvedInternalRoles ?? ['SM']).filter((r) => r !== ticket.currentOwnerUserRole)).map((r) => (
                         <option key={r} value={r}>{INTERNAL_ROLE_LABELS[r] ?? r}</option>
                       ))}
                     </select>
-                    <label className="block text-sm font-medium text-gray-700">Tekst pojašnjenja (obavezno)</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73' }}>Tekst pojašnjenja (obavezno)</label>
                     <textarea
                       value={clarificationComment}
                       onChange={(e) => setClarificationComment(e.target.value)}
                       placeholder="Opišite što treba pojasniti..."
                       rows={4}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                     />
                     <div className="flex gap-2">
                       <Button
@@ -290,8 +290,8 @@ export function AMTicketDetailModal({
                 )}
               </div>
 
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h4 className="font-medium text-red-900 mb-2">Odbijanje prijave</h4>
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF3B30' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Odbijanje prijave</h4>
                 {!showRejectForm ? (
                   <>
                     <p className="text-sm text-red-700 mb-3">Odbijte prijavu uz navođenje razloga.</p>
@@ -301,13 +301,13 @@ export function AMTicketDetailModal({
                   </>
                 ) : (
                   <div className="space-y-3">
-                    <label className="block text-sm font-medium text-red-900">Razlog (obavezno)</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73' }}>Razlog (obavezno)</label>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Razlog odbijanja..."
                       rows={3}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                     />
                     <div className="flex gap-2">
                       <Button
@@ -337,20 +337,20 @@ export function AMTicketDetailModal({
 
           {/* 12.5 Approval chain: Approve / Return (comment mandatory) / Reject */}
           {canApprovalChain && costAmount != null && (
-            <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Odobrenje procjene troška</h3>
+            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Odobrenje procjene troška</h3>
               <p className="text-sm text-gray-700 mb-3">
                 Iznos: <strong>€{costAmount.toLocaleString()}</strong>
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Komentar (opcionalno za odobrenje)</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Komentar (opcionalno za odobrenje)</label>
                   <textarea
                     value={approveComment}
                     onChange={(e) => setApproveComment(e.target.value)}
                     placeholder="Komentar za odobrenje..."
                     rows={2}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <Button
@@ -362,13 +362,13 @@ export function AMTicketDetailModal({
                 </Button>
               </div>
               <div className="mt-4 pt-4 border-t border-blue-200 space-y-3">
-                <label className="block text-sm font-medium text-gray-700">Vrati na VMO (komentar obavezan)</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73' }}>Vrati na VMO (komentar obavezan)</label>
                 <textarea
                   value={returnComment}
                   onChange={(e) => setReturnComment(e.target.value)}
                   placeholder="Razlog vraćanja..."
                   rows={2}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                 />
                 <Button
                   type="button"
@@ -394,7 +394,7 @@ export function AMTicketDetailModal({
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Razlog odbijanja..."
                       rows={2}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                     />
                     <div className="flex gap-2">
                       <Button
@@ -436,21 +436,21 @@ export function AMTicketDetailModal({
 
           {ticket.auditLog != null && ticket.auditLog.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
-              <div className="space-y-2">
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Povijest</h3>
+              <div>
                 {ticket.auditLog.map((entry) => (
-                  <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
-                    <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
+                  <div key={entry.id} style={{ padding: '12px 0', borderBottom: '1px solid #F0F0F5' }}>
+                    <span style={{ fontSize: '12px', color: '#6E6E73' }}>{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
+                    <span style={{ fontSize: '12px', color: '#6E6E73' }}>{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
-                      <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
+                      <span style={{ fontSize: '12px', color: '#6E6E73' }}> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}
                     {entry.actorRole != null && (
-                      <p className="mt-1 text-gray-600">Izvršio {entry.actorName} ({entry.actorRole})</p>
+                      <p style={{ fontSize: '13px', color: '#1D1D1F', fontWeight: 500, marginTop: '4px' }}>Izvršio {entry.actorName} ({entry.actorRole})</p>
                     )}
                     {entry.comment != null && (
-                      <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>
+                      <p style={{ fontSize: '13px', color: '#3C3C43', marginTop: '4px' }}>&quot;{entry.comment}&quot;</p>
                     )}
                   </div>
                 ))}

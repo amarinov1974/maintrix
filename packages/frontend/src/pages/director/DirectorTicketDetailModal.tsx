@@ -71,8 +71,8 @@ export function DirectorTicketDetailModal({
 
   if (isLoading || ticket == null) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg p-6">
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px' }}>
           <p>Učitavanje detalja prijave...</p>
         </div>
       </div>
@@ -94,18 +94,19 @@ export function DirectorTicketDetailModal({
   const thresholdInfo = costEstimation ? getThresholdInfo(amount) : null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="bg-white rounded-lg max-w-4xl w-full my-8">
-        <div className="p-6 border-b border-gray-200 sticky top-0 bg-white">
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
+        <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Prijava #{ticket.id}
-                </h2>
+                <h2 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1F' }}>Detalji prijave</h2>
                 <Badge variant="warning">Čeka odobrenje troška</Badge>
               </div>
-              <p className="text-sm text-gray-600">
+              <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>
+                Prijava #{ticket.id} •
+              </p>
+              <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>
                 Poslovnica: {ticket.storeName} • Kreirao:{' '}
                 {ticket.createdByUserName}
               </p>
@@ -123,29 +124,21 @@ export function DirectorTicketDetailModal({
 
         <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto">
           <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Detalji prijave
-              </h3>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <div>
-                <span className="text-sm font-medium text-gray-600">
-                  Kategorija:
-                </span>{' '}
-                <span className="text-sm text-gray-900">{formatCategory(ticket.category)}</span>
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h3>
+            <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Kategorija</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{formatCategory(ticket.category)}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni vlasnik</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</p>
+                </div>
               </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">
-                  Trenutni vlasnik:
-                </span>{' '}
-                <span className="text-sm text-gray-900">
-                  {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}
-                </span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">
-                  Originalni opis problema (zaključano):
-                </span>
-                <p className="text-sm text-gray-900 mt-1">
+              <div style={{ marginTop: '12px' }}>
+                <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Originalni opis problema (zaključano)</p>
+                <p style={{ fontSize: '14px', color: '#1D1D1F' }}>
                   {ticket.originalDescription ?? ticket.description}
                 </p>
               </div>
@@ -154,10 +147,10 @@ export function DirectorTicketDetailModal({
 
           {costEstimation != null && (
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>
                 Procjena troška
               </h3>
-              <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-600">
                     Procijenjeni iznos:
@@ -210,11 +203,11 @@ export function DirectorTicketDetailModal({
 
           {canApprove && (
             <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="font-medium text-green-900 mb-2">
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>
                   Odobrenje procjene troška
                 </h4>
-                <p className="text-sm text-green-700 mb-3">
+                <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>
                   Odobravanje će eskalirati sljedećem odobravatelju ili, ako
                   ste zadnji u lancu, vratit će prijavu VMO-u za kreiranje
                   radnog naloga.
@@ -224,7 +217,7 @@ export function DirectorTicketDetailModal({
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Komentar (opcionalno)..."
                   rows={2}
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-2"
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box', marginBottom: '8px' }}
                 />
                 <Button
                   type="button"
@@ -235,13 +228,13 @@ export function DirectorTicketDetailModal({
                 </Button>
               </div>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF9500' }}>
                 {!showReturnForm ? (
                   <div>
-                    <h4 className="font-medium text-yellow-900 mb-2">
+                    <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>
                       Povrat na VMO
                     </h4>
-                    <p className="text-sm text-yellow-700 mb-3">
+                    <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>
                       Ako procjena troška treba reviziju, možete je vratiti
                       Voditelju održavanja.
                     </p>
@@ -256,7 +249,7 @@ export function DirectorTicketDetailModal({
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <h4 className="font-medium text-yellow-900">
+                    <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F' }}>
                       Povrat na VMO
                     </h4>
                     <textarea
@@ -266,7 +259,7 @@ export function DirectorTicketDetailModal({
                       }
                       placeholder="Opišite što treba revidirati (obavezno)..."
                       rows={3}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                       autoFocus
                     />
                     <div className="flex gap-2">
@@ -299,13 +292,13 @@ export function DirectorTicketDetailModal({
                 )}
               </div>
 
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF3B30' }}>
                 {!showRejectForm ? (
                   <div>
-                    <h4 className="font-medium text-red-900 mb-2">
+                    <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>
                       Odbijanje prijave
                     </h4>
-                    <p className="text-sm text-red-700 mb-3">
+                    <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>
                       Ako procjena troška nije prihvatljiva, možete odbiti
                       cijelu prijavu.
                     </p>
@@ -320,7 +313,7 @@ export function DirectorTicketDetailModal({
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <h4 className="font-medium text-red-900">
+                    <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F' }}>
                       Odbijanje prijave
                     </h4>
                     <textarea
@@ -330,7 +323,7 @@ export function DirectorTicketDetailModal({
                       }
                       placeholder="Razlog odbijanja (obavezno)..."
                       rows={3}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                     />
                     <div className="flex gap-2">
                       <Button

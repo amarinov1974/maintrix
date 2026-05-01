@@ -83,8 +83,8 @@ export function TicketDetailModal({
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg p-6">
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px' }}>
           <p>Učitavanje detalja prijave...</p>
         </div>
       </div>
@@ -120,14 +120,14 @@ export function TicketDetailModal({
   const submittedAt = ticket.submittedAt ?? (ticket.currentStatus !== 'Draft' ? ticket.createdAt : null);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto flex flex-col">
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         {/* 9.1 Screen Header */}
-        <div className="p-6 border-b border-gray-200 sticky top-0 bg-white shrink-0">
+        <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Detalji prijave</h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <h1 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1F' }}>Detalji prijave</h1>
+              <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>
                 Prijava #{ticket.id}
               </p>
             </div>
@@ -151,33 +151,54 @@ export function TicketDetailModal({
 
           {/* 9.2 Ticket Core Information (Read-Only Block) */}
           <section className="space-y-4">
-            <h2 className="font-semibold text-gray-900">Informacije o prijavi</h2>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-              <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-                <span><strong>ID prijave:</strong> {ticket.id}</span>
+            <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h2>
+            <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>ID prijave</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.id}</p>
+                </div>
                 {submittedAt != null && (
-                  <span><strong>Datum i vrijeme prijave:</strong> {new Date(submittedAt).toLocaleString()}</span>
+                  <div>
+                    <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Datum i vrijeme prijave</p>
+                    <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{new Date(submittedAt).toLocaleString()}</p>
+                  </div>
                 )}
-                <span><strong>Kreirao:</strong> {ticket.createdByUserName}{ticket.createdByUserRole != null ? ` (${ticket.createdByUserRole})` : ''}</span>
-                <span><strong>Trenutni vlasnik:</strong> {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</span>
-                <span><strong>Poslovnica:</strong> {ticket.storeName}</span>
-                <span><strong>Kategorija:</strong> {formatCategory(ticket.category)}</span>
-                <span>
-                  <strong>Hitnost:</strong>{' '}
-                  {ticket.urgent ? <Badge variant="urgent">HITNO</Badge> : <Badge variant="default">Nije hitno</Badge>}
-                </span>
-                <span><strong>Trenutni status:</strong> <Badge variant={ticket.currentStatus.includes('Approved') ? 'success' : 'warning'}>{ticket.currentStatus}</Badge></span>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Kreirao</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.createdByUserName}{ticket.createdByUserRole != null ? ` (${ticket.createdByUserRole})` : ''}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni vlasnik</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Poslovnica</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.storeName}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Kategorija</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{formatCategory(ticket.category)}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Hitnost</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.urgent ? 'HITNO' : 'Nije hitno'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni status</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.currentStatus}</p>
+                </div>
               </div>
-              <div>
-                <strong className="text-sm text-gray-600">Originalni opis problema (zaključano)</strong>
-                <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{ticket.originalDescription ?? ticket.description}</p>
+              <div style={{ marginTop: '12px' }}>
+                <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Originalni opis problema (zaključano)</p>
+                <p style={{ fontSize: '14px', color: '#1D1D1F', whiteSpace: 'pre-wrap' }}>{ticket.originalDescription ?? ticket.description}</p>
               </div>
             </div>
           </section>
 
           {/* Related Work Orders — SM: list and navigate to QR (one WO direct, multiple require selection) */}
           <section>
-            <h3 className="font-semibold text-gray-900 mb-2">Povezani radni nalozi</h3>
+            <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Povezani radni nalozi</h3>
             {relatedWorkOrders.length === 0 ? (
               <p className="text-sm text-gray-500">Nema radnih naloga za ovu prijavu.</p>
             ) : (
@@ -203,7 +224,7 @@ export function TicketDetailModal({
           {(ticket.assetId != null || ticket.assetDescription != null) && (
             <section>
               <h3 className="font-semibold text-gray-900 mb-2">Oprema</h3>
-              <div className="bg-gray-50 rounded-lg p-4 text-sm">
+              <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px' }}>
                 {ticket.assetId != null && <span><strong>ID opreme:</strong> {ticket.assetId}</span>}
                 {ticket.assetDescription != null && (
                   <p className="mt-1"><strong>Opis:</strong> {ticket.assetDescription}</p>
@@ -214,7 +235,7 @@ export function TicketDetailModal({
 
           {/* 9.3 Attachments (view/download only; add-only in clarification) */}
           <section>
-            <h3 className="font-semibold text-gray-900 mb-2">Privici</h3>
+            <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Privici</h3>
             {visibleAttachments.length > 0 ? (
               <ul className="bg-gray-50 rounded-lg p-4 space-y-2">
                 {visibleAttachments.map((a) => (
@@ -235,8 +256,8 @@ export function TicketDetailModal({
 
           {/* Draft: Submit Ticket (only when owner and Draft) */}
           {canSubmitDraft && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800 mb-3">Ova prijava je u nacrtu. Pošaljite je u obradu.</p>
+            <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
+              <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Ova prijava je u nacrtu. Pošaljite je u obradu.</p>
               <Button type="button" onClick={() => submitMutation.mutate()} disabled={submitMutation.isPending}>
                   {submitMutation.isPending ? 'Slanje...' : 'Pošalji prijavu'}
               </Button>
@@ -245,28 +266,28 @@ export function TicketDetailModal({
 
           {/* 9.5–9.7 Clarification Mode */}
           {isClarificationMode && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-3">
-              <p className="text-sm text-yellow-800 font-medium">Zatraženo je pojašnjenje. Unesite odgovor (obavezno) i opcionalno dodajte privitke ili poveznicu na opremu.</p>
+            <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF9500' }}>
+              <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Zatraženo je pojašnjenje. Unesite odgovor (obavezno) i opcionalno dodajte privitke ili poveznicu na opremu.</p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Odgovor na pojašnjenje *</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Odgovor na pojašnjenje *</label>
                 <textarea
                   value={clarificationText}
                   onChange={(e) => setClarificationText(e.target.value)}
                   placeholder="Unesite odgovor na pojašnjenje..."
                   rows={4}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                 />
               </div>
               {ticket.assetId == null && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Dodaj poveznicu na opremu (opcionalno)</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Dodaj poveznicu na opremu (opcionalno)</label>
                   <input
                     type="text"
                     inputMode="numeric"
                     value={clarificationAssetId}
                     onChange={(e) => setClarificationAssetId(e.target.value)}
                     placeholder="ID opreme"
-                    className="w-full p-3 border border-gray-300 rounded-lg max-w-xs"
+                    style={{ width: '100%', maxWidth: '240px', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
               )}
@@ -299,7 +320,7 @@ export function TicketDetailModal({
                     onChange={(e) => setWithdrawReason(e.target.value)}
                     placeholder="Razlog (opcionalno)"
                     rows={2}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                   />
                   <div className="flex gap-3">
                     <Button type="button" variant="danger" onClick={() => withdrawMutation.mutate()} disabled={withdrawMutation.isPending}>
@@ -316,7 +337,7 @@ export function TicketDetailModal({
 
           {/* Comments (non-internal only when read-only) */}
           <section>
-              <h3 className="font-semibold text-gray-900 mb-2">Komentari</h3>
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Komentari</h3>
             {visibleComments.length > 0 ? (
               <div className="space-y-3">
                 {visibleComments.map((c) => (
@@ -339,7 +360,7 @@ export function TicketDetailModal({
                   onChange={(e) => setClarificationText(e.target.value)}
                   placeholder="Dodajte komentar..."
                   rows={3}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                 />
                 <Button type="button" onClick={() => addCommentMutation.mutate()} disabled={!clarificationText.trim() || addCommentMutation.isPending} className="mt-2">
                   {addCommentMutation.isPending ? 'Dodavanje...' : 'Dodaj komentar'}
@@ -351,20 +372,20 @@ export function TicketDetailModal({
           {/* 9.10 History Log — newest first, Performed by (Name + Role) */}
           {ticket.auditLog != null && ticket.auditLog.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
-              <div className="space-y-2">
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Povijest</h3>
+              <div>
                 {ticket.auditLog.map((entry) => (
-                  <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
-                    <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
+                  <div key={entry.id} style={{ padding: '12px 0', borderBottom: '1px solid #F0F0F5' }}>
+                    <span style={{ fontSize: '12px', color: '#6E6E73' }}>{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
+                    <span style={{ fontSize: '12px', color: '#6E6E73' }}>{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
-                      <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
+                      <span style={{ fontSize: '12px', color: '#6E6E73' }}> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}
-                    <p className="mt-1 text-gray-600">
+                    <p style={{ fontSize: '13px', color: '#1D1D1F', fontWeight: 500, marginTop: '4px' }}>
                       Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                     </p>
-                    {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
+                    {entry.comment != null && <p style={{ fontSize: '13px', color: '#3C3C43', marginTop: '4px' }}>&quot;{entry.comment}&quot;</p>}
                   </div>
                 ))}
               </div>

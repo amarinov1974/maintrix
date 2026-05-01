@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/shared/Layout';
 import { apiClient } from '../../api/client';
 import { useSession } from '../../contexts/SessionContext';
+import { formatAssetStatus } from '../../utils/formatters';
 
 interface Asset {
   id: number;
@@ -36,13 +37,6 @@ const STATUS_COLORS: Record<string, string> = {
   FAULTY: 'bg-red-100 text-red-800',
   IN_SERVICE: 'bg-yellow-100 text-yellow-800',
   DECOMMISSIONED: 'bg-gray-100 text-gray-600',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'Aktivno',
-  FAULTY: 'Kvar',
-  IN_SERVICE: 'Na servisu',
-  DECOMMISSIONED: 'Otpisano',
 };
 
 export function AssetListPage() {
@@ -225,7 +219,7 @@ export function AssetListPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[asset.status]}`}>
-                          {STATUS_LABELS[asset.status]}
+                          {formatAssetStatus(asset.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3">

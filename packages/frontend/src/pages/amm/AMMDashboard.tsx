@@ -16,6 +16,70 @@ import { TicketStatus, WorkOrderStatus, TerminalWorkOrderStatuses } from '../../
 import type { Ticket } from '../../api/tickets';
 import type { WorkOrder } from '../../api/work-orders';
 
+function BucketCard({
+  title,
+  count,
+  description,
+  accentColor,
+  to,
+}: {
+  title: string;
+  count: number;
+  description?: string;
+  accentColor: string;
+  to?: string;
+}) {
+  const inner = (
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        border: '1px solid #E8E8ED',
+        borderLeft: `4px solid ${accentColor}`,
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        transition: 'box-shadow 0.2s ease',
+        cursor: to && count > 0 ? 'pointer' : 'default',
+        opacity: count === 0 ? 0.6 : 1,
+      }}
+      onMouseEnter={e => {
+        if (to && count > 0)
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
+      }}
+    >
+      <div>
+        <p style={{ fontSize: '13px', color: '#6E6E73', marginBottom: '2px', fontWeight: 500 }}>
+          {title}
+        </p>
+        {description && (
+          <p style={{ fontSize: '11px', color: '#AEAEB2', marginTop: '2px' }}>{description}</p>
+        )}
+      </div>
+      <span style={{
+        fontSize: '28px',
+        fontWeight: '600',
+        color: count > 0 ? accentColor : '#AEAEB2',
+        lineHeight: 1,
+        minWidth: '32px',
+        textAlign: 'right',
+      }}>
+        {count}
+      </span>
+    </div>
+  );
+
+  if (to && count > 0) {
+    return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
+  }
+  return inner;
+}
+
 function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
   if (status.includes('Approved')) return 'success';
   if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
@@ -163,228 +227,84 @@ export function AMMDashboard() {
 
         {/* Tickets — Create Ticket + Ticket action groups */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Prijave</h2>
-          <Card className="bg-slate-50 border-slate-200">
-          <div className="flex items-center justify-between">
+          <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px', marginTop: '8px' }}>Prijave</h2>
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            border: '1px solid #E8E8ED',
+            padding: '16px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Nova prijava</h2>
-              <p className="text-sm text-gray-600">Kreirajte prijavu za bilo koju poslovnicu u regiji.</p>
+              <p style={{ fontSize: '14px', fontWeight: 500, color: '#1D1D1F' }}>Nova prijava</p>
+              <p style={{ fontSize: '12px', color: '#6E6E73', marginTop: '2px' }}>Kreirajte prijavu za bilo koju poslovnicu u regiji.</p>
             </div>
             <Link to="/amm/submit">
               <Button type="button">Nova prijava</Button>
             </Link>
           </div>
-        </Card>
+        
 
         {/* 10.4 Ticket Action Groups — click to open list when count > 0 */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          {openUrgentTickets.length > 0 ? (
-            <Link to="/amm/urgent-tickets">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-amber-200 bg-amber-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Hitne prijave</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="warning">{openUrgentTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Submitted, updated (after clarification), or awaiting cost estimation — urgent, owned by you</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-amber-200 bg-amber-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Hitne prijave</h2>
-                <Badge variant="warning">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Submitted, updated (after clarification), or awaiting cost estimation — urgent, owned by you</p>
-            </Card>
-          )}
-          {costEstimationNeededTickets.length > 0 ? (
-            <Link to="/amm/cost-estimation-tickets">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-blue-200 bg-blue-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Prijave — čeka procjena troška</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="warning">{costEstimationNeededTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Prijave koje čekaju procjenu troška</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-blue-200 bg-blue-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Prijave — čeka procjena troška</h2>
-                <Badge variant="warning">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Prijave koje čekaju procjenu troška</p>
-            </Card>
-          )}
-          {approvedCostTickets.length > 0 ? (
-            <Link to="/amm/approved-cost-tickets">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-green-200 bg-green-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Prijave s odobrenom procjenom</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="success">{approvedCostTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Procjena odobrena — kreirati radni nalog</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-green-200 bg-green-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Prijave s odobrenom procjenom</h2>
-                <Badge variant="success">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Procjena odobrena — kreirati radni nalog</p>
-            </Card>
-          )}
-          {workInProgressTickets.length > 0 ? (
-            <Link to="/amm/work-in-progress-tickets">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-teal-200 bg-teal-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Prijave — rad u tijeku</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="default">{workInProgressTickets.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Radni nalog poslan izvođaču</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-teal-200 bg-teal-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Prijave — rad u tijeku</h2>
-                <Badge variant="default">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Radni nalog poslan izvođaču</p>
-            </Card>
-          )}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <BucketCard
+            title="Hitne prijave"
+            count={openUrgentTickets.length}
+            accentColor="#FF3B30"
+            to="/amm/urgent-tickets"
+          />
+          <BucketCard
+            title="Prijave — čeka procjena troška"
+            count={costEstimationNeededTickets.length}
+            accentColor="#FF9500"
+            to="/amm/cost-estimation-tickets"
+          />
+          <BucketCard
+            title="Prijave s odobrenom procjenom"
+            count={approvedCostTickets.length}
+            accentColor="#34C759"
+            to="/amm/approved-cost-tickets"
+          />
+          <BucketCard
+            title="Prijave — rad u tijeku"
+            count={workInProgressTickets.length}
+            accentColor="#0071E3"
+            to="/amm/work-in-progress-tickets"
+          />
         </div>
         </div>
 
         {/* Work Orders — WO action groups */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Radni nalozi</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-          {returnedWorkOrders.length > 0 ? (
-            <Link to="/amm/returned-work-orders">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-rose-200 bg-rose-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Vraćeni radni nalozi</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="warning">{returnedWorkOrders.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Vraćeni ili odbijeni od izvođača</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-rose-200 bg-rose-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Vraćeni radni nalozi</h2>
-                <Badge variant="warning">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Vraćeni ili odbijeni od izvođača</p>
-            </Card>
-          )}
-          {workOrdersWithVendor.length > 0 ? (
-            <Link to="/amm/work-orders-with-vendor">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-sky-200 bg-sky-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Radni nalozi kod izvođača</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="default">{workOrdersWithVendor.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Pregled statusa i detalja</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-sky-200 bg-sky-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Radni nalozi kod izvođača</h2>
-                <Badge variant="default">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Pregled statusa i detalja</p>
-            </Card>
-          )}
-          {costProposalPreparedWOs.length > 0 ? (
-            <Link to="/amm/cost-proposal-work-orders">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-emerald-200 bg-emerald-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — odobrenje ponude</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="warning">{costProposalPreparedWOs.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Odobrenje ponude troška</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-emerald-200 bg-emerald-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — odobrenje ponude</h2>
-                <Badge variant="warning">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Odobrenje ponude troška</p>
-            </Card>
-          )}
-          {followUpExceptionWOs.length > 0 ? (
-            <Link to="/amm/follow-up-work-orders">
-              <Card
-                className="cursor-pointer hover:shadow-md transition border-orange-200 bg-orange-50/50 block"
-                onClick={undefined}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — iznimke</h2>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="warning">{followUpExceptionWOs.length}</Badge>
-                    <span className="text-sm text-gray-500">Klikni za otvaranje</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Radni nalozi koji trebaju pažnju</p>
-              </Card>
-            </Link>
-          ) : (
-            <Card className="border-orange-200 bg-orange-50/50 opacity-90">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Radni nalozi — iznimke</h2>
-                <Badge variant="warning">0</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Radni nalozi koji trebaju pažnju</p>
-            </Card>
-          )}
+          <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px', marginTop: '8px' }}>Radni nalozi</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <BucketCard
+              title="Vraćeni radni nalozi"
+              count={returnedWorkOrders.length}
+              accentColor="#FF3B30"
+              to="/amm/returned-work-orders"
+            />
+            <BucketCard
+              title="Radni nalozi kod izvođača"
+              count={workOrdersWithVendor.length}
+              accentColor="#0071E3"
+              to="/amm/work-orders-with-vendor"
+            />
+            <BucketCard
+              title="Radni nalozi — odobrenje ponude"
+              count={costProposalPreparedWOs.length}
+              accentColor="#FF9500"
+              to="/amm/cost-proposal-work-orders"
+            />
+            <BucketCard
+              title="Radni nalozi — iznimke"
+              count={followUpExceptionWOs.length}
+              accentColor="#FF3B30"
+              to="/amm/follow-up-work-orders"
+            />
           </div>
         </div>
 

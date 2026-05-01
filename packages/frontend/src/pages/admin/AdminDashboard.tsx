@@ -473,8 +473,8 @@ export function AdminDashboard() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-          <p className="text-gray-600">Manage users and system settings</p>
+          <h1 className="text-2xl font-bold text-gray-900">Admin panel</h1>
+          <p className="text-gray-600">Upravljanje korisnicima i postavkama sustava</p>
         </div>
 
         <div className="border-b border-gray-200">
@@ -565,12 +565,12 @@ export function AdminDashboard() {
                 <table className="min-w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Name</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Email</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Role</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Store/Region</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Ime</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">E-mail</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Uloga</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Poslovnica/Regija</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Akcije</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -722,12 +722,12 @@ export function AdminDashboard() {
                 <table className="min-w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Name</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Email</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Role</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Company</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Ime</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">E-mail</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Uloga</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Tvrtka</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Akcije</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -856,11 +856,11 @@ export function AdminDashboard() {
                 <table className="min-w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Name</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Address</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Region</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Naziv</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Adresa</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Regija</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-700">Akcije</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">

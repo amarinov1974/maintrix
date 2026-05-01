@@ -167,27 +167,37 @@ export function EntryScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 relative">
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#1D1D1F',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px',
+      position: 'relative',
+    }}>
       {gateLoading && (
-        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-20">
-          <p className="text-gray-600">Loading…</p>
+        <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }}>
+          <p style={{ color: '#6E6E73' }}>Loading…</p>
         </div>
       )}
       {showGateForm && (
-        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '400px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
             <MaintrixLogo size="md" variant="dark" />
+            <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '8px' }}>Prijavite se za nastavak</p>
           </div>
-          <p className="text-gray-600 mb-6">Prijavite se za nastavak</p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              gateLoginMutation.mutate();
-            }}
-          >
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Korisničko ime
+          <form onSubmit={(e) => { e.preventDefault(); gateLoginMutation.mutate(); }}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px', letterSpacing: '0.03em' }}>
+                KORISNIČKO IME
               </label>
               <input
                 type="text"
@@ -195,12 +205,24 @@ export function EntryScreen() {
                 onChange={(e) => setGateUsername(e.target.value)}
                 required
                 autoComplete="username"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  border: '1px solid #D2D2D7',
+                  borderRadius: '10px',
+                  fontSize: '15px',
+                  color: '#1D1D1F',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.15s',
+                }}
+                onFocus={e => (e.target.style.borderColor = '#0071E3')}
+                onBlur={e => (e.target.style.borderColor = '#D2D2D7')}
               />
             </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Lozinka
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px', letterSpacing: '0.03em' }}>
+                LOZINKA
               </label>
               <input
                 type="password"
@@ -208,16 +230,40 @@ export function EntryScreen() {
                 onChange={(e) => setGatePassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  border: '1px solid #D2D2D7',
+                  borderRadius: '10px',
+                  fontSize: '15px',
+                  color: '#1D1D1F',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.15s',
+                }}
+                onFocus={e => (e.target.style.borderColor = '#0071E3')}
+                onBlur={e => (e.target.style.borderColor = '#D2D2D7')}
               />
             </div>
             {gateError && (
-              <p className="mb-4 text-red-600 text-sm">{gateError}</p>
+              <p style={{ color: '#FF3B30', fontSize: '13px', marginBottom: '16px' }}>{gateError}</p>
             )}
             <button
               type="submit"
               disabled={gateLoginMutation.isPending}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              style={{
+                width: '100%',
+                backgroundColor: '#0071E3',
+                color: '#FFFFFF',
+                padding: '14px',
+                borderRadius: '10px',
+                border: 'none',
+                fontSize: '15px',
+                fontWeight: 500,
+                cursor: gateLoginMutation.isPending ? 'not-allowed' : 'pointer',
+                opacity: gateLoginMutation.isPending ? 0.6 : 1,
+                transition: 'opacity 0.15s',
+              }}
             >
               {gateLoginMutation.isPending ? 'Prijava u tijeku...' : 'Prijava'}
             </button>
@@ -225,87 +271,101 @@ export function EntryScreen() {
         </div>
       )}
       {showDemoForm && (
-      <>
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <MaintrixLogo size="md" variant="dark" />
-        </div>
-        <p className="text-gray-600 mb-8">Demo način — odabir korisnika</p>
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Vrsta korisnika
-          </label>
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => {
-                setUserType('INTERNAL');
-                setSelectedUserId(null);
-              }}
-              className={`flex-1 py-2 px-4 rounded-lg border-2 transition ${
-                userType === 'INTERNAL'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              Interni korisnik
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setUserType('VENDOR');
-                setSelectedUserId(null);
-              }}
-              className={`flex-1 py-2 px-4 rounded-lg border-2 transition ${
-                userType === 'VENDOR'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              Izvođač
-            </button>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '400px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px' }}>
+            <MaintrixLogo size="md" variant="dark" />
+            <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '8px' }}>Demo način — odabir korisnika</p>
           </div>
-        </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Odabir korisnika
-          </label>
+          <div style={{ marginBottom: '20px' }}>
+            <p style={{ fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '8px', letterSpacing: '0.03em' }}>VRSTA KORISNIKA</p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => { setUserType('INTERNAL'); setSelectedUserId(null); }}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  border: userType === 'INTERNAL' ? '2px solid #0071E3' : '2px solid #D2D2D7',
+                  backgroundColor: userType === 'INTERNAL' ? '#EBF5FF' : 'transparent',
+                  color: userType === 'INTERNAL' ? '#0071E3' : '#6E6E73',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                Interni korisnik
+              </button>
+              <button
+                type="button"
+                onClick={() => { setUserType('VENDOR'); setSelectedUserId(null); }}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  border: userType === 'VENDOR' ? '2px solid #0071E3' : '2px solid #D2D2D7',
+                  backgroundColor: userType === 'VENDOR' ? '#EBF5FF' : 'transparent',
+                  color: userType === 'VENDOR' ? '#0071E3' : '#6E6E73',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                Izvođač
+              </button>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <p style={{ fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '8px', letterSpacing: '0.03em' }}>ODABIR KORISNIKA</p>
           {usersLoading && (
-            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">
+            <p style={{ fontSize: '13px', color: '#FF9500', backgroundColor: '#FFF5E6', border: '1px solid #FDD8A0', borderRadius: '8px', padding: '10px', marginBottom: '8px' }}>
               Učitavanje korisnika...
             </p>
           )}
           {usersError && (
-            <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 mb-2">
+            <div style={{ fontSize: '13px', color: '#FF3B30', backgroundColor: '#FFF0EE', border: '1px solid #FFBBB5', borderRadius: '8px', padding: '10px', marginBottom: '8px' }}>
               <p>Nije moguće učitati korisnike. Provjeri je li backend pokrenut.</p>
-              <p className="mt-1 text-xs opacity-90">
+              <p style={{ marginTop: '6px', fontSize: '12px', opacity: 0.9 }}>
                 {(usersErrorDetail as { response?: { data?: { error?: string } }; message?: string })?.response?.data?.error ??
                   (usersErrorDetail as { message?: string })?.message ??
                   String(usersErrorDetail)}
               </p>
-              <button
-                type="button"
-                onClick={() => refetchUsers()}
-                className="mt-2 text-sm font-medium text-red-800 underline hover:no-underline"
-              >
+              <button type="button" onClick={() => refetchUsers()} style={{ marginTop: '6px', fontSize: '12px', color: '#FF3B30', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                 Pokušaj ponovo
               </button>
             </div>
           )}
           {!usersLoading && !usersError && Array.isArray(users) && users.length === 0 && (
-            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">
+            <p style={{ fontSize: '13px', color: '#FF9500', backgroundColor: '#FFF5E6', border: '1px solid #FDD8A0', borderRadius: '8px', padding: '10px', marginBottom: '8px' }}>
               Nema korisnika u bazi. Pokreni: <code className="bg-amber-100 px-1 rounded">npm run db:seed</code> in the backend package.
             </p>
           )}
           <select
             value={selectedUserId ?? ''}
-            onChange={(e) =>
-              setSelectedUserId(e.target.value ? Number(e.target.value) : null)
-            }
-            disabled={usersLoading || usersError}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            onChange={(e) => setSelectedUserId(e.target.value ? Number(e.target.value) : null)}
+            disabled={usersLoading || !!usersError}
+            style={{
+              width: '100%',
+              padding: '12px 14px',
+              border: '1px solid #D2D2D7',
+              borderRadius: '10px',
+              fontSize: '14px',
+              color: '#1D1D1F',
+              backgroundColor: '#FFFFFF',
+              cursor: 'pointer',
+              boxSizing: 'border-box',
+            }}
           >
             <option value="">-- Odaberi korisnika --</option>
             {users?.map((user) => (
@@ -319,37 +379,48 @@ export function EntryScreen() {
               </option>
             ))}
           </select>
-        </div>
+          </div>
 
-        <button
-          type="button"
-          onClick={handleLogin}
-          disabled={selectedUserId == null || loginMutation.isPending}
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
-        >
-          {loginMutation.isPending ? 'Prijava u tijeku...' : 'Prijava'}
-        </button>
-
-        {loginMutation.isError && (
-          <p className="mt-4 text-red-600 text-sm text-center">
-            Prijava neuspješna. Pokušajte ponovo.
-          </p>
-        )}
-
-        <p className="mt-6 text-xs text-gray-500 text-center">
-          Demo način — bez lozinke
-        </p>
-        {gateEnabled && gateAuthenticated && (
           <button
             type="button"
-            onClick={handleGateLogout}
-            className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700 underline"
+            onClick={handleLogin}
+            disabled={selectedUserId == null || loginMutation.isPending}
+            style={{
+              width: '100%',
+              backgroundColor: selectedUserId == null || loginMutation.isPending ? '#AEAEB2' : '#0071E3',
+              color: '#FFFFFF',
+              padding: '14px',
+              borderRadius: '10px',
+              border: 'none',
+              fontSize: '15px',
+              fontWeight: 500,
+              cursor: selectedUserId == null || loginMutation.isPending ? 'not-allowed' : 'pointer',
+              transition: 'background-color 0.15s',
+            }}
           >
-            Odjava
+            {loginMutation.isPending ? 'Prijava u tijeku...' : 'Prijava'}
           </button>
-        )}
-      </div>
-      </>
+
+          {loginMutation.isError && (
+            <p style={{ color: '#FF3B30', fontSize: '13px', textAlign: 'center', marginTop: '12px' }}>
+              Prijava neuspješna. Pokušajte ponovo.
+            </p>
+          )}
+
+          <p style={{ fontSize: '12px', color: '#AEAEB2', textAlign: 'center', marginTop: '20px' }}>
+            Demo način — bez lozinke
+          </p>
+
+          {gateEnabled && gateAuthenticated && (
+            <button
+              type="button"
+              onClick={handleGateLogout}
+              style={{ marginTop: '12px', width: '100%', fontSize: '13px', color: '#6E6E73', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Odjava
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

@@ -33,3 +33,13 @@ export function formatHistoryAction(value: string): string {
   };
   return map[value] ?? value.replace(/_/g, ' ');
 }
+
+export function formatAssetStatus(value: string): string {
+  const map: Record<string, string> = {
+    ACTIVE: 'Aktivno',
+    FAULTY: 'Kvar',
+    IN_SERVICE: 'Na servisu',
+    DECOMMISSIONED: 'Otpisano',
+  };
+  return map[value] ?? value;
+}

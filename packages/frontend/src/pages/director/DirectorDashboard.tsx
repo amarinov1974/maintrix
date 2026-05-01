@@ -14,6 +14,70 @@ import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
 import { formatCategory } from '../../utils/formatters';
 
+function BucketCard({
+  title,
+  count,
+  description,
+  accentColor,
+  to,
+}: {
+  title: string;
+  count: number;
+  description?: string;
+  accentColor: string;
+  to?: string;
+}) {
+  const inner = (
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        border: '1px solid #E8E8ED',
+        borderLeft: `4px solid ${accentColor}`,
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        transition: 'box-shadow 0.2s ease',
+        cursor: to && count > 0 ? 'pointer' : 'default',
+        opacity: count === 0 ? 0.6 : 1,
+      }}
+      onMouseEnter={e => {
+        if (to && count > 0)
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
+      }}
+    >
+      <div>
+        <p style={{ fontSize: '13px', color: '#6E6E73', marginBottom: '2px', fontWeight: 500 }}>
+          {title}
+        </p>
+        {description && (
+          <p style={{ fontSize: '11px', color: '#AEAEB2', marginTop: '2px' }}>{description}</p>
+        )}
+      </div>
+      <span style={{
+        fontSize: '28px',
+        fontWeight: '600',
+        color: count > 0 ? accentColor : '#AEAEB2',
+        lineHeight: 1,
+        minWidth: '32px',
+        textAlign: 'right',
+      }}>
+        {count}
+      </span>
+    </div>
+  );
+
+  if (to && count > 0) {
+    return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
+  }
+  return inner;
+}
+
 function getRoleLabel(role: string) {
   if (role === 'D') return 'Direktor prodaje';
   if (role === 'C2') return 'Direktor održavanja';
@@ -84,30 +148,21 @@ export function DirectorDashboard() {
           </Link>
         </div>
 
-        <Card className="bg-blue-50 border-blue-200">
-          <div className="flex items-start gap-3">
-            <div className="text-blue-600 text-2xl">💰</div>
-            <div>
-              <h3 className="font-medium text-blue-900 mb-1">
-                Vaša uloga u lancu odobrenja
-              </h3>
-              <p className="text-sm text-blue-700 mb-2">
-                Pregledavate procjene troška na temelju pragova odobrenja:
-              </p>
-              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                <li>
-                  <strong>≤ €1,000:</strong> Samo AM (nećete vidjeti ove prijave)
-                </li>
-                <li>
-                  <strong>€1,001 - €3,000:</strong> AM → D → C2
-                </li>
-                <li>
-                  <strong>&gt; €3,000:</strong> AM → D → C2 → BOD
-                </li>
-              </ul>
-            </div>
-          </div>
-        </Card>
+        <div style={{
+          backgroundColor: '#F5F5F7',
+          borderRadius: '10px',
+          padding: '14px 18px',
+          borderLeft: '4px solid #0071E3',
+          marginBottom: '16px',
+        }}>
+          <p style={{ fontSize: '12px', fontWeight: 600, color: '#0071E3', marginBottom: '6px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Vaša uloga u lancu odobrenja</p>
+          <p style={{ fontSize: '13px', color: '#3C3C43', marginBottom: '6px' }}>Pregledavate procjene troška na temelju pragova odobrenja:</p>
+          <ul style={{ fontSize: '12px', color: '#3C3C43', paddingLeft: '16px', margin: 0, lineHeight: '1.8' }}>
+            <li>≤ €1.000: Samo AM (nećete vidjeti ove prijave)</li>
+            <li>€1.001 – €3.000: AM → D → C2</li>
+            <li>&gt; €3.000: AM → D → C2 → BOD</li>
+          </ul>
+        </div>
 
         {isLoading ? (
           <Card>
