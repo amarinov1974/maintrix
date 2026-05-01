@@ -11,7 +11,7 @@ import { authAPI } from '../../api/auth';
 import { useSession } from '../../contexts/SessionContext';
 import { TicketStatus } from '../../types/statuses';
 import { Button, Badge } from '../../components/shared';
-import { formatCategory, formatHistoryAction } from '../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 
 interface AMMTicketDetailModalProps {
   ticketId: number;
@@ -301,7 +301,7 @@ export function AMMTicketDetailModal({
                 </div>
                 <div>
                   <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni status</p>
-                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.currentStatus}</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{formatStatus(ticket.currentStatus)}</p>
                 </div>
               </div>
               <div style={{ marginTop: '12px' }}>
@@ -349,7 +349,7 @@ export function AMMTicketDetailModal({
                 {workOrdersForTicket.map((wo) => (
                   <li key={wo.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm bg-white rounded-lg p-3 border border-gray-200">
                     <span className="font-medium text-gray-900">{wo.vendorCompanyName}</span>
-                    <Badge variant={wo.currentStatus?.includes('Created') ? 'default' : 'warning'}>{wo.currentStatus ?? '—'}</Badge>
+                    <Badge variant={wo.currentStatus?.includes('Created') ? 'default' : 'warning'}>{wo.currentStatus != null ? formatStatus(wo.currentStatus) : '—'}</Badge>
                     <span className="text-gray-500">{new Date(wo.createdAt).toLocaleString()}</span>
                   </li>
                 ))}

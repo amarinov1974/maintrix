@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import type { WorkOrder } from '../../../api/work-orders';
 import { Card, Button } from '../../../components/shared';
+import { formatStatus } from '../../../utils/formatters';
 
 interface S3WorkOrderListProps {
   items: WorkOrder[];
@@ -138,7 +139,7 @@ export function S3WorkOrderList({
                   </span>
                 )}
               </div>
-              <span className="text-sm font-medium text-gray-600 shrink-0">{wo.currentStatus}</span>
+              <span className="text-sm font-medium text-gray-600 shrink-0">{formatStatus(wo.currentStatus)}</span>
             </div>
           ))}
         </div>

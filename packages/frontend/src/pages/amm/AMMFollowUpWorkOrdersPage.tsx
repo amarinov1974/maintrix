@@ -11,6 +11,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import { WorkOrderStatus } from '../../types/statuses';
 import type { WorkOrder } from '../../api/work-orders';
+import { formatStatus } from '../../utils/formatters';
 
 const FOLLOW_UP_STATUSES = [
   WorkOrderStatus.FOLLOW_UP_REQUESTED,
@@ -112,7 +113,7 @@ function WorkOrderPreviewRow({
         <span className="font-semibold text-gray-900">Work Order #{workOrder.id}</span>
         <span className="text-sm text-gray-600">Ticket #{workOrder.ticketId}</span>
         <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>
-          {workOrder.currentStatus}
+          {formatStatus(workOrder.currentStatus)}
         </Badge>
         <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>
         {workOrder.storeName && (

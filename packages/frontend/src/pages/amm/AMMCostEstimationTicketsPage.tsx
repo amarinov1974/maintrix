@@ -11,6 +11,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMTicketDetailModal } from './AMMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
+import { formatStatus } from '../../utils/formatters';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
 
@@ -105,7 +106,7 @@ function TicketPreviewRow({ ticket, onOpen }: { ticket: Ticket; onOpen: () => vo
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
         {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-        <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{ticket.currentStatus}</Badge>
+        <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
         <span className="text-sm text-gray-600">{ticket.storeName}</span>
         <span className="text-sm text-gray-500">
           {new Date(ticket.createdAt).toLocaleDateString()}

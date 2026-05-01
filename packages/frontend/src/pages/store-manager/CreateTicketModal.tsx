@@ -61,11 +61,11 @@ export function CreateTicketModal({ onClose }: CreateTicketModalProps) {
   const validate = (): boolean => {
     setValidationError('');
     if (!category.trim()) {
-      setValidationError('Please select a category.');
+      setValidationError('Odaberite kategoriju.');
       return false;
     }
     if (!description.trim()) {
-      setValidationError('Please enter a description.');
+      setValidationError('Unesite opis kvara.');
       return false;
     }
     return true;

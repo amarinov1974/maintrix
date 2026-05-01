@@ -5,7 +5,7 @@
 
 import type { WorkOrder } from '../../../api/work-orders';
 import { Card, Badge, Button } from '../../../components/shared';
-import { formatCategory } from '../../../utils/formatters';
+import { formatCategory, formatStatus } from '../../../utils/formatters';
 
 interface S1WorkOrderListProps {
   items: WorkOrder[];
@@ -76,7 +76,7 @@ export function S1WorkOrderList({
                 <span>•</span>
                 <span>AMM comment: {shortComment(wo.commentToVendor)}</span>
                 <span>•</span>
-                <span className="font-medium">{wo.currentStatus}</span>
+                <span className="font-medium">{formatStatus(wo.currentStatus)}</span>
                 {wo.assignedTechnicianName != null && wo.assignedTechnicianName !== '' && (
                   <>
                     <span>•</span>

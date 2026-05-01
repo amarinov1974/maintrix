@@ -46,15 +46,27 @@ export function formatAssetStatus(value: string): string {
 
 export function formatStatus(value: string): string {
   const map: Record<string, string> = {
+    'Ticket Submitted': 'Prijava podnesena',
+    Draft: 'Nacrt',
     'Cost Estimation Needed': 'Potrebna procjena troška',
+    'Cost Estimation Approval Needed': 'Odobrenje procjene troška',
     'Awaiting Ticket Creator Response': 'Čeka odgovor podnositelja',
     'Updated Ticket Submitted': 'Ažurirana prijava podnesena',
     'Work Order In Progress': 'Radni nalog u tijeku',
     'Ticket Cost Estimation Approved': 'Procjena troška odobrena',
     'Ticket Archived': 'Prijava arhivirana',
     'Ticket Rejected': 'Prijava odbijena',
-    'Ticket Submitted': 'Prijava podnesena',
-    Draft: 'Nacrt',
+    'Awaiting Service Provider': 'Čeka izvođača',
+    'Work In Progress': 'Rad u tijeku',
+    'Cost Proposal Submitted': 'Ponuda troška predana',
+    'Cost Proposal Approved': 'Ponuda troška odobrena',
+    'Cost Proposal Revision Requested': 'Zatražena revizija ponude',
+    'Work Completed': 'Rad završen',
+    'Closed With Cost': 'Zatvoreno s troškom',
+    'Closed Without Cost': 'Zatvoreno bez troška',
+    'Follow Up Needed': 'Potreban follow-up',
+    'Rejected By Provider': 'Odbijeno od izvođača',
+    'Returned By Provider': 'Vraćeno od izvođača',
   };
   return map[value] ?? value;
 }

@@ -11,7 +11,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
 import { TicketStatus } from '../../types/statuses';
 import { QRGenerationModal } from './QRGenerationModal';
-import { formatCategory, formatHistoryAction } from '../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 
 interface TicketDetailModalProps {
   ticketId: number;
@@ -186,7 +186,7 @@ export function TicketDetailModal({
                 </div>
                 <div>
                   <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni status</p>
-                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.currentStatus}</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{formatStatus(ticket.currentStatus)}</p>
                 </div>
               </div>
               <div style={{ marginTop: '12px' }}>
@@ -207,7 +207,7 @@ export function TicketDetailModal({
                   {relatedWorkOrders.map((wo) => (
                     <li key={wo.id} className="flex flex-wrap items-center gap-2 text-sm">
                       <span className="font-medium">Radni nalog #{wo.id}</span>
-                      <Badge variant="default">{wo.currentStatus}</Badge>
+                      <Badge variant="default">{formatStatus(wo.currentStatus)}</Badge>
                       <span className="text-gray-600">{wo.vendorCompanyName}</span>
                       <span className="text-gray-500">{new Date(wo.updatedAt).toLocaleDateString()}</span>
                     </li>

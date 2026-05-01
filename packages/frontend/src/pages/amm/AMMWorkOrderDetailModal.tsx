@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { workOrdersAPI } from '../../api/work-orders';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
-import { formatCategory, formatHistoryAction } from '../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 
 interface AMMWorkOrderDetailModalProps {
   workOrderId: number;
@@ -148,7 +148,7 @@ export function AMMWorkOrderDetailModal({
               <div className="flex items-center gap-2">
                 <span className="text-gray-600">Status:</span>
                 <Badge variant={wo.currentStatus === 'Cost Proposal Prepared' ? 'warning' : 'default'}>
-                  {wo.currentStatus ?? '—'}
+                  {wo.currentStatus != null ? formatStatus(wo.currentStatus) : '—'}
                 </Badge>
               </div>
               <div>

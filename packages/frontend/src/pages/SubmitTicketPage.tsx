@@ -105,15 +105,15 @@ export function SubmitTicketPage({ backLink, backLabel = 'Natrag' }: SubmitTicke
   const validate = (): boolean => {
     setValidationError('');
     if (isAMM && (storeId === '' || storeId == null)) {
-      setValidationError('Please select a store.');
+      setValidationError('Odaberite poslovnicu.');
       return false;
     }
     if (!category.trim()) {
-      setValidationError('Please select a category.');
+      setValidationError('Odaberite kategoriju.');
       return false;
     }
     if (!description.trim()) {
-      setValidationError('Please enter a description.');
+      setValidationError('Unesite opis kvara.');
       return false;
     }
     return true;

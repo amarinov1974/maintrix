@@ -11,7 +11,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Badge } from '../../components/shared';
 import { TicketDetailModal } from './TicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
-import { formatCategory } from '../../utils/formatters';
+import { formatCategory, formatStatus } from '../../utils/formatters';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
 
@@ -92,7 +92,7 @@ export function SMActionRequiredPage() {
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
                     <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>
-                      {ticket.currentStatus}
+                      {formatStatus(ticket.currentStatus)}
                     </Badge>
                     {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
                     <span className="text-sm text-gray-600">{formatCategory(ticket.category)}</span>

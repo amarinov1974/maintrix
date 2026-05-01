@@ -11,6 +11,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Badge } from '../../components/shared';
 import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import type { WorkOrder } from '../../api/work-orders';
+import { formatStatus } from '../../utils/formatters';
 
 const COMMENT_PREVIEW_WORDS = 25;
 
@@ -133,7 +134,7 @@ function WorkOrderPreviewRow({
           <Badge variant="danger">Hitno</Badge>
         )}
         <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>
-          {workOrder.currentStatus}
+          {formatStatus(workOrder.currentStatus)}
         </Badge>
         <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>
         {workOrder.storeName && (

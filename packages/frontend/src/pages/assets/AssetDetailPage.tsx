@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { Layout } from '../../components/shared/Layout';
 import { apiClient } from '../../api/client';
-import { formatAssetStatus, formatCategory } from '../../utils/formatters';
+import { formatAssetStatus, formatCategory, formatStatus } from '../../utils/formatters';
 
 type AssetStatus = 'ACTIVE' | 'FAULTY' | 'IN_SERVICE' | 'DECOMMISSIONED';
 
@@ -274,7 +274,7 @@ export function AssetDetailPage() {
                         <td className="px-4 py-3 text-gray-600">{formatCategory(ticket.category)}</td>
                         <td className="px-4 py-3">
                           <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700">
-                            {ticket.currentStatus}
+                            {formatStatus(ticket.currentStatus)}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-gray-600">{ticket.urgent ? '⚡' : '—'}</td>
@@ -308,7 +308,7 @@ export function AssetDetailPage() {
                       <td className="px-4 py-3 text-gray-600">{workOrder.vendorCompany.name}</td>
                       <td className="px-4 py-3">
                         <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700">
-                          {workOrder.currentStatus}
+                          {formatStatus(workOrder.currentStatus)}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-600">{formatDate(workOrder.createdAt)}</td>

@@ -13,7 +13,7 @@ import { WorkOrderStatus } from '../../../types/statuses';
 import { CheckInModal } from './CheckInModal';
 import { CheckOutModal } from './CheckOutModal';
 import { getS2WODraft, setS2WODraft, clearS2WODraft } from './s2Draft';
-import { formatCategory, formatHistoryAction } from '../../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../../utils/formatters';
 
 interface S2WorkOrderDetailModalProps {
   workOrderId: number;
@@ -185,7 +185,7 @@ export function S2WorkOrderDetailModal({
                     </ul>
                   </div>
                 )}
-                <div><span className="text-gray-600">Status:</span> <strong>{wo.currentStatus}</strong></div>
+                <div><span className="text-gray-600">Status:</span> <strong>{formatStatus(wo.currentStatus)}</strong></div>
               </div>
             </section>
 

@@ -12,6 +12,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMTicketDetailModal } from './AMMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
+import { formatStatus } from '../../utils/formatters';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
 
@@ -70,7 +71,7 @@ export function AMMWorkInProgressTicketsPage() {
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
                     {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-                    <Badge variant="default">{ticket.currentStatus}</Badge>
+                    <Badge variant="default">{formatStatus(ticket.currentStatus)}</Badge>
                     <span className="text-sm text-gray-600">{ticket.storeName}</span>
                     <span className="text-sm text-gray-500">
                       {new Date(ticket.updatedAt).toLocaleDateString()}

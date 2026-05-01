@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
-import { formatCategory, formatHistoryAction } from '../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 
 interface AMTicketDetailModalProps {
   ticketId: number;
@@ -149,7 +149,7 @@ export function AMTicketDetailModal({
                       : 'warning'
                   }
                 >
-                  {ticket.currentStatus}
+                  {formatStatus(ticket.currentStatus)}
                 </Badge>
               </div>
               <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>

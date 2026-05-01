@@ -11,7 +11,7 @@ import { useSession } from '../../../contexts/SessionContext';
 import { Button, Badge } from '../../../components/shared';
 import { WorkOrderStatus } from '../../../types/statuses';
 import { AssignTechnicianModal } from './AssignTechnicianModal';
-import { formatCategory, formatHistoryAction } from '../../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../../utils/formatters';
 
 interface S1WorkOrderDetailModalProps {
   workOrderId: number;
@@ -138,7 +138,7 @@ export function S1WorkOrderDetailModal({
                 )}
                 <div>
                   <span className="text-gray-600">Current status:</span>{' '}
-                  <strong>{wo.currentStatus}</strong>
+                  <strong>{formatStatus(wo.currentStatus)}</strong>
                 </div>
                 {wo.assignedTechnicianId != null && (
                   <div>

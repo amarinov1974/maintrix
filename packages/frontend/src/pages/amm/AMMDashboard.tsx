@@ -443,7 +443,7 @@ function WorkOrderRow({ workOrder, onSelect }: { workOrder: WorkOrder; onSelect:
     >
       <span className="font-semibold text-gray-900">Work Order #{workOrder.id}</span>
       <span className="text-sm text-gray-600">Prijava #{workOrder.ticketId}</span>
-      <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>{workOrder.currentStatus}</Badge>
+      <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>{formatStatus(workOrder.currentStatus)}</Badge>
       <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>
       <span className="text-sm text-gray-500">{new Date(workOrder.updatedAt).toLocaleDateString()}</span>
     </button>
