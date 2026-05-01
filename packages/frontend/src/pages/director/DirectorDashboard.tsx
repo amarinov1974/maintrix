@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
-import { Layout, Card, Badge, Button } from '../../components/shared';
+import { Layout, Card, Badge, Button, ApprovalChainInfo } from '../../components/shared';
 import { DirectorTicketDetailModal } from './DirectorTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
@@ -85,6 +85,13 @@ function getRoleLabel(role: string) {
   return role;
 }
 
+function getRoleDescription(role: string) {
+  if (role === 'D') return 'Odobravate procjene troška od €1.001 do €3.000.';
+  if (role === 'C2') return 'Odobravate procjene troška od €1.001 do €3.000.';
+  if (role === 'BOD') return 'Odobravate procjene troška iznad €3.000.';
+  return 'Odobravate procjene troška.';
+}
+
 function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
   if (status.includes('Approved')) return 'success';
   if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
@@ -148,21 +155,7 @@ export function DirectorDashboard() {
           </Link>
         </div>
 
-        <div style={{
-          backgroundColor: '#F5F5F7',
-          borderRadius: '10px',
-          padding: '14px 18px',
-          borderLeft: '4px solid #0071E3',
-          marginBottom: '16px',
-        }}>
-          <p style={{ fontSize: '12px', fontWeight: 600, color: '#0071E3', marginBottom: '6px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Vaša uloga u lancu odobrenja</p>
-          <p style={{ fontSize: '13px', color: '#3C3C43', marginBottom: '6px' }}>Pregledavate procjene troška na temelju pragova odobrenja:</p>
-          <ul style={{ fontSize: '12px', color: '#3C3C43', paddingLeft: '16px', margin: 0, lineHeight: '1.8' }}>
-            <li>≤ €1.000: Samo AM (nećete vidjeti ove prijave)</li>
-            <li>€1.001 – €3.000: AM → D → C2</li>
-            <li>&gt; €3.000: AM → D → C2 → BOD</li>
-          </ul>
-        </div>
+        <ApprovalChainInfo roleDescription={getRoleDescription(session?.role ?? '')} />
 
         {isLoading ? (
           <Card>

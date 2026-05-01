@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
-import { Layout, Card, Badge, Button } from '../../components/shared';
+import { Layout, Card, Badge, Button, ApprovalChainInfo } from '../../components/shared';
 import { AMTicketDetailModal } from './AMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import { formatCategory, formatStatus } from '../../utils/formatters';
@@ -155,18 +155,7 @@ export function AreaManagerDashboard() {
           </Link>
         </div>
 
-        <div style={{
-          backgroundColor: '#F5F5F7',
-          borderRadius: '10px',
-          padding: '14px 18px',
-          borderLeft: '4px solid #0071E3',
-          marginBottom: '16px',
-        }}>
-          <p style={{ fontSize: '12px', fontWeight: 600, color: '#0071E3', marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Vaša uloga</p>
-          <p style={{ fontSize: '13px', color: '#3C3C43' }}>
-            Odobravate ne-hitne prijave prije procjene troška. Pregledajte svaku prijavu i odobrite ili odbijte.
-          </p>
-        </div>
+        <ApprovalChainInfo roleDescription="Odobravate procjene troška do €1.000." />
 
         {isLoading ? (
           <Card>
