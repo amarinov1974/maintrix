@@ -1,17 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InternalRoles } from '../src/types/roles.js';
 
-const prismaMock = {
-  ticket: {
-    findUnique: vi.fn(),
-    update: vi.fn(),
+const { prismaMock, validateTransitionMock } = vi.hoisted(() => ({
+  prismaMock: {
+    ticket: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    auditLog: {
+      create: vi.fn(),
+    },
   },
-  auditLog: {
-    create: vi.fn(),
-  },
-};
-
-const validateTransitionMock = vi.fn();
+  validateTransitionMock: vi.fn(),
+}));
 
 vi.mock('../src/config/database.js', () => ({
   prisma: prismaMock,

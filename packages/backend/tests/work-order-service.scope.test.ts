@@ -1,17 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const prismaMock = {
-  workOrder: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
+const { prismaMock } = vi.hoisted(() => ({
+  prismaMock: {
+    workOrder: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+    },
+    internalUser: {
+      findMany: vi.fn(),
+    },
+    vendorUser: {
+      findMany: vi.fn(),
+    },
   },
-  internalUser: {
-    findMany: vi.fn(),
-  },
-  vendorUser: {
-    findMany: vi.fn(),
-  },
-};
+}));
 
 vi.mock('../src/config/database.js', () => ({
   prisma: prismaMock,
