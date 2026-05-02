@@ -1,3 +1,7 @@
+/**
+ * Production `tsc` uses tsconfig.json (vite/client only).
+ * Test globals: `pnpm typecheck:test` uses tsconfig.test.json (vitest, jest-dom).
+ */
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
     "start": "serve -s dist -l tcp://0.0.0.0:$PORT",
     "preview": "vite preview",
     "test": "vitest run",
