@@ -621,7 +621,7 @@ export function AdminDashboard() {
             )}
 
             {editingUser && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-md">
                   <h3 className="font-semibold text-gray-900 mb-4">Edit User — {editingUser.name}</h3>
                   <form onSubmit={handleEditInternalSubmit} className="space-y-3">
@@ -776,7 +776,7 @@ export function AdminDashboard() {
             )}
 
             {editingVendor && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-md">
                   <h3 className="font-semibold text-gray-900 mb-4">Edit Vendor User — {editingVendor.name}</h3>
                   <form onSubmit={handleEditVendorSubmit} className="space-y-3">
@@ -903,7 +903,7 @@ export function AdminDashboard() {
             )}
 
             {editingStore && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-md">
                   <h3 className="font-semibold text-gray-900 mb-4">Edit Store — {editingStore.name}</h3>
                   <form onSubmit={handleEditStoreSubmit} className="space-y-3">
@@ -1078,7 +1078,7 @@ export function AdminDashboard() {
             )}
 
             {editingAsset && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                   <h3 className="font-semibold text-gray-900 mb-4">Uredi opremu — {editingAsset.name}</h3>
                   <form onSubmit={handleEditAssetSubmit} className="grid grid-cols-2 gap-3">
