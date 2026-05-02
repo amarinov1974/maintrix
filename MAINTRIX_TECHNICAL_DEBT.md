@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-02*
+*Zadnje ažurirano: 2026-05-03*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -59,7 +59,6 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 - [ ] **Attachment serving authorization audit.** Provjeriti da download ruta provjerava session + scope nad parent ticketom/WO-om.
 - [ ] **State transition labels cure u UI Povijesti.** Vendor i internal korisnici vide tehničke labele tipa `ASSIGN TECHNICIAN`, `QR GENERATED (ACCEPTED_TECHNICIAN_ASSIGNED → ACCEPTED_TECHNICIAN_ASSIGNED)`, `CHECKIN (ACCEPTED_TECHNICIAN_ASSIGNED → Service In Progress)`. Treba mapping tablica koja prevodi action + status par u human-friendly HR string, ili backend šalje već lokaliziran log entry. Otkriveno u screenshot reviewu 2026-05-02.
 - [ ] **Native browser alert za check-in potvrdu.** Trenutno koristi `window.confirm`/`alert` koji se ne može prevesti (`"Your arrival on site has been registered. You can now start work."`). Zamijeniti app-level toast/modal porukom u HR.
-- [ ] **Validacija forme “Izvještaj rada”.** — trenutno prima besmislene unose tipa `"fasfasf csdfsa 1"`. Dodati min length, smislene validacije na opis/jedinicu/količina prije submit-a.
 
 ### Niski prioritet (UX / kozmetika / accessibility)
 
@@ -72,6 +71,12 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 - [ ] **Demo seed strategy** — odluka: hoće li seed kreirati demo WO-e i tickete, ili to ostaje “ručno kreiraj kroz UI”? Trenutno (od 2026-04-27) seed ne kreira tickete/WO-e. Privremena odluka 2026-05-02: ostaje na ručno kreiranje kroz UI.
 - [ ] **Backup procedure dokumentirana + jednom restano testirana.**
 - [ ] **Strukturirani logovi (pino + log shipping).**
+
+---
+
+## Domenske odluke (decided / closed)
+
+- **Izvještaj rada — fleksibilnost potvrđena (2026-05-03).** Domenska odluka: izvještaj je digitalna replika papirnog radnog naloga, slobodan unos je feature. Strukturirana validacija sadržaja se ne uvodi. Polje količina prebačeno s number na text input, dodano brisanje pojedinog reda stavke.
 
 ---
 

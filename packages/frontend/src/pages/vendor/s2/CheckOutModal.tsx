@@ -57,7 +57,7 @@ export function CheckOutModal({
       (r) =>
         String(r.description).trim() !== '' &&
         String(r.unit).trim() !== '' &&
-        Number(r.quantity) >= 0
+        String(r.quantity).trim() !== ''
     );
 
   const handleCheckOut = () => {
@@ -71,7 +71,7 @@ export function CheckOutModal({
         (r) =>
           String(r.description).trim() !== '' &&
           String(r.unit).trim() !== '' &&
-          Number(r.quantity) >= 0
+          String(r.quantity).trim() !== ''
       ),
     });
   };

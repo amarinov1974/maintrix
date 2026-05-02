@@ -364,7 +364,10 @@ export class WorkOrderService {
           rowNumber: existingRowCount + i + 1,
           description: row.description,
           unit: row.unit,
-          quantity: row.quantity,
+          quantity:
+            typeof row.quantity === 'number'
+              ? String(row.quantity)
+              : String(row.quantity ?? ''),
         },
       });
     }
@@ -1346,7 +1349,7 @@ export class WorkOrderService {
         wo.workReportRows?.map((r) => ({
           description: r.description,
           unit: r.unit,
-          quantity: Number(r.quantity),
+          quantity: String(r.quantity ?? ''),
         })) ?? [],
       invoiceRows:
         wo.invoiceRows?.map((r) => ({

@@ -20,7 +20,18 @@ interface S2WorkOrderDetailModalProps {
   onClose: () => void;
 }
 
-const INITIAL_ROW: WorkReportRow = { description: '', unit: '', quantity: 1 };
+const INITIAL_ROW: WorkReportRow = { description: '', unit: '', quantity: '' };
+
+function normalizeWorkReportRow(r: {
+  description: string;
+  unit: string;
+  quantity: string | number;
+}): WorkReportRow {
+  const q = r.quantity;
+  const quantityStr =
+    typeof q === 'number' && !Number.isNaN(q) ? String(q) : String(q ?? '');
+  return { description: r.description, unit: r.unit, quantity: quantityStr };
+}
 
 export function S2WorkOrderDetailModal({
   workOrderId,
@@ -53,7 +64,7 @@ export function S2WorkOrderDetailModal({
     if (isFollowUpVisit) return; // follow-up: don't pre-fill work report from draft
     const draft = getS2WODraft(workOrderId);
     if (draft?.workReport != null && Array.isArray(draft.workReport) && draft.workReport.length > 0) {
-      setWorkReport(draft.workReport);
+      setWorkReport(draft.workReport.map((r) => normalizeWorkReportRow(r)));
     }
     if (draft?.reportCompleted === true) {
       setReportCompleted(true);
@@ -61,9 +72,11 @@ export function S2WorkOrderDetailModal({
   }, [workOrderId, wo?.id, isFollowUpVisit]);
 
   const saveDraftAndClose = () => {
-    const reportToSave = workReport.length ? workReport : (wo?.workReport != null && wo.workReport.length > 0
-      ? wo.workReport.map((r) => ({ description: r.description, unit: r.unit, quantity: r.quantity }))
-      : [INITIAL_ROW]);
+    const reportToSave = workReport.length
+      ? workReport
+      : wo?.workReport != null && wo.workReport.length > 0
+        ? wo.workReport.map((r) => normalizeWorkReportRow(r))
+        : [INITIAL_ROW];
     setS2WODraft(workOrderId, { workReport: reportToSave, reportCompleted });
     onClose();
   };
@@ -73,11 +86,7 @@ export function S2WorkOrderDetailModal({
     // Follow-up visit: don't show previous visit's work report — same as first visit (empty)
     if (isFollowUpVisit) return [INITIAL_ROW];
     if (wo?.workReport != null && wo.workReport.length > 0) {
-      return wo.workReport.map((r) => ({
-        description: r.description,
-        unit: r.unit,
-        quantity: r.quantity,
-      }));
+      return wo.workReport.map((r) => normalizeWorkReportRow(r));
     }
     return [INITIAL_ROW];
   }, [workReport, wo?.workReport, isFollowUpVisit]);
@@ -87,7 +96,7 @@ export function S2WorkOrderDetailModal({
     setWorkReport((prev) => (prev.length ? [...prev, { ...INITIAL_ROW }] : [...effectiveReport, { ...INITIAL_ROW }]));
   };
 
-  const updateRow = (index: number, field: keyof WorkReportRow, value: string | number) => {
+  const updateRow = (index: number, field: keyof WorkReportRow, value: string) => {
     if (reportCompleted) return;
     const base = workReport.length ? workReport : effectiveReport;
     const next = [...base];
@@ -95,12 +104,21 @@ export function S2WorkOrderDetailModal({
     setWorkReport(next);
   };
 
+  const removeRow = (index: number) => {
+    if (reportCompleted) return;
+    const base = workReport.length ? workReport : effectiveReport;
+    if (base.length <= 1) {
+      setWorkReport([{ ...INITIAL_ROW }]);
+      return;
+    }
+    setWorkReport(base.filter((_, i) => i !== index));
+  };
+
   const canCompleteReport = effectiveReport.every(
     (r) =>
       String(r.description).trim() !== '' &&
       String(r.unit).trim() !== '' &&
-      Number(r.quantity) >= 0 &&
-      !Number.isNaN(Number(r.quantity))
+      String(r.quantity).trim() !== ''
   );
 
   const markReportComplete = () => {
@@ -215,7 +233,10 @@ export function S2WorkOrderDetailModal({
                           <th className="text-left p-2">#</th>
                           <th className="text-left p-2">Opis *</th>
                           <th className="text-left p-2">Jedinica *</th>
-                          <th className="text-left p-2">Količina *</th>
+                          <th className="text-left p-2 min-w-[6rem]">Količina *</th>
+                          <th className="w-10 p-2">
+                            <span className="sr-only">Ukloni stavku</span>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -244,14 +265,26 @@ export function S2WorkOrderDetailModal({
                             </td>
                             <td className="p-2">
                               <input
-                                type="number"
-                                min={0}
-                                step={0.01}
+                                type="text"
                                 value={row.quantity}
-                                onChange={(e) => updateRow(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                onChange={(e) => updateRow(index, 'quantity', e.target.value)}
+                                placeholder="npr. 2, 1.5 h, 3 kom"
                                 disabled={reportCompleted}
-                                className="w-24 p-2 border border-gray-300 rounded"
+                                className="w-full min-w-[5rem] p-2 border border-gray-300 rounded"
                               />
+                            </td>
+                            <td className="p-2 text-right align-middle">
+                              {!reportCompleted && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeRow(index)}
+                                  className="text-gray-400 hover:text-gray-600 text-lg leading-none px-1.5 py-0.5 rounded hover:bg-gray-100"
+                                  aria-label="Ukloni stavku"
+                                  title="Ukloni stavku"
+                                >
+                                  ×
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}

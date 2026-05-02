@@ -63,7 +63,8 @@ export interface WorkOrderDetail extends WorkOrder {
 export interface WorkReportRow {
   description: string;
   unit: string;
-  quantity: number;
+  /** Free-form quantity line (matches paper work order flexibility) */
+  quantity: string;
 }
 
 export interface InvoiceRow {
