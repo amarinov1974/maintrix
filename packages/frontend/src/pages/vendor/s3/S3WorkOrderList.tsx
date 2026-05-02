@@ -65,7 +65,7 @@ export function S3WorkOrderList({
               onClick={handleCreateBatch}
               disabled={selectedIds.size === 0 || batchCreating}
             >
-              {batchCreating ? 'Creating…' : 'Create Invoice Batch (PDF)'}
+              {batchCreating ? 'Kreiranje…' : 'Kreiraj račun (PDF)'}
             </Button>
           )}
           <Button type="button" variant="secondary" onClick={onBack}>
@@ -78,7 +78,7 @@ export function S3WorkOrderList({
           <span>{batchError}</span>
           {onClearBatchError && (
             <button type="button" onClick={onClearBatchError} className="underline">
-              Dismiss
+              Odbaci
             </button>
           )}
         </div>
@@ -96,10 +96,10 @@ export function S3WorkOrderList({
                   onChange={toggleSelectAll}
                   className="rounded border-gray-300"
                 />
-                <span className="text-sm font-medium text-gray-700">Select all</span>
+                <span className="text-sm font-medium text-gray-700">Označi sve</span>
               </label>
               <span className="text-sm text-gray-500">
-                {selectedIds.size} of {items.length} selected
+                {selectedIds.size} od {items.length} odabrano
               </span>
             </div>
           )}
@@ -127,15 +127,15 @@ export function S3WorkOrderList({
                   onChange={() => toggleOne(wo.id)}
                   onClick={(e) => e.stopPropagation()}
                   className="rounded border-gray-300 shrink-0"
-                  aria-label={`Select WO #${wo.id}`}
+                  aria-label={`Označi RN #${wo.id}`}
                 />
               )}
               <div className="min-w-0 flex-1">
                 <span className="font-medium text-gray-900">{wo.storeName ?? `WO #${wo.id}`}</span>
-                <span className="text-sm text-gray-500 ml-2">Ticket #{wo.ticketId}</span>
+                <span className="text-sm text-gray-500 ml-2">Prijava #{wo.ticketId}</span>
                 {wo.checkoutTs != null && (
                   <span className="text-sm text-gray-500 ml-2">
-                    Completed: {new Date(wo.checkoutTs).toLocaleDateString()}
+                    Završeno: {new Date(wo.checkoutTs).toLocaleDateString()}
                   </span>
                 )}
               </div>

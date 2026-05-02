@@ -46,7 +46,7 @@ export function AMMCostProposalWorkOrdersPage() {
               Radni nalozi — odobrenje ponude
             </h1>
             <p className="text-sm text-gray-600 mt-0.5">
-              Approve / Request Revision / Close Without Cost — newest first
+              Odobri / Zatraži reviziju / Zatvori bez troška — najnovije prvo
             </p>
           </div>
           <Link to="/amm">
@@ -57,7 +57,7 @@ export function AMMCostProposalWorkOrdersPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-gray-500">Loading…</p>
+          <p className="text-gray-500">Učitavanje…</p>
         ) : costProposalWOs.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
             Nema radnih naloga koji čekaju odobrenje ponude.
@@ -104,8 +104,8 @@ function WorkOrderPreviewRow({
       }}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold text-gray-900">Work Order #{workOrder.id}</span>
-        <span className="text-sm text-gray-600">Ticket #{workOrder.ticketId}</span>
+        <span className="font-semibold text-gray-900">Radni nalog #{workOrder.id}</span>
+        <span className="text-sm text-gray-600">Prijava #{workOrder.ticketId}</span>
         <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>
           {formatStatus(workOrder.currentStatus)}
         </Badge>
