@@ -39,11 +39,14 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 ### Visoki prioritet (prije prvog plaćenog klijenta)
 
 - [ ] **Test coverage na auth i multi-tenant scope filtre.** Minimalno:
-  - vendor vidi samo svoje WO-e
-  - internal user vidi samo WO-e svoje retail firme
-  - cross-tenant access (vendor pokušava dohvatiti WO druge vendor firme) je blokiran
-  - get-by-id varijante svih navedenih
-- [ ] **Vitest/PostCSS config ne radi lokalno.** Testovi se trenutno ne mogu pokrenuti zbog BOM/JSON parse errora u PostCSS configu. Sve dok se ovo ne riješi, novi testovi se pišu ali ih nitko ne pokreće.
+  - vendor vidi samo svoje WO-e — pokriveno (`work-order-service.scope.test.ts`)
+  - internal user vidi samo WO-e svoje retail firme — pokriveno (`work-order-service.scope.test.ts`)
+  - cross-tenant access (vendor pokušava dohvatiti WO druge vendor firme) je blokiran — pokriveno (`work-order-service.scope.test.ts`)
+  - get-by-id varijante svih navedenih — pokriveno (WO + ticket, `cce5962`)
+  - ticket scope (listTickets/getTicket po `companyId`, cross-tenant blokiran) — pokriveno (`ticket-service.scope.test.ts`, `cce5962`)
+  - preostalo: auth middleware testovi (session/role guards), attachment download scope, admin endpointi
+- [x] **Vitest/PostCSS config ne radi lokalno.** ~~Testovi se trenutno ne mogu pokrenuti zbog BOM/JSON parse errora u PostCSS configu.~~ Riješeno (`4f468fd`). Stvarni uzrok bio je UTF-8 BOM (`EF BB BF`) na početku **root `package.json`**, ne PostCSS configa — BOM je razbijao npm-ov JSON parser pri workspace resolution-u. Frontend vitest sada starta čisto (`passWithNoTests: true` dok se ne dodaju testovi).
+- [x] **WO scope testovi nisu zapravo trčali u CI/lokalno.** Testovi iz `ab8c49c` postojali su, ali `vi.mock('../src/config/database.js', ...)` referencirao je top-level `prismaMock` koji se zbog vitest hoistinga koristio prije inicijalizacije — cijela suite je collapsala s `ReferenceError` i 0 testova se izvršavalo. Riješeno prelaskom na `vi.hoisted()` (`cce5962`). Sada 15/15 prolazi.
 - [ ] **Centralizirani authorization middleware.** Trenutno svaki endpoint mora ručno primijeniti `companyId` filter. To je krhko — jedan zaboravljen filter = tenant data leak ili (kao u ovom incidentu) potpuno mrtav flow. Treba layer koji forsira scope automatski.
 - [ ] **CI/CD pipeline.** GitHub Actions: lint, typecheck, prisma migrate validate, vitest run. Bez ovoga svaki push u `main` je rizik.
 - [ ] **Better Auth (real per-user login)** prije prvog ugovora. Demo gate ostaje za demo deployment.
