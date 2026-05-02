@@ -12,12 +12,7 @@ import { useSession } from '../../../contexts/SessionContext';
 import { Layout, Card, Button } from '../../../components/shared';
 import { S3WorkOrderList } from './S3WorkOrderList';
 import { S3WorkOrderDetailModal } from './S3WorkOrderDetailModal';
-import { TerminalWorkOrderStatuses } from '../../../types/statuses';
-
-const SERVICE_COMPLETED = 'Servis završen (čeka ponudu troška)';
-const COST_REVISION_REQUESTED = 'Zatražena revizija ponude';
-const COST_PROPOSAL_APPROVED = 'Cost Proposal Approved';
-const CLOSED_WITHOUT_COST = 'Closed Without Cost';
+import { TerminalWorkOrderStatuses, WorkOrderStatus } from '../../../types/statuses';
 
 type ListMode = 'service-completed' | 'revision' | 'approved' | 'closed' | null;
 
@@ -39,19 +34,21 @@ export function S3Dashboard() {
   });
 
   const serviceCompleted = workOrders.filter(
-    (wo) => wo.currentStatus === SERVICE_COMPLETED && wo.currentOwnerId === session?.userId
+    (wo) => wo.currentStatus === WorkOrderStatus.SERVICE_COMPLETED
   );
   const revisionRequested = workOrders.filter(
-    (wo) => wo.currentStatus === COST_REVISION_REQUESTED && wo.currentOwnerId === session?.userId
+    (wo) => wo.currentStatus === WorkOrderStatus.COST_REVISION_REQUESTED
   );
   // Approved but not yet in an invoice batch (eligible for "Create Invoice Batch")
   const approved = workOrders.filter(
-    (wo) => wo.currentStatus === COST_PROPOSAL_APPROVED && wo.invoiceBatchId == null
+    (wo) => wo.currentStatus === WorkOrderStatus.COST_PROPOSAL_APPROVED && wo.invoiceBatchId == null
   );
-  const closedNoCost = workOrders.filter((wo) => wo.currentStatus === CLOSED_WITHOUT_COST);
+  const closedNoCost = workOrders.filter(
+    (wo) => wo.currentStatus === WorkOrderStatus.CLOSED_WITHOUT_COST
+  );
   // Approved and already batched — show in "Closed Work Orders" (read-only)
   const batchedApproved = workOrders.filter(
-    (wo) => wo.currentStatus === COST_PROPOSAL_APPROVED && wo.invoiceBatchId != null
+    (wo) => wo.currentStatus === WorkOrderStatus.COST_PROPOSAL_APPROVED && wo.invoiceBatchId != null
   );
   const closedWorkOrders = [...closedNoCost, ...batchedApproved];
 

@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-03*
+*Zadnje ažurirano: 2026-05-04*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -59,6 +59,7 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 - [ ] **Attachment serving authorization audit.** Provjeriti da download ruta provjerava session + scope nad parent ticketom/WO-om.
 - [ ] **State transition labels cure u UI Povijesti.** Vendor i internal korisnici vide tehničke labele tipa `ASSIGN TECHNICIAN`, `QR GENERATED (ACCEPTED_TECHNICIAN_ASSIGNED → ACCEPTED_TECHNICIAN_ASSIGNED)`, `CHECKIN (ACCEPTED_TECHNICIAN_ASSIGNED → Service In Progress)`. Treba mapping tablica koja prevodi action + status par u human-friendly HR string, ili backend šalje već lokaliziran log entry. Otkriveno u screenshot reviewu 2026-05-02.
 - [ ] **Native browser alert za check-in potvrdu.** Trenutno koristi `window.confirm`/`alert` koji se ne može prevesti (`"Your arrival on site has been registered. You can now start work."`). Zamijeniti app-level toast/modal porukom u HR.
+- [ ] **Audit: hardkodirani `currentStatus` / `ticket.currentStatus` string literali (2026-05-04, nakon S3 dashboard fixa).** Nekoliko modala i komponenti još uspoređuju statuse s literalima umjesto `WorkOrderStatus` / `TicketStatus` enuma — rizik istog razreda kao bug na S3 dashboardu ako stringovi divergiraju. Lokacije za follow-up (popis iz grep prolaza): `QRGenerationModal.tsx`, `S3WorkOrderDetailModal.tsx`, `AMMWorkOrderDetailModal.tsx`, `AMMTicketDetailModal.tsx`, `AMTicketDetailModal.tsx`, `DirectorTicketDetailModal.tsx`, `TicketDetailModal.tsx` (SM). Stranice koje već koriste enum u filterima (bolji uzor): `AMMCostProposalWorkOrdersPage.tsx`, `AMMApprovedCostTicketsPage.tsx`, `AMMWorkInProgressTicketsPage.tsx`, `DirectorDashboard.tsx`, `StoreManagerDashboard.tsx`, `S3MyWorkOrdersPage.tsx` (`TerminalWorkOrderStatuses`, ne raw stringovi za WO lifecycle).
 
 ### Niski prioritet (UX / kozmetika / accessibility)
 
