@@ -14,6 +14,7 @@ import {
 import { useSession } from '../../../contexts/SessionContext';
 import { Button, Badge } from '../../../components/shared';
 import { getS3WODraft, setS3WODraft, clearS3WODraft } from './s3Draft';
+import { formatCategory, formatHistoryAction } from '../../../utils/formatters';
 
 const NOT_IN_PRICELIST_VALUE = '__not_in_list__';
 
@@ -465,9 +466,9 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
 
   if (loadingWO || wo == null) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading work order...</p>
+          <p>Učitavanje...</p>
         </div>
       </div>
     );
@@ -475,15 +476,15 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
 
   if (submitSuccess) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg max-w-md w-full p-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
             <p className="text-sm text-green-800">
-              Cost proposal sent to AMM.
+              Ponuda troška poslana VMO-u.
             </p>
           </div>
           <Button type="button" onClick={onClose} className="w-full">
-            Back to dashboard
+            Natrag na nadzornu ploču
           </Button>
         </div>
       </div>
@@ -491,39 +492,39 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-lg max-w-4xl w-full my-8">
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Work Order Detail</h1>
-              <p className="text-sm text-gray-600 mt-1">WO #{wo.id} • Ticket #{wo.ticketId}</p>
+              <h1 className="text-xl font-bold text-gray-900">Detalji radnog naloga</h1>
+              <p className="text-sm text-gray-600 mt-1">WO #{wo.id} • Prijava #{wo.ticketId}</p>
               <Badge variant={wo.urgent ? 'danger' : 'secondary'} className="mt-2">
-                {wo.urgent ? 'Urgent' : 'Non-Urgent'}
+                {wo.urgent ? 'Hitno' : 'Nije hitno'}
               </Badge>
             </div>
             <Button type="button" variant="secondary" onClick={saveDraftAndClose}>
-              Back
+              Natrag
             </Button>
           </div>
         </div>
 
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
           <section>
-            <h2 className="font-semibold text-gray-900 mb-2">Details (read-only)</h2>
+            <h2 className="font-semibold text-gray-900 mb-2">Detalji (samo pregled)</h2>
             <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
-              <div><span className="text-gray-600">Store:</span> {wo.storeName ?? '—'}</div>
+                <div><span className="text-gray-600">Poslovnica:</span> {wo.storeName ?? '—'}</div>
               {wo.storeAddress != null && wo.storeAddress !== '' && (
-                <div><span className="text-gray-600">Address:</span> {wo.storeAddress}</div>
+                  <div><span className="text-gray-600">Adresa:</span> {wo.storeAddress}</div>
               )}
-              <div><span className="text-gray-600">Category:</span> {wo.category ?? '—'}</div>
-              <div><span className="text-gray-600">AMM comment:</span> {wo.commentToVendor ?? '—'}</div>
+                <div><span className="text-gray-600">Kategorija:</span> {wo.category ? formatCategory(wo.category) : '—'}</div>
+                <div><span className="text-gray-600">Komentar VMO:</span> {wo.commentToVendor ?? '—'}</div>
               {wo.assetDescription != null && wo.assetDescription !== '' && (
-                <div><span className="text-gray-600">Asset:</span> {wo.assetDescription}</div>
+                  <div><span className="text-gray-600">Oprema:</span> {wo.assetDescription}</div>
               )}
               {wo.attachments != null && wo.attachments.length > 0 && (
                 <div>
-                  <span className="text-gray-600">Attachments:</span>
+                    <span className="text-gray-600">Privici:</span>
                   <ul className="list-disc list-inside mt-1">
                     {wo.attachments.map((a) => (
                       <li key={a.id}>{a.fileName}</li>
@@ -536,7 +537,7 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
 
           {wo.workReport != null && wo.workReport.length > 0 && (
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Technician work report (read-only)</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Izvještaj tehničara (samo pregled)</h2>
               <div className="overflow-x-auto border border-gray-200 rounded-lg">
                 <table className="w-full text-sm">
                   <thead>
@@ -564,7 +565,7 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
 
           {canEditAndSubmit && (
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Invoice proposal</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Ponuda troška</h2>
               <div className="overflow-x-auto border border-gray-200 rounded-lg">
                 <table className="w-full text-sm">
                   <thead>
@@ -572,9 +573,9 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
                       <th className="text-left p-2 w-10">#</th>
                       <th className="text-left p-2">Description</th>
                       <th className="text-left p-2">Unit</th>
-                      <th className="text-right p-2">Qty</th>
+                      <th className="text-right p-2">Kol.</th>
                       <th className="text-right p-2">Price/Unit</th>
-                      <th className="text-right p-2">Line Total</th>
+                      <th className="text-right p-2">Ukupno stavke</th>
                       {!proposalCompleted && <th className="w-20" />}
                     </tr>
                   </thead>
@@ -736,13 +737,13 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
               </div>
               {!proposalCompleted && (
                 <Button type="button" size="sm" variant="secondary" onClick={addRow} className="mt-2">
-                  + Add Row
+                  + Dodaj stavku
                 </Button>
               )}
               <div className="mt-3 flex flex-wrap gap-2 items-center">
                 {proposalCompleted ? (
                   <Button type="button" variant="secondary" size="sm" onClick={() => setProposalCompleted(false)}>
-                    Edit Proposal
+                    Uredi ponudu
                   </Button>
                 ) : (
                   <Button
@@ -751,12 +752,12 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
                     onClick={() => setProposalCompleted(true)}
                     disabled={!canComplete}
                   >
-                    Complete Proposal
+                    Zaključi ponudu
                   </Button>
                 )}
               </div>
               <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex justify-between items-center">
-                <span className="font-semibold text-gray-900">Total:</span>
+                <span className="font-semibold text-gray-900">Ukupno:</span>
                 <span className="text-2xl font-bold text-blue-900">€{total.toFixed(2)}</span>
               </div>
               <div className="mt-4">
@@ -765,7 +766,7 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
                   onClick={handleSend}
                   disabled={!proposalCompleted || !canComplete || submitMutation.isPending}
                 >
-                  {submitMutation.isPending ? 'Sending...' : 'Send Cost Proposal'}
+                  {submitMutation.isPending ? 'Slanje...' : 'Pošalji ponudu'}
                 </Button>
               </div>
             </section>
@@ -775,7 +776,7 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
             wo.invoiceRows != null &&
             wo.invoiceRows.length > 0 && (
               <section>
-                <h2 className="font-semibold text-gray-900 mb-2">Invoice (read-only)</h2>
+                <h2 className="font-semibold text-gray-900 mb-2">Ponuda troška (samo pregled)</h2>
                 <div className="overflow-x-auto border border-gray-200 rounded-lg">
                   <table className="w-full text-sm">
                     <thead>
@@ -783,9 +784,9 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
                         <th className="text-left p-2">#</th>
                         <th className="text-left p-2">Description</th>
                         <th className="text-left p-2">Unit</th>
-                        <th className="text-right p-2">Qty</th>
+                        <th className="text-right p-2">Kol.</th>
                         <th className="text-right p-2">Price/Unit</th>
-                        <th className="text-right p-2">Total</th>
+                        <th className="text-right p-2">Ukupno</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -812,10 +813,10 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
                   </table>
                 </div>
                 <p className="text-xs text-gray-600 mt-2">
-                  Colors: light yellow = auto-generated (arrival/service time), light green = item from price list, light red = item not in price list.
+                  Boje: svijetlo žuto = automatski generirano (dolazak/radno vrijeme), svijetlo zeleno = stavka iz cjenika, svijetlo crveno = stavka izvan cjenika.
                 </p>
                 {wo.totalCost != null && (
-                  <p className="mt-2 font-semibold">Total: €{Number(wo.totalCost).toFixed(2)}</p>
+                  <p className="mt-2 font-semibold">Ukupno: €{Number(wo.totalCost).toFixed(2)}</p>
                 )}
               </section>
             )
@@ -824,18 +825,18 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
           {/* History — work order workflow (statuses + comments) */}
           {wo.auditLog != null && wo.auditLog.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">History</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
               <div className="space-y-2">
                 {wo.auditLog.map((entry) => (
                   <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
                     <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{entry.actionType}</span>
+                    <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
                       <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}
                     <p className="mt-1 text-gray-600">
-                      Performed by {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
+                      Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                     </p>
                     {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
                   </div>

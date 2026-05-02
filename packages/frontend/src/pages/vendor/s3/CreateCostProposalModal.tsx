@@ -28,12 +28,12 @@ export function CreateCostProposalModal({
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [invoiceRows, setInvoiceRows] = useState<InvoiceRowInput[]>([
     {
-      description: 'Service call / arrival fee',
-      unit: 'fixed',
+      description: 'Dolazak na lokaciju',
+      unit: 'fiksno',
       quantity: 1,
       pricePerUnit: 50,
     },
-    { description: 'Labor', unit: 'hours', quantity: 2, pricePerUnit: 75 },
+    { description: 'Rad', unit: 'sati', quantity: 2, pricePerUnit: 75 },
   ]);
 
   const { data: workOrder, isLoading } = useQuery({
@@ -52,7 +52,7 @@ export function CreateCostProposalModal({
   const addInvoiceRow = () => {
     setInvoiceRows([
       ...invoiceRows,
-      { description: '', unit: 'units', quantity: 1, pricePerUnit: 0 },
+      { description: '', unit: 'kom', quantity: 1, pricePerUnit: 0 },
     ]);
   };
 
@@ -82,7 +82,7 @@ export function CreateCostProposalModal({
       (r) => r.description.trim() && r.pricePerUnit > 0
     );
     if (validRows.length === 0) {
-      alert('Add at least one invoice row');
+      alert('Dodajte barem jednu stavku.');
       return;
     }
 
@@ -94,9 +94,9 @@ export function CreateCostProposalModal({
 
   if (isLoading || workOrder == null) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading...</p>
+          <p>Učitavanje...</p>
         </div>
       </div>
     );
@@ -104,15 +104,15 @@ export function CreateCostProposalModal({
 
   if (submitSuccess) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg max-w-md w-full p-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
             <p className="text-sm text-green-800">
-              Cost proposal sent to AMM.
+              Ponuda troška poslana VMO-u.
             </p>
           </div>
           <Button type="button" onClick={onClose} className="w-full">
-            Back to dashboard
+            Natrag na nadzornu ploču
           </Button>
         </div>
       </div>
@@ -120,11 +120,11 @@ export function CreateCostProposalModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-lg max-w-4xl w-full my-8">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
-            Create Cost Proposal
+            Izrada ponude troška
           </h2>
           <p className="text-sm text-gray-600">WO #{workOrderId}</p>
         </div>
@@ -133,7 +133,7 @@ export function CreateCostProposalModal({
           {workOrder.workReport != null && workOrder.workReport.length > 0 && (
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">
-                Work Performed
+                Rad
               </h3>
               <div className="bg-gray-50 rounded-lg p-4">
                 {workOrder.workReport.map((row, idx) => (
@@ -147,7 +147,7 @@ export function CreateCostProposalModal({
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-2">
-              Invoice Line Items
+              Materijal
             </h3>
             <div className="space-y-2">
               {invoiceRows.map((row, index) => (
@@ -158,7 +158,7 @@ export function CreateCostProposalModal({
                     onChange={(e) =>
                       updateInvoiceRow(index, 'description', e.target.value)
                     }
-                    placeholder="Description"
+                    placeholder="Opis *"
                     className="flex-1 p-2 border border-gray-300 rounded-lg"
                   />
                   <input
@@ -167,7 +167,7 @@ export function CreateCostProposalModal({
                     onChange={(e) =>
                       updateInvoiceRow(index, 'unit', e.target.value)
                     }
-                    placeholder="Unit"
+                    placeholder="Jedinica"
                     className="w-24 p-2 border border-gray-300 rounded-lg"
                   />
                   <input
@@ -182,7 +182,7 @@ export function CreateCostProposalModal({
                     }
                     min={0}
                     step={0.1}
-                    placeholder="Qty"
+                    placeholder="Kol. *"
                     className="w-24 p-2 border border-gray-300 rounded-lg"
                   />
                   <input
@@ -197,7 +197,7 @@ export function CreateCostProposalModal({
                     }
                     min={0}
                     step={0.01}
-                    placeholder="Price"
+                    placeholder="Jedinična cijena (€) *"
                     className="w-28 p-2 border border-gray-300 rounded-lg"
                   />
                   <div className="w-28 p-2 text-right font-medium">
@@ -207,7 +207,7 @@ export function CreateCostProposalModal({
                     type="button"
                     onClick={() => removeInvoiceRow(index)}
                     className="text-red-600 hover:text-red-800"
-                    aria-label="Remove row"
+                    aria-label="Ukloni"
                   >
                     ✕
                   </button>
@@ -221,13 +221,13 @@ export function CreateCostProposalModal({
               onClick={addInvoiceRow}
               className="mt-2"
             >
-              + Add Line Item
+              Dodaj stavku
             </Button>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex justify-between items-center">
-              <span className="font-semibold text-gray-900">Total Cost:</span>
+              <span className="font-semibold text-gray-900">Ukupno:</span>
               <span className="text-2xl font-bold text-blue-900">
                 €{calculateTotal().toFixed(2)}
               </span>
@@ -237,9 +237,9 @@ export function CreateCostProposalModal({
           {submitMutation.isError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">
-                Error:{' '}
+                Greška:{' '}
                 {(submitMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                  'Failed to submit'}
+                  'Slanje nije uspjelo'}
               </p>
             </div>
           )}
@@ -247,7 +247,7 @@ export function CreateCostProposalModal({
 
         <div className="p-6 border-t border-gray-200 flex gap-3">
           <Button type="button" variant="secondary" onClick={onClose}>
-            Cancel
+            Odustani
           </Button>
           <Button
             type="button"
@@ -256,8 +256,8 @@ export function CreateCostProposalModal({
             className="flex-1"
           >
             {submitMutation.isPending
-              ? 'Submitting...'
-              : 'Submit Cost Proposal'}
+              ? 'Slanje...'
+              : 'Pošalji ponudu'}
           </Button>
         </div>
       </div>

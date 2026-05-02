@@ -57,7 +57,7 @@ export function CheckOutModal({
       (r) =>
         String(r.description).trim() !== '' &&
         String(r.unit).trim() !== '' &&
-        Number(r.quantity) >= 0
+        String(r.quantity).trim() !== ''
     );
 
   const handleCheckOut = () => {
@@ -71,23 +71,23 @@ export function CheckOutModal({
         (r) =>
           String(r.description).trim() !== '' &&
           String(r.unit).trim() !== '' &&
-          Number(r.quantity) >= 0
+          String(r.quantity).trim() !== ''
       ),
     });
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-lg max-w-lg w-full my-8">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Check Out</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Odjava s posla</h2>
           <p className="text-sm text-gray-600">WO #{workOrderId}</p>
         </div>
 
         <div className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Outcome *
+              Ishod *
             </label>
             <select
               value={outcome}
@@ -102,23 +102,23 @@ export function CheckOutModal({
               }
               className="w-full p-3 border border-gray-300 rounded-lg"
             >
-              <option value="FIXED">Issue Fixed</option>
-              <option value="FOLLOW_UP">Follow-Up Visit Needed</option>
-              <option value="NEW_WO_NEEDED">New Work Order Needed</option>
-              <option value="UNSUCCESSFUL">Repair Unsuccessful</option>
+              <option value="FIXED">Problem riješen</option>
+              <option value="FOLLOW_UP">Potrebna dodatna posjeta</option>
+              <option value="NEW_WO_NEEDED">Potreban novi radni nalog</option>
+              <option value="UNSUCCESSFUL">Popravak neuspješan</option>
             </select>
           </div>
 
           {commentRequired && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Comment * (required for this outcome)
+                Komentar * (obavezan za ovaj ishod)
               </label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={3}
-                placeholder="Explain..."
+                placeholder="Opišite..."
                 className="w-full p-3 border border-gray-300 rounded-lg"
               />
             </div>
@@ -126,31 +126,31 @@ export function CheckOutModal({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              QR Code Token * (scan or paste)
+              QR kod * (skenirajte ili unesite)
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={qrToken}
                 onChange={(e) => setQrToken(e.target.value)}
-                placeholder="Scan checkout QR or paste token..."
+                placeholder="Skenirajte QR za odjavu ili unesite token..."
                 className="flex-1 min-w-0 p-3 border border-gray-300 rounded-lg"
               />
               <Button
                 type="button"
                 variant="secondary"
                 onClick={() => setShowScanner(true)}
-                title="Open camera to scan QR on store's phone"
+                title="Otvorite kameru za skeniranje QR koda"
               >
-                Scan
+                Skeniraj
               </Button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Scan the QR on the store&apos;s phone or paste the token.</p>
+            <p className="text-xs text-gray-500 mt-1">Skenirajte QR na telefonu poslovnice ili unesite token.</p>
           </div>
 
           {showScanner && (
             <QrScannerModal
-              title="Scan Check-Out QR"
+              title="Skeniraj QR za odjavu"
               onScan={(token) => {
                 setQrToken(token);
                 setShowScanner(false);
@@ -163,7 +163,7 @@ export function CheckOutModal({
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">
                 {(checkOutMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                  'Check-out failed'}
+                  'Odjava neuspješna'}
               </p>
             </div>
           )}
@@ -171,7 +171,7 @@ export function CheckOutModal({
 
         <div className="p-6 border-t border-gray-200 flex gap-3">
           <Button type="button" variant="secondary" onClick={saveDraftOnClose}>
-            Cancel
+            Odustani
           </Button>
           <Button
             type="button"
@@ -179,7 +179,7 @@ export function CheckOutModal({
             disabled={!canSubmit || checkOutMutation.isPending}
             className="flex-1"
           >
-            {checkOutMutation.isPending ? 'Checking Out...' : 'Check Out'}
+            {checkOutMutation.isPending ? 'Odjava u tijeku...' : 'Odjava s posla'}
           </Button>
         </div>
       </div>

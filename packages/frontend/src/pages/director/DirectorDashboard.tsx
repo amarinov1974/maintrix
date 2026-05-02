@@ -8,16 +8,88 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
-import { Layout, Card, Badge, Button } from '../../components/shared';
+import { Layout, Card, Badge, Button, ApprovalChainInfo } from '../../components/shared';
 import { DirectorTicketDetailModal } from './DirectorTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
+import { formatCategory, formatStatus } from '../../utils/formatters';
+
+function BucketCard({
+  title,
+  count,
+  description,
+  accentColor,
+  to,
+}: {
+  title: string;
+  count: number;
+  description?: string;
+  accentColor: string;
+  to?: string;
+}) {
+  const inner = (
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        border: '1px solid #E8E8ED',
+        borderLeft: `4px solid ${accentColor}`,
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        transition: 'box-shadow 0.2s ease',
+        cursor: to && count > 0 ? 'pointer' : 'default',
+        opacity: count === 0 ? 0.6 : 1,
+      }}
+      onMouseEnter={e => {
+        if (to && count > 0)
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
+      }}
+    >
+      <div>
+        <p style={{ fontSize: '13px', color: '#6E6E73', marginBottom: '2px', fontWeight: 500 }}>
+          {title}
+        </p>
+        {description && (
+          <p style={{ fontSize: '11px', color: '#AEAEB2', marginTop: '2px' }}>{description}</p>
+        )}
+      </div>
+      <span style={{
+        fontSize: '28px',
+        fontWeight: '600',
+        color: count > 0 ? accentColor : '#AEAEB2',
+        lineHeight: 1,
+        minWidth: '32px',
+        textAlign: 'right',
+      }}>
+        {count}
+      </span>
+    </div>
+  );
+
+  if (to && count > 0) {
+    return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
+  }
+  return inner;
+}
 
 function getRoleLabel(role: string) {
-  if (role === 'D') return 'Sales Director';
-  if (role === 'C2') return 'Maintenance Director';
-  if (role === 'BOD') return 'Board of Directors';
+  if (role === 'D') return 'Direktor prodaje';
+  if (role === 'C2') return 'Direktor održavanja';
+  if (role === 'BOD') return 'Upravni odbor';
   return role;
+}
+
+function getRoleDescription(role: string) {
+  if (role === 'D') return 'Odobravate procjene troška od €1.001 do €3.000.';
+  if (role === 'C2') return 'Odobravate procjene troška od €1.001 do €3.000.';
+  if (role === 'BOD') return 'Odobravate procjene troška iznad €3.000.';
+  return 'Odobravate procjene troška.';
 }
 
 function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
@@ -73,50 +145,26 @@ export function DirectorDashboard() {
             <h1 className="text-2xl font-bold text-gray-900">
               {getRoleLabel(session?.role ?? '')} Dashboard
             </h1>
-            <p className="text-gray-600">Cost Estimation Approvals</p>
+            <p className="text-gray-600">Odobrenje procjena troška</p>
           </div>
           <Link
             to="/assets"
             className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
           >
-            🏭 Asset Register
+            🏭 Registar opreme
           </Link>
         </div>
 
-        <Card className="bg-blue-50 border-blue-200">
-          <div className="flex items-start gap-3">
-            <div className="text-blue-600 text-2xl">💰</div>
-            <div>
-              <h3 className="font-medium text-blue-900 mb-1">
-                Your Role in Approval Chain
-              </h3>
-              <p className="text-sm text-blue-700 mb-2">
-                You review cost estimations for maintenance tickets based on
-                approval thresholds:
-              </p>
-              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                <li>
-                  <strong>≤ €1,000:</strong> AM only (you won&apos;t see these)
-                </li>
-                <li>
-                  <strong>€1,001 - €3,000:</strong> AM → D → C2
-                </li>
-                <li>
-                  <strong>&gt; €3,000:</strong> AM → D → C2 → BOD
-                </li>
-              </ul>
-            </div>
-          </div>
-        </Card>
+        <ApprovalChainInfo roleDescription={getRoleDescription(session?.role ?? '')} />
 
         {isLoading ? (
           <Card>
-            <p className="text-gray-600">Loading tickets...</p>
+            <p className="text-gray-600">Učitavanje prijava...</p>
           </Card>
         ) : tickets != null && tickets.length > 0 ? (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              {tickets.length} ticket(s) awaiting your approval
+              {tickets.length} prijava čeka Vaše odobrenje
             </p>
             {tickets.map((ticket) => (
               <Card
@@ -128,17 +176,17 @@ export function DirectorDashboard() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        Ticket #{ticket.id}
+                        Prijava #{ticket.id}
                       </h3>
-                      <Badge variant="warning">Awaiting Approval</Badge>
+                      <Badge variant="warning">Čeka odobrenje</Badge>
                     </div>
                     <p className="text-gray-700 mb-2">{ticket.originalDescription ?? ticket.description}</p>
                     <div className="flex gap-4 text-sm text-gray-600 flex-wrap">
-                      <span>Store: {ticket.storeName}</span>
+                      <span>Poslovnica: {ticket.storeName}</span>
                       <span>•</span>
-                      <span>Category: {ticket.category}</span>
+                      <span>Kategorija: {formatCategory(ticket.category)}</span>
                       <span>•</span>
-                      <span>Created by: {ticket.createdByUserName}</span>
+                      <span>Kreirao: {ticket.createdByUserName}</span>
                     </div>
                   </div>
                 </div>
@@ -150,10 +198,10 @@ export function DirectorDashboard() {
             <div className="text-center py-8">
               <div className="text-4xl mb-4">✅</div>
               <p className="text-gray-600 text-lg font-medium mb-2">
-                All Caught Up!
+                Sve odrađeno!
               </p>
               <p className="text-sm text-gray-500">
-                No cost estimations awaiting your approval at the moment.
+                Nema procjena troška koje čekaju Vaše odobrenje.
               </p>
             </div>
           </Card>
@@ -161,9 +209,9 @@ export function DirectorDashboard() {
 
         {/* My tickets — read-only, participated but not current owner */}
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">My tickets</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Moje prijave</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Tickets you participated in (e.g. in the approval chain) but are not currently owning. Read-only.
+            Prijave u kojima ste sudjelovali (npr. u lancu odobrenja). Samo pregled.
           </p>
           <div className="flex gap-2 mb-4">
             <Button
@@ -172,7 +220,7 @@ export function DirectorDashboard() {
               size="sm"
               onClick={() => setTicketReadOnlyFilter('active')}
             >
-              Active tickets ({myActiveTickets.length})
+              Aktivne prijave ({myActiveTickets.length})
             </Button>
             <Button
               type="button"
@@ -180,13 +228,13 @@ export function DirectorDashboard() {
               size="sm"
               onClick={() => setTicketReadOnlyFilter('closed')}
             >
-              Closed tickets ({myClosedTickets.length})
+              Zatvorene prijave ({myClosedTickets.length})
             </Button>
           </div>
           {loadingParticipated ? (
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500">Učitavanje...</p>
           ) : readOnlyTicketsFiltered.length === 0 ? (
-            <p className="text-gray-500">No tickets in this group.</p>
+            <p className="text-gray-500">Nema prijava u ovoj grupi.</p>
           ) : (
             <div className="space-y-2">
               {readOnlyTicketsFiltered.map((t) => (
@@ -222,9 +270,9 @@ function TicketRow({ ticket, onClick }: { ticket: Ticket; onClick: () => void })
         onClick();
       }}
     >
-      <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
+      <span className="font-semibold text-gray-900">Prijava #{ticket.id}</span>
       {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{ticket.currentStatus}</Badge>
+      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
       <span className="text-sm text-gray-600">{ticket.storeName}</span>
       <span className="text-sm text-gray-500">{new Date(ticket.createdAt).toLocaleDateString()}</span>
     </button>

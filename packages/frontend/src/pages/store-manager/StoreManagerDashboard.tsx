@@ -12,6 +12,71 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Card, Badge } from '../../components/shared';
 import { TicketDetailModal } from './TicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
+import { formatCategory, formatStatus } from '../../utils/formatters';
+
+function BucketCard({
+  title,
+  count,
+  description,
+  accentColor,
+  to,
+}: {
+  title: string;
+  count: number;
+  description?: string;
+  accentColor: string;
+  to?: string;
+}) {
+  const inner = (
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        border: '1px solid #E8E8ED',
+        borderLeft: `4px solid ${accentColor}`,
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        transition: 'box-shadow 0.2s ease',
+        cursor: to && count > 0 ? 'pointer' : 'default',
+        opacity: count === 0 ? 0.6 : 1,
+      }}
+      onMouseEnter={e => {
+        if (to && count > 0)
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
+      }}
+    >
+      <div>
+        <p style={{ fontSize: '13px', color: '#6E6E73', marginBottom: '2px', fontWeight: 500 }}>
+          {title}
+        </p>
+        {description && (
+          <p style={{ fontSize: '11px', color: '#AEAEB2', marginTop: '2px' }}>{description}</p>
+        )}
+      </div>
+      <span style={{
+        fontSize: '28px',
+        fontWeight: '600',
+        color: count > 0 ? accentColor : '#AEAEB2',
+        lineHeight: 1,
+        minWidth: '32px',
+        textAlign: 'right',
+      }}>
+        {count}
+      </span>
+    </div>
+  );
+
+  if (to && count > 0) {
+    return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
+  }
+  return inner;
+}
 
 function getStatusBadgeVariant(
   status: string
@@ -125,6 +190,7 @@ export function StoreManagerDashboard() {
   ];
 
   const actionRequiredCount = actionRequiredTickets?.length ?? 0;
+  const clarificationTickets = actionRequiredTickets ?? [];
 
   const qrTicketsMap = (() => {
     const map = new Map<number, typeof qrWorkOrders>();
@@ -137,6 +203,7 @@ export function StoreManagerDashboard() {
     return map;
   })();
   const qrTicketIds = Array.from(qrTicketsMap.keys());
+  const qrRequiredTickets = qrTicketIds;
 
   const [myTicketsFilter, setMyTicketsFilter] = useState<'active' | 'closed'>('active');
   const terminalStatuses = [
@@ -169,138 +236,61 @@ export function StoreManagerDashboard() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Store Manager Dashboard
+            Nadzorna ploča — Voditelj poslovnice
           </h1>
           <p className="text-gray-600">
-            {session?.storeName ?? 'Store'}
+            {session?.storeName ?? 'Poslovnica'}
           </p>
         </div>
 
         {/* Section 1 — Create Ticket */}
-        <Card className="bg-slate-50 border-slate-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Create Ticket
-              </h2>
-              <p className="text-sm text-gray-600">
-                Submit a new maintenance request for your store.
-              </p>
-            </div>
-            <Link to="/store-manager/submit">
-              <Button type="button">Submit New Ticket</Button>
-            </Link>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          border: '1px solid #E8E8ED',
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <div>
+            <p style={{ fontSize: '14px', fontWeight: 500, color: '#1D1D1F' }}>Nova prijava</p>
+            <p style={{ fontSize: '12px', color: '#6E6E73', marginTop: '2px' }}>Prijavite novi kvar ili zahtjev za održavanje.</p>
           </div>
-        </Card>
+          <Link to="/store-manager/submit">
+            <Button type="button">Nova prijava</Button>
+          </Link>
+        </div>
 
         {/* Section 2 — Ticket Drafts */}
-        <Card className="bg-gray-50 border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Ticket Drafts
-          </h2>
-          <p className="text-sm text-gray-600 mb-3">
-            Tickets you saved as draft — open to continue editing and submit when ready.
-          </p>
-          {draftTickets.length === 0 ? (
-            <p className="text-sm text-gray-500">No drafts.</p>
-          ) : (
-            <ul className="space-y-2">
-              {draftTickets
-                .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-                .map((ticket) => (
-                  <li key={ticket.id}>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedTicketId(ticket.id)}
-                      className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-100 hover:border-gray-300 transition focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-1"
-                    >
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-medium text-gray-900">
-                          Ticket #{ticket.id}
-                        </span>
-                        <Badge variant="default">Draft</Badge>
-                        {ticket.urgent && (
-                          <Badge variant="urgent">URGENT</Badge>
-                        )}
-                        <span className="text-sm text-gray-500">
-                          {new Date(ticket.updatedAt).toLocaleString()}
-                        </span>
-                      </div>
-                      {ticket.description?.trim() && (
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                          {ticket.description.trim()}
-                        </p>
-                      )}
-                    </button>
-                  </li>
-                ))}
-            </ul>
-          )}
-        </Card>
+        <BucketCard
+          title="Nacrti prijava"
+          count={draftTickets.length}
+          accentColor="#6E6E73"
+        />
 
         {/* Section 3 — Action Required */}
-        {actionRequiredCount > 0 ? (
-          <Link to="/store-manager/action-required">
-            <Card className="bg-amber-50 border-amber-200 cursor-pointer hover:shadow-md transition block">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Action Required
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Tickets returned for your clarification (newest first).
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="warning">{actionRequiredCount}</Badge>
-                  <span className="text-sm text-gray-500">Click to open list</span>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        ) : (
-          <Card>
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Action Required
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Tickets returned for your clarification (newest first).
-                </p>
-              </div>
-              <Badge variant="warning">0</Badge>
-            </div>
-          </Card>
-        )}
+        <BucketCard
+          title="Potrebna akcija"
+          count={clarificationTickets.length}
+          accentColor="#FF3B30"
+          to="/store-manager/action-required"
+        />
 
         {/* Section 4 — QR Generation Required */}
-        <Card className="bg-emerald-50 border-emerald-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            QR Generation Required
-          </h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Work orders with technician assigned or follow-up visit needed — generate QR for check-in or check-out.
-          </p>
-          {qrTicketIds.length === 0 ? (
-            <p className="text-sm text-gray-500">No tickets requiring QR right now.</p>
-          ) : (
-            <Link to="/store-manager/qr-required">
-              <div className="flex items-center justify-between p-3 rounded-lg border border-emerald-200 bg-white hover:bg-emerald-50/50 cursor-pointer transition">
-                <span className="font-medium text-gray-900">
-                  {qrTicketIds.length} ticket{qrTicketIds.length !== 1 ? 's' : ''} requiring QR
-                </span>
-                <span className="text-sm text-emerald-700">Click to open list →</span>
-              </div>
-            </Link>
-          )}
-        </Card>
+        <BucketCard
+          title="Potrebno generiranje QR koda"
+          count={qrRequiredTickets.length}
+          accentColor="#FF9500"
+          to="/store-manager/qr-required"
+        />
 
         {/* Section 5 — My Tickets */}
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              My Tickets
+            <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px', marginTop: '8px' }}>
+              Moje prijave
             </h2>
             <div className="flex gap-2">
               <Button
@@ -308,26 +298,26 @@ export function StoreManagerDashboard() {
                 variant={myTicketsFilter === 'active' ? 'primary' : 'secondary'}
                 onClick={() => setMyTicketsFilter('active')}
               >
-                Active tickets
+                Aktivne prijave
               </Button>
               <Button
                 type="button"
                 variant={myTicketsFilter === 'closed' ? 'primary' : 'secondary'}
                 onClick={() => setMyTicketsFilter('closed')}
               >
-                Closed tickets
+                Zatvorene prijave
               </Button>
             </div>
           </div>
           <p className="text-sm text-gray-600 mb-4">
             {myTicketsFilter === 'active'
-              ? 'Tickets you participated in (not current owner).'
-              : 'Tickets that finished their life (rejected, withdrawn, archived).'}
+              ? 'Prijave u kojima ste sudjelovali.'
+              : 'Zatvorene i arhivirane prijave.'}
           </p>
           {(myTicketsFilter === 'closed' && loadingMyTickets) || (myTicketsFilter === 'active' && loadingParticipated) ? (
             <p className="text-gray-600">Loading...</p>
           ) : myTicketsFiltered.length === 0 ? (
-            <p className="text-gray-500">No tickets to show.</p>
+            <p className="text-gray-500">Nema prijava za prikaz.</p>
           ) : (
             <div className="space-y-3">
               {myTicketsFiltered.map((ticket) => (
@@ -338,19 +328,19 @@ export function StoreManagerDashboard() {
                 >
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="font-semibold text-gray-900">
-                      Ticket #{ticket.id}
+                      Prijava #{ticket.id}
                     </span>
                     <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>
-                      {ticket.currentStatus}
+                      {formatStatus(ticket.currentStatus)}
                     </Badge>
                     {ticket.urgent && (
                       <Badge variant="urgent">URGENT</Badge>
                     )}
                     <span className="text-sm text-gray-600">
-                      {ticket.category}
+                      {formatCategory(ticket.category)}
                     </span>
                     <span className="text-sm text-gray-500">
-                      Last updated{' '}
+                      Zadnja izmjena{' '}
                       {new Date(ticket.updatedAt).toLocaleDateString()}
                     </span>
                   </div>

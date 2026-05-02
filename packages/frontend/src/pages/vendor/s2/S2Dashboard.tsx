@@ -11,6 +11,7 @@ import { workOrdersAPI } from '../../../api/work-orders';
 import { useSession } from '../../../contexts/SessionContext';
 import { Layout, Card, Badge } from '../../../components/shared';
 import { S2WorkOrderDetailModal } from './S2WorkOrderDetailModal';
+import { formatCategory } from '../../../utils/formatters';
 
 function shortComment(comment: string | null | undefined, maxLen: number = 60): string {
   if (comment == null || comment === '') return '—';
@@ -45,27 +46,27 @@ export function S2Dashboard() {
   }, [workOrders]);
 
   return (
-    <Layout screenTitle="Dashboard">
+    <Layout screenTitle="Nadzorna ploča">
       <div className="space-y-6">
         <p className="text-gray-600">
-          Your assigned work orders. Urgent first, then non-urgent. Open one to check in or complete work.
+          Vaši dodijeljeni radni nalozi. Hitni prikazani prvi. Otvorite za prijavu dolaska ili završetak rada.
         </p>
 
         {isLoading ? (
           <Card>
-            <p className="text-gray-600">Loading work orders...</p>
+            <p className="text-gray-600">Učitavanje radnih naloga...</p>
           </Card>
         ) : sorted.length === 0 ? (
           <Card>
             <div className="text-center py-8">
-              <p className="text-gray-600">No work orders assigned to you</p>
+              <p className="text-gray-600">Nemate dodijeljenih radnih naloga.</p>
             </div>
           </Card>
         ) : (
           <div className="space-y-6">
             {sorted.filter((wo) => wo.urgent).length > 0 && (
               <section>
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Urgent Work Orders</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Hitni radni nalozi</h2>
                 <div className="space-y-2">
                   {sorted
                     .filter((wo) => wo.urgent)
@@ -77,14 +78,14 @@ export function S2Dashboard() {
                       >
                         <div className="flex flex-wrap items-center gap-2 mb-1">
                           <span className="font-medium text-gray-900">{wo.storeName ?? 'Store'}</span>
-                          <Badge variant="danger">Urgent</Badge>
+                          <Badge variant="danger">Hitno</Badge>
                           <span className="text-sm text-gray-500">ETA: {formatEta(wo.eta)}</span>
                         </div>
                         {wo.storeAddress != null && wo.storeAddress !== '' && (
                           <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
                         )}
                         <p className="text-sm text-gray-600">
-                          Category: {wo.category ?? '—'} • AMM: {shortComment(wo.commentToVendor)}
+                          Kategorija: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
                         </p>
                       </Card>
                     ))}
@@ -93,7 +94,7 @@ export function S2Dashboard() {
             )}
             <section>
               <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                {sorted.some((wo) => wo.urgent) ? 'Non-Urgent Work Orders' : 'Work Orders'}
+                {sorted.some((wo) => wo.urgent) ? 'Radni nalozi koji nisu hitni' : 'Radni nalozi'}
               </h2>
               <div className="space-y-2">
                 {sorted
@@ -106,14 +107,14 @@ export function S2Dashboard() {
                     >
                       <div className="flex flex-wrap items-center gap-2 mb-1">
                         <span className="font-medium text-gray-900">{wo.storeName ?? 'Store'}</span>
-                        <Badge variant="secondary">Non-Urgent</Badge>
+                        <Badge variant="secondary">Nije hitno</Badge>
                         <span className="text-sm text-gray-500">ETA: {formatEta(wo.eta)}</span>
                       </div>
                       {wo.storeAddress != null && wo.storeAddress !== '' && (
                         <p className="text-sm text-gray-600 mb-1">{wo.storeAddress}</p>
                       )}
                       <p className="text-sm text-gray-600">
-                        Category: {wo.category ?? '—'} • AMM: {shortComment(wo.commentToVendor)}
+                        Kategorija: {wo.category ? formatCategory(wo.category) : '—'} • AMM: {shortComment(wo.commentToVendor)}
                       </p>
                     </Card>
                   ))}

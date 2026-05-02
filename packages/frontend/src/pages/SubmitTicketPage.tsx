@@ -13,18 +13,18 @@ import { useSession } from '../contexts/SessionContext';
 import { Layout, Button, Card } from '../components/shared';
 
 const CATEGORIES: { value: string; label: string }[] = [
-  { value: 'ELECTRICAL_INSTALLATIONS', label: 'Electrical Installations' },
-  { value: 'HEATING_VENTILATION_AIR_CONDITIONING', label: 'Heating, Ventilation and Air Conditioning' },
-  { value: 'REFRIGERATION', label: 'Refrigeration' },
-  { value: 'KITCHEN_EQUIPMENT', label: 'Kitchen Equipment' },
-  { value: 'ELEVATORS', label: 'Elevators' },
-  { value: 'AUTOMATIC_DOORS', label: 'Automatic Doors' },
-  { value: 'FIRE_PROTECTION_SYSTEM', label: 'Fire Protection System' },
-  { value: 'WATER_AND_SEWAGE', label: 'Water and Sewage' },
-  { value: 'CONSTRUCTION_WORKS', label: 'Construction Works' },
-  { value: 'HYGIENE', label: 'Hygiene' },
-  { value: 'ENVIRONMENTAL', label: 'Environmental' },
-  { value: 'OTHER', label: 'Other' },
+  { value: 'ELECTRICAL_INSTALLATIONS', label: 'Elektroinstalacije' },
+  { value: 'HEATING_VENTILATION_AIR_CONDITIONING', label: 'Grijanje, ventilacija i klima' },
+  { value: 'REFRIGERATION', label: 'Rashlađivanje' },
+  { value: 'KITCHEN_EQUIPMENT', label: 'Kuhinjska oprema' },
+  { value: 'ELEVATORS', label: 'Liftovi' },
+  { value: 'AUTOMATIC_DOORS', label: 'Automatska vrata' },
+  { value: 'FIRE_PROTECTION_SYSTEM', label: 'Zaštita od požara' },
+  { value: 'WATER_AND_SEWAGE', label: 'Vodoopskrba i kanalizacija' },
+  { value: 'CONSTRUCTION_WORKS', label: 'Građevinski radovi' },
+  { value: 'HYGIENE', label: 'Higijena' },
+  { value: 'ENVIRONMENTAL', label: 'Okoliš' },
+  { value: 'OTHER', label: 'Ostalo' },
 ];
 
 const ASSET_CATEGORY_TO_TICKET_CATEGORY: Record<string, string> = Object.fromEntries(
@@ -36,7 +36,7 @@ interface SubmitTicketPageProps {
   backLabel?: string;
 }
 
-export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketPageProps) {
+export function SubmitTicketPage({ backLink, backLabel = 'Natrag' }: SubmitTicketPageProps) {
   const { session } = useSession();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -105,15 +105,15 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
   const validate = (): boolean => {
     setValidationError('');
     if (isAMM && (storeId === '' || storeId == null)) {
-      setValidationError('Please select a store.');
+      setValidationError('Odaberite poslovnicu.');
       return false;
     }
     if (!category.trim()) {
-      setValidationError('Please select a category.');
+      setValidationError('Odaberite kategoriju.');
       return false;
     }
     if (!description.trim()) {
-      setValidationError('Please enter a description.');
+      setValidationError('Unesite opis kvara.');
       return false;
     }
     return true;
@@ -229,7 +229,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
   if (showSuccess != null) {
     return (
       <Layout
-        screenTitle="Submit Ticket"
+        screenTitle="Nova prijava kvara"
         backLink={backLink}
         backLabel={backLabel}
       >
@@ -237,11 +237,11 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
           <div className="bg-green-100 border-2 border-green-500 rounded-lg p-6">
             <p className="text-green-800 font-semibold text-xl mb-2">
               {showSuccess === 'draft'
-                ? '✓ Ticket saved as draft.'
-                : '✓ Ticket submitted.'}
+                ? '✓ Prijava spremljena kao nacrt.'
+                : '✓ Prijava uspješno poslana.'}
             </p>
             <p className="text-green-700 text-sm">
-              Returning to dashboard in 2 seconds...
+              Povratak na nadzornu ploču za 2 sekunde...
             </p>
           </div>
         </Card>
@@ -251,7 +251,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
 
   return (
     <Layout
-      screenTitle="Submit Ticket"
+      screenTitle="Nova prijava kvara"
       backLink={backLink}
       backLabel={backLabel}
     >
@@ -282,7 +282,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
           {/* 8.3 Category (Mandatory) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category *
+              Kategorija *
             </label>
             <select
               value={category}
@@ -291,7 +291,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
               required
               className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${categoryLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             >
-              <option value="">— Select Category —</option>
+              <option value="">— Odaberite kategoriju —</option>
               {CATEGORIES.map((cat) => (
                 <option key={cat.value} value={cat.value}>
                   {cat.label}
@@ -300,9 +300,9 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
             </select>
             {categoryLocked && (
               <p className="text-xs text-blue-600 mt-1">
-                Category auto-filled from selected asset.{` `}
+                Kategorija automatski popunjena iz odabrane opreme.{` `}
                 <button type="button" onClick={handleClearAsset} className="underline">
-                  Clear asset
+                  Ukloni opremu
                 </button>
               </p>
             )}
@@ -311,14 +311,14 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
           {/* 8.4 Description (Mandatory) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
+              Opis *
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
               rows={6}
-              placeholder="Describe the observed issue, context, and findings in your own words..."
+              placeholder="Opišite uočeni problem, kontekst i nalaze..."
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -326,7 +326,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
           {/* 8.5 Urgency (Mandatory) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Urgency *
+              Hitnost *
             </label>
             <div className="flex gap-6">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -337,7 +337,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
                   onChange={() => setUrgent(false)}
                   className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">No</span>
+                <span className="text-sm text-gray-700">Nije hitno</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -347,12 +347,12 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
                   onChange={() => setUrgent(true)}
                   className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Yes (Urgent)</span>
+                <span className="text-sm text-gray-700">Da (Hitno)</span>
               </label>
             </div>
             {urgent && (
               <p className="mt-2 text-sm text-amber-700">
-                Urgent tickets are routed to Area Maintenance Manager (C1) for immediate action.
+                Hitne prijave se prosljeđuju Voditelju održavanja na neposrednu akciju.
               </p>
             )}
           </div>
@@ -360,10 +360,10 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
           {/* 8.6 Attachments (Optional) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Attachments (optional)
+              Privici (opcionalno)
             </label>
             <p className="text-xs text-gray-600 mb-2">
-              Add files or take a photo. On mobile, choosing images may open the camera.
+              Dodajte datoteke ili fotografiju. Na mobitelu će se možda otvoriti kamera.
             </p>
             <input
               ref={fileInputRef}
@@ -379,7 +379,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
               size="sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              Add files or take photo
+              Dodaj datoteke ili fotografiju
             </Button>
             {selectedFiles.length > 0 && (
               <ul className="mt-2 text-sm text-gray-600 list-disc list-inside">
@@ -393,7 +393,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
           {/* 8.7 Asset Linking (Optional) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Asset linking (optional)
+              Povezivanje s opremom (opcionalno)
             </label>
             {selectedAsset ? (
               <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -410,7 +410,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
                   onClick={handleClearAsset}
                   className="text-xs text-gray-500 hover:text-red-600 underline"
                 >
-                  Remove
+                  Ukloni
                 </button>
               </div>
             ) : (
@@ -421,13 +421,13 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
                   onClick={() => setShowAssetBrowser(!showAssetBrowser)}
                   disabled={effectiveStoreId == null}
                 >
-                  {showAssetBrowser ? 'Close' : '🔍 Browse Assets'}
+                  {showAssetBrowser ? 'Zatvori' : '🔍 Pretraži opremu'}
                 </Button>
                 {effectiveStoreId == null && (
-                  <p className="text-xs text-gray-500">Select a store first to browse assets.</p>
+                  <p className="text-xs text-gray-500">Najprije odaberite poslovnicu.</p>
                 )}
                 {showAssetBrowser && storeAssets.length === 0 && (
-                  <p className="text-sm text-gray-500">No assets found for this store.</p>
+                  <p className="text-sm text-gray-500">Nema opreme za ovu poslovnicu.</p>
                 )}
                 {showAssetBrowser && storeAssets.length > 0 && (
                   <div className="border rounded-lg overflow-hidden max-h-60 overflow-y-auto">
@@ -457,7 +457,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
           {/* 8.8 Buttons */}
           <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
             <Button type="button" variant="secondary" onClick={() => navigate(backLink)}>
-              Cancel
+              Odustani
             </Button>
             <Button
               type="button"
@@ -465,10 +465,10 @@ export function SubmitTicketPage({ backLink, backLabel = 'Back' }: SubmitTicketP
               onClick={handleSaveDraft}
               disabled={isBusy}
             >
-              {createMutation.isPending && !isSending ? 'Saving...' : 'Save as Draft'}
+              {createMutation.isPending && !isSending ? 'Spremanje...' : 'Spremi kao nacrt'}
             </Button>
             <Button type="button" onClick={handleSubmitTicket} disabled={isBusy}>
-              {isSending ? 'Submitting...' : 'Submit Ticket'}
+              {isSending ? 'Slanje...' : 'Pošalji prijavu'}
             </Button>
           </div>
 

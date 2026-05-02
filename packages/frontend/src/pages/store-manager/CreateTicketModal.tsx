@@ -14,18 +14,18 @@ interface CreateTicketModalProps {
 
 // Must match Prisma TicketCategory enum keys exactly
 const CATEGORIES: { value: string; label: string }[] = [
-  { value: 'ELECTRICAL_INSTALLATIONS', label: 'Electrical Installations' },
-  { value: 'HEATING_VENTILATION_AIR_CONDITIONING', label: 'Heating, Ventilation and Air Conditioning' },
-  { value: 'REFRIGERATION', label: 'Refrigeration' },
-  { value: 'KITCHEN_EQUIPMENT', label: 'Kitchen Equipment' },
-  { value: 'ELEVATORS', label: 'Elevators' },
-  { value: 'AUTOMATIC_DOORS', label: 'Automatic Doors' },
-  { value: 'FIRE_PROTECTION_SYSTEM', label: 'Fire Protection System' },
-  { value: 'WATER_AND_SEWAGE', label: 'Water and Sewage' },
-  { value: 'CONSTRUCTION_WORKS', label: 'Construction Works' },
-  { value: 'HYGIENE', label: 'Hygiene' },
-  { value: 'ENVIRONMENTAL', label: 'Environmental' },
-  { value: 'OTHER', label: 'Other' },
+  { value: 'ELECTRICAL_INSTALLATIONS', label: 'Elektroinstalacije' },
+  { value: 'HEATING_VENTILATION_AIR_CONDITIONING', label: 'Grijanje, ventilacija i klima' },
+  { value: 'REFRIGERATION', label: 'Rashlađivanje' },
+  { value: 'KITCHEN_EQUIPMENT', label: 'Kuhinjska oprema' },
+  { value: 'ELEVATORS', label: 'Liftovi' },
+  { value: 'AUTOMATIC_DOORS', label: 'Automatska vrata' },
+  { value: 'FIRE_PROTECTION_SYSTEM', label: 'Zaštita od požara' },
+  { value: 'WATER_AND_SEWAGE', label: 'Vodoopskrba i kanalizacija' },
+  { value: 'CONSTRUCTION_WORKS', label: 'Građevinski radovi' },
+  { value: 'HYGIENE', label: 'Higijena' },
+  { value: 'ENVIRONMENTAL', label: 'Okoliš' },
+  { value: 'OTHER', label: 'Ostalo' },
 ];
 
 export function CreateTicketModal({ onClose }: CreateTicketModalProps) {
@@ -61,11 +61,11 @@ export function CreateTicketModal({ onClose }: CreateTicketModalProps) {
   const validate = (): boolean => {
     setValidationError('');
     if (!category.trim()) {
-      setValidationError('Please select a category.');
+      setValidationError('Odaberite kategoriju.');
       return false;
     }
     if (!description.trim()) {
-      setValidationError('Please enter a description.');
+      setValidationError('Unesite opis kvara.');
       return false;
     }
     return true;
@@ -128,7 +128,7 @@ export function CreateTicketModal({ onClose }: CreateTicketModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {showSuccess != null ? (
           <div className="p-8 text-center">

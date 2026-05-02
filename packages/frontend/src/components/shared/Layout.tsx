@@ -5,6 +5,7 @@
 
 import { Link } from 'react-router-dom';
 import { useSession } from '../../contexts/SessionContext';
+import { MaintrixLogo } from './MaintrixLogo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,58 +21,57 @@ export function Layout({
   children,
   screenTitle,
   backLink,
-  backLabel = 'Back',
+  backLabel = 'Natrag',
 }: LayoutProps) {
   const { session, logout } = useSession();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center flex-wrap gap-2">
-          <div className="flex items-center gap-3">
-            <img
-              src="/ntl-logo.png"
-              alt="NTL logo"
-              className="h-10 w-auto object-contain"
-            />
-            <div>
-              {screenTitle != null ? (
-                <h1 className="text-xl font-bold text-gray-900">{screenTitle}</h1>
-              ) : (
-                <h1 className="text-xl font-bold text-gray-900">CMMS System</h1>
-              )}
-              {session != null && (
-                <p className="text-sm text-gray-600">
-                  {session.userName} • {session.role === 'S1' ? 'Service Admin' : session.role === 'S2' ? 'Technician' : session.role === 'S3' ? 'Finance / Backoffice' : session.role === 'AMM' ? 'Area Maintenance Manager' : session.role === 'ADMIN' ? 'System Administrator' : session.role}
-                  {session.companyName != null ? ` • ${session.companyName}` : ''}
-                  {session.servicedCompanyName != null ? ` • Serviced: ${session.servicedCompanyName}` : ''}
-                  {session.storeName != null ? ` • Store: ${session.storeName}` : ''}
-                  {session.regionName != null ? ` • Region: ${session.regionName}` : ''}
-                </p>
-              )}
-            </div>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <header style={{ backgroundColor: 'var(--color-header)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="max-w-6xl mx-auto px-6 py-0 flex justify-between items-center" style={{ height: '56px' }}>
+          <div className="flex items-center gap-4">
+            <MaintrixLogo size="sm" variant="light" />
+            <div style={{ width: '1px', height: '20px', backgroundColor: 'rgba(255,255,255,0.15)' }} />
+            {screenTitle != null && (
+              <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.01em' }}>
+                {screenTitle}
+              </span>
+            )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {session != null && (
+              <span className="text-xs mr-3" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                {session.userName}
+                {session.storeName != null ? ` · ${session.storeName}` : ''}
+                {session.regionName != null ? ` · ${session.regionName}` : ''}
+              </span>
+            )}
             {backLink != null && (
               <Link
                 to={backLink}
-                className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+                className="text-sm px-3 py-1.5 rounded-md transition-all"
+                style={{ color: 'rgba(255,255,255,0.7)', backgroundColor: 'transparent' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                {backLabel}
+                ← {backLabel}
               </Link>
             )}
             <button
               type="button"
               onClick={logout}
-              className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+              className="text-sm px-3 py-1.5 rounded-md transition-all"
+              style={{ color: 'rgba(255,255,255,0.7)', backgroundColor: 'transparent' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
-              Logout
+              Odjava
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">{children}</main>
+      <main className="max-w-6xl mx-auto px-6 py-8">{children}</main>
     </div>
   );
 }

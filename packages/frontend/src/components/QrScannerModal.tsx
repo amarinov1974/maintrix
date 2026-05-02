@@ -71,7 +71,7 @@ export function QrScannerModal({
   }, [handleScan]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[60]">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
       <div className="bg-white rounded-lg max-w-sm w-full overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-lg font-bold text-gray-900">{title}</h2>

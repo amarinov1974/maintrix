@@ -9,8 +9,9 @@ import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
 import { authAPI } from '../../api/auth';
 import { useSession } from '../../contexts/SessionContext';
-import { TicketStatus } from '../../types/statuses';
+import { TicketStatus, WorkOrderStatus } from '../../types/statuses';
 import { Button, Badge } from '../../components/shared';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 
 interface AMMTicketDetailModalProps {
   ticketId: number;
@@ -18,12 +19,12 @@ interface AMMTicketDetailModalProps {
 }
 
 const INTERNAL_ROLE_LABELS: Record<string, string> = {
-  SM: 'Store Manager (creator)',
-  AM: 'Area Manager',
-  AMM: 'Area Maintenance Manager',
-  D: 'Sales Director',
-  C2: 'Maintenance Director',
-  BOD: 'Board of Directors',
+  SM: 'Voditelj poslovnice (kreator)',
+  AM: 'Voditelj regije',
+  AMM: 'Voditelj održavanja',
+  D: 'Direktor prodaje',
+  C2: 'Direktor održavanja',
+  BOD: 'Upravni odbor',
 };
 
 export function AMMTicketDetailModal({
@@ -179,9 +180,9 @@ export function AMMTicketDetailModal({
 
   if (isLoading || ticket == null) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg p-6">
-          <p>Loading ticket details...</p>
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px' }}>
+          <p>Učitavanje detalja prijave...</p>
         </div>
       </div>
     );
@@ -222,9 +223,20 @@ export function AMMTicketDetailModal({
       (ticket.currentStatus === 'Ticket Cost Estimation Approved' ||
         ticket.currentStatus === 'Work Order In Progress'));
 
-  const canArchive =
+  const archivableTicketStatus =
     ticket.currentStatus === 'Ticket Cost Estimation Approved' ||
     ticket.currentStatus === 'Work Order In Progress';
+  const hasWorkOrders = workOrdersForTicket.length > 0;
+  const terminalWorkOrderStatuses: string[] = [
+    WorkOrderStatus.COST_PROPOSAL_APPROVED,
+    WorkOrderStatus.CLOSED_WITHOUT_COST,
+    WorkOrderStatus.REJECTED,
+  ];
+  const allWorkOrdersTerminal = hasWorkOrders && workOrdersForTicket.every(
+    (wo) => wo.currentStatus != null && terminalWorkOrderStatuses.includes(wo.currentStatus)
+  );
+  const canArchive = archivableTicketStatus && hasWorkOrders && allWorkOrdersTerminal;
+  const showArchiveSection = archivableTicketStatus && hasWorkOrders;
 
   const submittedAt =
     ticket.submittedAt ??
@@ -234,17 +246,17 @@ export function AMMTicketDetailModal({
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="bg-white rounded-lg max-w-4xl w-full my-8 flex flex-col max-h-[90vh]">
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         {/* 11.1 Screen Header */}
-        <div className="p-6 border-b border-gray-200 sticky top-0 bg-white shrink-0">
+        <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Ticket Detail</h1>
-              <p className="text-sm text-gray-500 mt-0.5">Ticket #{ticket.id}</p>
+              <h1 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1F' }}>Detalji prijave</h1>
+              <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>Prijava #{ticket.id}</p>
             </div>
             <Button type="button" variant="secondary" onClick={onClose}>
-              Back
+              Natrag
             </Button>
           </div>
         </div>
@@ -254,10 +266,10 @@ export function AMMTicketDetailModal({
             <div className="flex flex-col items-center justify-center py-8">
               <div className="bg-green-100 border-2 border-green-500 rounded-lg p-6 max-w-md w-full text-center">
                 <p className="text-green-800 font-semibold text-xl mb-2">
-                  ✓ Cost estimation sent to Area Manager for approval.
+                  ✓ Procjena troška poslana voditelju regije na odobrenje.
                 </p>
                 <p className="text-green-700 text-sm">
-                  Returning to dashboard in 2 seconds...
+                  Povratak na nadzornu ploču za 2 sekunde...
                 </p>
               </div>
             </div>
@@ -265,39 +277,60 @@ export function AMMTicketDetailModal({
           <>
           {/* 11.2 Ticket Core Information (Read-Only Block) */}
           <section>
-            <h2 className="font-semibold text-gray-900 mb-2">Ticket information</h2>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-              <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-                <span><strong>Ticket ID:</strong> {ticket.id}</span>
+            <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h2>
+            <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>ID prijave</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.id}</p>
+                </div>
                 {submittedAt != null && (
-                  <span><strong>Date &amp; Time Submitted:</strong> {new Date(submittedAt).toLocaleString()}</span>
+                  <div>
+                    <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Datum i vrijeme prijave</p>
+                    <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{new Date(submittedAt).toLocaleString()}</p>
+                  </div>
                 )}
-                <span><strong>Created By:</strong> {ticket.createdByUserName}{ticket.createdByUserRole != null ? ` (${ticket.createdByUserRole})` : ''}</span>
-                <span><strong>Current Owner:</strong> {ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</span>
-                <span><strong>Store:</strong> {ticket.storeName}</span>
-                <span><strong>Category:</strong> {ticket.category}</span>
-                <span>
-                  <strong>Urgency:</strong>{' '}
-                  {ticket.urgent ? <Badge variant="urgent">URGENT</Badge> : <Badge variant="default">Non-Urgent</Badge>}
-                </span>
-                <span><strong>Current Status:</strong> <Badge variant={ticket.currentStatus.includes('Approved') ? 'success' : 'warning'}>{ticket.currentStatus}</Badge></span>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Kreirao</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.createdByUserName}{ticket.createdByUserRole != null ? ` (${ticket.createdByUserRole})` : ''}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni vlasnik</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.currentOwnerUserName != null ? `${ticket.currentOwnerUserName}${ticket.currentOwnerUserRole != null ? ` (${ticket.currentOwnerUserRole})` : ''}` : '—'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Poslovnica</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.storeName}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Kategorija</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{formatCategory(ticket.category)}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Hitnost</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{ticket.urgent ? 'HITNO' : 'Nije hitno'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Trenutni status</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>{formatStatus(ticket.currentStatus)}</p>
+                </div>
               </div>
-              <div>
-                <strong className="text-sm text-gray-600">Original Problem Description (locked)</strong>
-                <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{ticket.originalDescription ?? ticket.description}</p>
+              <div style={{ marginTop: '12px' }}>
+                <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Originalni opis problema (zaključano)</p>
+                <p style={{ fontSize: '14px', color: '#1D1D1F', whiteSpace: 'pre-wrap' }}>{ticket.originalDescription ?? ticket.description}</p>
               </div>
               {(ticket.assetId != null || ticket.assetDescription != null) && (
-                <div>
-                  <strong className="text-sm text-gray-600">Asset</strong>
-                  <p className="text-sm text-gray-900">
+                <div style={{ marginTop: '12px' }}>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Oprema</p>
+                  <p style={{ fontSize: '14px', color: '#1D1D1F' }}>
                     {ticket.assetId != null && `ID: ${ticket.assetId}`}
                     {ticket.assetDescription != null && ` — ${ticket.assetDescription}`}
                   </p>
                 </div>
               )}
               {visibleAttachments.length > 0 && (
-                <div>
-                  <strong className="text-sm text-gray-600">Attachments</strong>
+                <div style={{ marginTop: '12px' }}>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Privici</p>
                   <ul className="mt-1 text-sm text-gray-900 list-disc list-inside">
                     {visibleAttachments.map((a) => (
                       <li key={a.id}>{a.fileName}</li>
@@ -311,23 +344,23 @@ export function AMMTicketDetailModal({
           {/* 11.4 / 11.5 Action Section — Urgent flow: Create WO, Request Clarification, Reject */}
           {woSuccessState === 'sent' && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="font-medium text-green-800 mb-2">Work Order successfully sent.</p>
-              <p className="text-sm text-green-700 mb-3">Create another Work Order?</p>
+              <p className="font-medium text-green-800 mb-2">Radni nalog uspješno poslan.</p>
+              <p className="text-sm text-green-700 mb-3">Kreirati još jedan radni nalog?</p>
               <div className="flex gap-2">
-                <Button type="button" variant="primary" onClick={() => handleCreateAnotherWO(false)} size="sm">No</Button>
-                <Button type="button" variant="secondary" onClick={() => handleCreateAnotherWO(true)} size="sm">Yes</Button>
+                <Button type="button" variant="primary" onClick={() => handleCreateAnotherWO(false)} size="sm">Ne</Button>
+                <Button type="button" variant="secondary" onClick={() => handleCreateAnotherWO(true)} size="sm">Da</Button>
               </div>
             </div>
           )}
 
           {workOrdersForTicket.length > 0 && (
             <section className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Work orders for this ticket</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Radni nalozi za ovu prijavu</h3>
               <ul className="space-y-2">
                 {workOrdersForTicket.map((wo) => (
                   <li key={wo.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm bg-white rounded-lg p-3 border border-gray-200">
                     <span className="font-medium text-gray-900">{wo.vendorCompanyName}</span>
-                    <Badge variant={wo.currentStatus?.includes('Created') ? 'default' : 'warning'}>{wo.currentStatus ?? '—'}</Badge>
+                    <Badge variant={wo.currentStatus?.includes('Created') ? 'default' : 'warning'}>{wo.currentStatus != null ? formatStatus(wo.currentStatus) : '—'}</Badge>
                     <span className="text-gray-500">{new Date(wo.createdAt).toLocaleString()}</span>
                   </li>
                 ))}
@@ -336,10 +369,10 @@ export function AMMTicketDetailModal({
           )}
 
           {woSuccessState !== 'sent' && canCreateWO && (
-            <section className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Create Work Order</h3>
+            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #34C759' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Kreiranje radnog naloga</h3>
               {ticket.urgent && (
-                <p className="text-sm text-green-800 mb-2">Urgent: create work order(s) directly — no cost estimation or approval required.</p>
+                <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Hitno: kreirajte radni nalog direktno — bez procjene troška.</p>
               )}
               {createWOMutation.isError && (
                 <p className="text-sm text-red-600 bg-red-50 p-2 rounded mb-2">
@@ -350,30 +383,30 @@ export function AMMTicketDetailModal({
                 </p>
               )}
               {!showWorkOrderForm ? (
-                <Button type="button" onClick={() => setShowWorkOrderForm(true)}>Create Work Order</Button>
+                <Button type="button" onClick={() => setShowWorkOrderForm(true)}>Kreiraj radni nalog</Button>
               ) : (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Vendor *</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Odabir izvođača *</label>
                     <select
                       value={selectedVendorId}
                       onChange={(e) => setSelectedVendorId(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                     >
-                      <option value="">— Select Vendor —</option>
+                      <option value="">— Odaberite izvođača —</option>
                       {vendorCompanies.map((v) => (
                         <option key={v.id} value={v.id}>{v.name}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Comment to Vendor *</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Komentar izvođaču *</label>
                     <textarea
                       value={commentToVendor}
                       onChange={(e) => setCommentToVendor(e.target.value)}
-                      placeholder="Explain the issue and provide instructions for the vendor..."
+                      placeholder="Opišite problem i dajte upute izvođaču..."
                       rows={4}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                     />
                   </div>
                   <div className="flex gap-2">
@@ -386,9 +419,9 @@ export function AMMTicketDetailModal({
                         createWOMutation.isPending
                       }
                     >
-                      {createWOMutation.isPending ? 'Sending...' : 'Send Work Order'}
+                      {createWOMutation.isPending ? 'Slanje...' : 'Pošalji radni nalog'}
                     </Button>
-                    <Button type="button" variant="secondary" onClick={() => setShowWorkOrderForm(false)}>Cancel</Button>
+                    <Button type="button" variant="secondary" onClick={() => setShowWorkOrderForm(false)}>Odustani</Button>
                   </div>
                 </div>
               )}
@@ -396,35 +429,35 @@ export function AMMTicketDetailModal({
           )}
 
           {canReturnToRequester && (
-            <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Respond to clarification</h3>
-              <p className="text-sm text-blue-900 mb-2">
+            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Odgovor na zahtjev za pojašnjenje</h3>
+              <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>
                 {ticket.clarificationRequestedByUserName != null || ticket.clarificationRequestedByUserRole != null
-                  ? `${ticket.clarificationRequestedByUserName ?? 'Requester'}${ticket.clarificationRequestedByUserRole != null ? ` (${INTERNAL_ROLE_LABELS[ticket.clarificationRequestedByUserRole] ?? ticket.clarificationRequestedByUserRole})` : ''} requested clarification. You can only return the ticket to them.`
-                  : 'Return the ticket to the role that requested clarification.'}
+                  ? `${ticket.clarificationRequestedByUserName ?? 'Requester'}${ticket.clarificationRequestedByUserRole != null ? ` (${INTERNAL_ROLE_LABELS[ticket.clarificationRequestedByUserRole] ?? ticket.clarificationRequestedByUserRole})` : ''} zatražio pojašnjenje. Možete vratiti prijavu samo njima.`
+                  : 'Vratite prijavu ulozi koja je zatražila pojašnjenje.'}
               </p>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Optional comment</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Komentar (opcionalno)</label>
               <textarea
                 value={clarificationComment}
                 onChange={(e) => setClarificationComment(e.target.value)}
-                placeholder="Add a comment (optional)..."
+                placeholder="Dodajte komentar (opcionalno)..."
                 rows={3}
-                className="w-full p-3 border border-gray-300 rounded-lg mb-3"
+                style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box', marginBottom: '12px' }}
               />
               <Button
                 type="button"
                 onClick={() => submitResponseToRequesterMutation.mutate(clarificationComment.trim() || undefined)}
                 disabled={submitResponseToRequesterMutation.isPending}
               >
-                {submitResponseToRequesterMutation.isPending ? 'Sending...' : `Return to ${ticket.clarificationRequestedByUserName ?? 'requester'}`}
+                {submitResponseToRequesterMutation.isPending ? 'Slanje...' : `Vrati na ${ticket.clarificationRequestedByUserName ?? 'podnositelja'}`}
               </Button>
             </section>
           )}
 
           {canRequestClarification && (
-            <section className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Request Ticket Clarification</h3>
-              <p className="text-sm text-gray-700 mb-2">Send the ticket to a role that has been involved in this ticket. After they update it, the ticket will return to you.</p>
+            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF9500' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Zahtjev za pojašnjenje</h3>
+              <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Pošaljite prijavu ulozi koja je bila uključena. Nakon ažuriranja, prijava se vraća Vama.</p>
               {clarifyMutation.isError && (
                 <p className="text-sm text-red-600 bg-red-50 p-2 rounded mb-2">
                   {(() => {
@@ -434,24 +467,24 @@ export function AMMTicketDetailModal({
                 </p>
               )}
               {!showClarificationPopup ? (
-                <Button type="button" onClick={() => { const baseRoles = ticket.involvedInternalRoles ?? ['SM']; const options = baseRoles.filter((r) => r !== ticket.currentOwnerUserRole); const targetOptions = options.length > 0 ? options : ['SM']; setAssignToRole(targetOptions[0] ?? 'SM'); setShowClarificationPopup(true); }}>Request Ticket Clarification</Button>
+                <Button type="button" onClick={() => { const baseRoles = ticket.involvedInternalRoles ?? ['SM']; const options = baseRoles.filter((r) => r !== ticket.currentOwnerUserRole); const targetOptions = options.length > 0 ? options : ['SM']; setAssignToRole(targetOptions[0] ?? 'SM'); setShowClarificationPopup(true); }}>Zatraži pojašnjenje</Button>
               ) : (
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">Send clarification request to</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73' }}>Pošalji zahtjev za pojašnjenje prema</label>
                   <select
                     value={assignToRole}
                     onChange={(e) => setAssignToRole(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                   >
                     {(() => { const baseRoles = ticket.involvedInternalRoles ?? ['SM']; const options = baseRoles.filter((r) => r !== ticket.currentOwnerUserRole); const targetOptions = options.length > 0 ? options : ['SM']; return targetOptions.map((r) => (<option key={r} value={r}>{INTERNAL_ROLE_LABELS[r] ?? r}</option>)); })()}
                   </select>
-                  <label className="block text-sm font-medium text-gray-700">Clarification text (mandatory)</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73' }}>Tekst pojašnjenja (obavezno)</label>
                   <textarea
                     value={clarificationComment}
                     onChange={(e) => setClarificationComment(e.target.value)}
-                    placeholder="Explain what needs clarification..."
+                    placeholder="Opišite što treba pojasniti..."
                     rows={4}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                   />
                   <div className="flex gap-2">
                     <Button
@@ -459,9 +492,9 @@ export function AMMTicketDetailModal({
                       onClick={() => clarifyMutation.mutate({ comment: clarificationComment, role: assignToRole })}
                       disabled={!clarificationComment.trim() || clarifyMutation.isPending}
                     >
-                      {clarifyMutation.isPending ? 'Sending...' : 'Submit'}
+                      {clarifyMutation.isPending ? 'Slanje...' : 'Pošalji'}
                     </Button>
-                    <Button type="button" variant="secondary" onClick={() => setShowClarificationPopup(false)}>Cancel</Button>
+                    <Button type="button" variant="secondary" onClick={() => setShowClarificationPopup(false)}>Odustani</Button>
                   </div>
                 </div>
               )}
@@ -469,19 +502,19 @@ export function AMMTicketDetailModal({
           )}
 
           {canReject && (
-            <section className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Reject Ticket</h3>
+            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF3B30' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Odbijanje prijave</h3>
               {!showRejectForm ? (
-                <Button type="button" variant="danger" onClick={() => setShowRejectForm(true)}>Reject Ticket</Button>
+                <Button type="button" variant="danger" onClick={() => setShowRejectForm(true)}>Odbij prijavu</Button>
               ) : (
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-red-900">Reason (mandatory)</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73' }}>Razlog (obavezno)</label>
                   <textarea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Reason for rejection..."
+                    placeholder="Razlog odbijanja..."
                     rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                   />
                   <div className="flex gap-2">
                     <Button
@@ -490,9 +523,9 @@ export function AMMTicketDetailModal({
                       onClick={() => rejectMutation.mutate(rejectReason)}
                       disabled={!rejectReason.trim() || rejectMutation.isPending}
                     >
-                      {rejectMutation.isPending ? 'Rejecting...' : 'Confirm Rejection'}
+                      {rejectMutation.isPending ? 'Odbijanje...' : 'Potvrdi odbijanje'}
                     </Button>
-                    <Button type="button" variant="secondary" onClick={() => setShowRejectForm(false)}>Cancel</Button>
+                    <Button type="button" variant="secondary" onClick={() => setShowRejectForm(false)}>Odustani</Button>
                   </div>
                 </div>
               )}
@@ -500,25 +533,25 @@ export function AMMTicketDetailModal({
           )}
 
           {canSubmitCost && (
-            <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Submit Cost Estimation</h3>
-              <p className="text-sm text-blue-700 mb-3">Enter the estimated cost and optionally attach documents. This will route the ticket through the approval chain.</p>
+            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Predaja procjene troška</h3>
+              <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Unesite procijenjeni trošak i opcijski priložite dokumentaciju. Prijava će proći kroz lanac odobrenja.</p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Estimated amount (EUR)</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Procijenjeni iznos (EUR)</label>
                   <input
                     type="number"
                     value={costAmount}
                     onChange={(e) => setCostAmount(e.target.value)}
-                    placeholder="Amount in EUR"
+                    placeholder="Iznos u EUR"
                     min="0"
                     step="0.01"
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Documents (optional)</label>
-                  <p className="text-xs text-gray-600 mb-2">Attach supporting documents for the cost estimation.</p>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Dokumenti (opcionalno)</label>
+                  <p className="text-xs text-gray-600 mb-2">Priložite prateću dokumentaciju za procjenu troška.</p>
                   <input
                     ref={costEstimationFileInputRef}
                     type="file"
@@ -534,7 +567,7 @@ export function AMMTicketDetailModal({
                     onClick={() => costEstimationFileInputRef.current?.click()}
                     disabled={uploadingAttachment}
                   >
-                    {uploadingAttachment ? 'Uploading...' : 'Add document(s)'}
+                    {uploadingAttachment ? 'Učitavanje...' : 'Dodaj dokument(e)'}
                   </Button>
                   {ticket.attachments != null && ticket.attachments.length > 0 && (
                     <ul className="mt-2 text-sm text-gray-600 list-disc list-inside">
@@ -550,32 +583,38 @@ export function AMMTicketDetailModal({
                     onClick={() => submitCostMutation.mutate(parseFloat(costAmount))}
                     disabled={!costAmount || parseFloat(costAmount) <= 0 || submitCostMutation.isPending}
                   >
-                    {submitCostMutation.isPending ? 'Submitting...' : 'Submit for Approval'}
+                    {submitCostMutation.isPending ? 'Slanje...' : 'Pošalji na odobrenje'}
                   </Button>
                 </div>
               </div>
             </section>
           )}
 
-          {canArchive && (
+          {showArchiveSection && (
             <section className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700 mb-2">Ticket is approved. Archive when all work orders are complete.</p>
+              <p className="text-sm text-gray-700 mb-2">
+                {allWorkOrdersTerminal
+                  ? 'Prijava je odobrena. Arhivirajte kada su svi radni nalozi završeni.'
+                  : 'Nije moguće arhivirati — postoje aktivni radni nalozi.'}
+              </p>
               {archiveMutation.isError && (
                 <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
                   {(archiveMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
                     'Archive failed'}
                 </div>
               )}
-              <Button type="button" variant="secondary" onClick={() => archiveMutation.mutate()} disabled={archiveMutation.isPending}>
-                {archiveMutation.isPending ? 'Archiving...' : 'Archive Ticket'}
-              </Button>
+              <div title={!allWorkOrdersTerminal ? 'Nije moguće arhivirati — postoje aktivni radni nalozi.' : undefined} style={{ display: 'inline-block' }}>
+                <Button type="button" variant="secondary" onClick={() => archiveMutation.mutate()} disabled={archiveMutation.isPending || !allWorkOrdersTerminal}>
+                  {archiveMutation.isPending ? 'Arhiviranje...' : 'Arhiviraj prijavu'}
+                </Button>
+              </div>
             </section>
           )}
 
           {/* 11.3 Comments (internal; AMM sees all ticket comments) — newest first */}
           {ticket.comments != null && ticket.comments.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">Comments</h3>
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Komentari</h3>
               <div className="space-y-3">
                 {[...ticket.comments]
                   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -595,20 +634,20 @@ export function AMMTicketDetailModal({
           {/* 11.10 History Log — newest on top */}
           {ticket.auditLog != null && ticket.auditLog.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">History</h3>
-              <div className="space-y-2">
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Povijest</h3>
+              <div>
                 {ticket.auditLog.map((entry) => (
-                  <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
-                    <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
+                  <div key={entry.id} style={{ padding: '12px 0', borderBottom: '1px solid #F0F0F5' }}>
+                    <span style={{ fontSize: '12px', color: '#6E6E73' }}>{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{entry.actionType}</span>
+                    <span style={{ fontSize: '12px', color: '#6E6E73' }}>{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
-                      <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
+                      <span style={{ fontSize: '12px', color: '#6E6E73' }}> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}
-                    <p className="mt-1 text-gray-600">
-                      Performed by {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
+                    <p style={{ fontSize: '13px', color: '#1D1D1F', fontWeight: 500, marginTop: '4px' }}>
+                      Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                     </p>
-                    {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
+                    {entry.comment != null && <p style={{ fontSize: '13px', color: '#3C3C43', marginTop: '4px' }}>&quot;{entry.comment}&quot;</p>}
                   </div>
                 ))}
               </div>
@@ -619,7 +658,7 @@ export function AMMTicketDetailModal({
         </div>
 
         <div className="p-6 border-t border-gray-200 sticky bottom-0 bg-white shrink-0">
-          <Button type="button" variant="secondary" onClick={onClose} className="w-full">Back</Button>
+          <Button type="button" variant="secondary" onClick={onClose} className="w-full">Natrag</Button>
         </div>
       </div>
     </div>

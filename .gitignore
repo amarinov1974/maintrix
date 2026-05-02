@@ -41,3 +41,8 @@ Thumbs.db
 # Database
 *.db
 *.db-journal
+
+# Documentation / design artifacts (keep out of source repo)
+UX screenshots/
+ChatGPT Image*.png
+*.docx

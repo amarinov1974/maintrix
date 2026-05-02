@@ -418,12 +418,14 @@ model WOComment {
 }
 
 model WorkReportRow {
-  id          Int     @id @default(autoincrement())
-  woId        Int     @map("wo_id")
-  rowNumber   Int     @map("row_number")
-  description String  @db.Text
-  unit        String  @db.VarChar(50)
-  quantity    Decimal @db.Decimal(10, 2)
+  id          Int    @id @default(autoincrement())
+  woId        Int    @map("wo_id")
+  rowNumber   Int    @map("row_number")
+  description String @db.Text
+  unit        String @db.VarChar(50)
+  /// Free-form text replicating paper work order entry.
+  /// Not used for arithmetic. Display only.
+  quantity    String @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
 
   workOrder WorkOrder @relation(fields: [woId], references: [id], onDelete: Cascade)

@@ -12,6 +12,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMTicketDetailModal } from './AMMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
+import { formatStatus } from '../../utils/formatters';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
 
@@ -36,18 +37,18 @@ export function AMMWorkInProgressTicketsPage() {
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
   return (
-    <Layout screenTitle="Tickets — Work in Progress">
+    <Layout screenTitle="Prijave — rad u tijeku">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Tickets — Work in Progress</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Prijave — rad u tijeku</h1>
             <p className="text-sm text-gray-600 mt-0.5">
               Work order(s) sent — create extra work orders or archive when all done — newest first
             </p>
           </div>
           <Link to="/amm">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
@@ -56,7 +57,7 @@ export function AMMWorkInProgressTicketsPage() {
           <p className="text-gray-500">Loading…</p>
         ) : workInProgressTickets.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
-            No tickets in work in progress.
+            Nema prijava u tijeku rada.
           </div>
         ) : (
           <ul className="space-y-2">
@@ -70,7 +71,7 @@ export function AMMWorkInProgressTicketsPage() {
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
                     {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-                    <Badge variant="default">{ticket.currentStatus}</Badge>
+                    <Badge variant="default">{formatStatus(ticket.currentStatus)}</Badge>
                     <span className="text-sm text-gray-600">{ticket.storeName}</span>
                     <span className="text-sm text-gray-500">
                       {new Date(ticket.updatedAt).toLocaleDateString()}

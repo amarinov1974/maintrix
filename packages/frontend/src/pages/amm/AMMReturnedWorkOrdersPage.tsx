@@ -13,6 +13,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import { WorkOrderStatus } from '../../types/statuses';
 import type { WorkOrder } from '../../api/work-orders';
+import { formatStatus } from '../../utils/formatters';
 
 const COMMENT_PREVIEW_WORDS = 25;
 
@@ -59,12 +60,12 @@ export function AMMReturnedWorkOrdersPage() {
   );
 
   return (
-    <Layout screenTitle="Work orders — returned">
+    <Layout screenTitle="Vraćeni radni nalozi">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Work orders — returned
+              Vraćeni radni nalozi
             </h1>
             <p className="text-sm text-gray-600 mt-0.5">
               Returned or rejected by service provider (S1) — review and resend or close
@@ -72,7 +73,7 @@ export function AMMReturnedWorkOrdersPage() {
           </div>
           <Link to="/amm">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
@@ -81,7 +82,7 @@ export function AMMReturnedWorkOrdersPage() {
           <p className="text-gray-500">Loading…</p>
         ) : sorted.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
-            No returned or rejected work orders.
+            Nema vraćenih radnih naloga.
           </div>
         ) : (
           <ul className="space-y-2">
@@ -129,10 +130,10 @@ function WorkOrderPreviewRow({
         <span className="font-semibold text-gray-900">Work Order #{workOrder.id}</span>
         <span className="text-sm text-gray-600">Ticket #{workOrder.ticketId}</span>
         {workOrder.urgent && (
-          <Badge variant="danger">Urgent</Badge>
+          <Badge variant="danger">Hitno</Badge>
         )}
         <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>
-          {workOrder.currentStatus}
+          {formatStatus(workOrder.currentStatus)}
         </Badge>
         <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>
         {workOrder.storeName && (

@@ -11,6 +11,7 @@ import { useSession } from '../../../contexts/SessionContext';
 import { Button, Badge } from '../../../components/shared';
 import { WorkOrderStatus } from '../../../types/statuses';
 import { AssignTechnicianModal } from './AssignTechnicianModal';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../../utils/formatters';
 
 interface S1WorkOrderDetailModalProps {
   workOrderId: number;
@@ -65,9 +66,9 @@ export function S1WorkOrderDetailModal({
 
   if (isLoading || wo == null) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading work order...</p>
+          <p>Učitavanje radnog naloga...</p>
         </div>
       </div>
     );
@@ -75,59 +76,59 @@ export function S1WorkOrderDetailModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
         <div className="bg-white rounded-lg max-w-2xl w-full my-8">
           <div className="p-6 border-b border-gray-200">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Work Order Detail</h1>
+                <h1 className="text-xl font-bold text-gray-900">Detalji radnog naloga</h1>
                 <p className="text-sm text-gray-600 mt-1">
-                  WO #{wo.id} • Ticket #{wo.ticketId}
+                  WO #{wo.id} • Prijava #{wo.ticketId}
                 </p>
                 <Badge
                   variant={wo.urgent ? 'danger' : 'secondary'}
                   className="mt-2"
                 >
-                  {wo.urgent ? 'Urgent' : 'Non-Urgent'}
+                  {wo.urgent ? 'Hitno' : 'Nije hitno'}
                 </Badge>
               </div>
               <Button type="button" variant="secondary" onClick={onClose}>
-                Back
+                Natrag
               </Button>
             </div>
           </div>
 
           <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Details</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Detalji</h2>
               <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
                 <div>
-                  <span className="text-gray-600">Store:</span>{' '}
+                  <span className="text-gray-600">Poslovnica:</span>{' '}
                   {wo.storeName ?? '—'}
                 </div>
                 {wo.storeAddress != null && wo.storeAddress !== '' && (
                   <div>
-                    <span className="text-gray-600">Address:</span>{' '}
+                    <span className="text-gray-600">Adresa:</span>{' '}
                     {wo.storeAddress}
                   </div>
                 )}
                 <div>
-                  <span className="text-gray-600">Category:</span>{' '}
-                  {wo.category ?? '—'}
+                  <span className="text-gray-600">Kategorija:</span>{' '}
+                  {wo.category ? formatCategory(wo.category) : '—'}
                 </div>
                 <div>
-                  <span className="text-gray-600">AMM comment:</span>{' '}
+                  <span className="text-gray-600">Komentar VMO:</span>{' '}
                   {wo.commentToVendor ?? '—'}
                 </div>
                 {wo.assetDescription != null && wo.assetDescription !== '' && (
                   <div>
-                    <span className="text-gray-600">Asset:</span>{' '}
+                    <span className="text-gray-600">Oprema:</span>{' '}
                     {wo.assetDescription}
                   </div>
                 )}
                 {wo.attachments != null && wo.attachments.length > 0 && (
                   <div>
-                    <span className="text-gray-600">Attachments:</span>
+                    <span className="text-gray-600">Privici:</span>
                     <ul className="list-disc list-inside mt-1">
                       {wo.attachments.map((a) => (
                         <li key={a.id}>{a.fileName}</li>
@@ -136,13 +137,13 @@ export function S1WorkOrderDetailModal({
                   </div>
                 )}
                 <div>
-                  <span className="text-gray-600">Current status:</span>{' '}
-                  <strong>{wo.currentStatus}</strong>
+                  <span className="text-gray-600">Trenutni status:</span>{' '}
+                  <strong>{formatStatus(wo.currentStatus)}</strong>
                 </div>
                 {wo.assignedTechnicianId != null && (
                   <div>
-                    <span className="text-gray-600">Assigned to (owner):</span>{' '}
-                    <strong>{wo.assignedTechnicianName ?? 'Technician'}</strong>
+                    <span className="text-gray-600">Dodijeljeno (vlasnik):</span>{' '}
+                    <strong>{wo.assignedTechnicianName ?? 'Tehničar'}</strong>
                   </div>
                 )}
               </div>
@@ -150,14 +151,14 @@ export function S1WorkOrderDetailModal({
 
             {canAct && (
               <section className="space-y-4 border-t pt-4">
-                <h2 className="font-semibold text-gray-900">Actions</h2>
+                <h2 className="font-semibold text-gray-900">Akcije</h2>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <Button
                     type="button"
                     onClick={() => setShowAssign(true)}
                     className="w-full"
                   >
-                    Assign Technician
+                    Dodijeli tehničara
                   </Button>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -168,17 +169,17 @@ export function S1WorkOrderDetailModal({
                       onClick={() => setShowReturnForm(true)}
                       className="w-full"
                     >
-                      Return for Clarification
+                      Vrati na pojašnjenje
                     </Button>
                   ) : (
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">
-                        Comment (mandatory)
+                        Komentar (obavezan)
                       </label>
                       <textarea
                         value={returnComment}
                         onChange={(e) => setReturnComment(e.target.value)}
-                        placeholder="Clarification needed..."
+                        placeholder="Opišite što treba pojasniti..."
                         rows={3}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                       />
@@ -191,8 +192,8 @@ export function S1WorkOrderDetailModal({
                           }
                         >
                           {returnMutation.isPending
-                            ? 'Submitting...'
-                            : 'Confirm Return'}
+                            ? 'Slanje...'
+                            : 'Potvrdi povrat'}
                         </Button>
                         <Button
                           type="button"
@@ -202,7 +203,7 @@ export function S1WorkOrderDetailModal({
                             setReturnComment('');
                           }}
                         >
-                          Cancel
+                          Odustani
                         </Button>
                       </div>
                     </div>
@@ -216,17 +217,17 @@ export function S1WorkOrderDetailModal({
                       onClick={() => setShowRejectForm(true)}
                       className="w-full"
                     >
-                      Reject Work Order
+                      Odbij radni nalog
                     </Button>
                   ) : (
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-red-900">
-                        Reason (mandatory)
+                        Razlog (obavezno)
                       </label>
                       <textarea
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
-                        placeholder="Reason for rejection..."
+                        placeholder="Razlog odbijanja..."
                         rows={3}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                       />
@@ -240,8 +241,8 @@ export function S1WorkOrderDetailModal({
                           }
                         >
                           {rejectMutation.isPending
-                            ? 'Rejecting...'
-                            : 'Confirm Rejection'}
+                            ? 'Odbijanje...'
+                            : 'Potvrdi odbijanje'}
                         </Button>
                         <Button
                           type="button"
@@ -251,7 +252,7 @@ export function S1WorkOrderDetailModal({
                             setRejectReason('');
                           }}
                         >
-                          Cancel
+                          Odustani
                         </Button>
                       </div>
                     </div>
@@ -263,18 +264,18 @@ export function S1WorkOrderDetailModal({
             {/* History — work order workflow (statuses + comments) */}
             {wo.auditLog != null && wo.auditLog.length > 0 && (
               <section>
-                <h3 className="font-semibold text-gray-900 mb-2">History</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
                 <div className="space-y-2">
                   {wo.auditLog.map((entry) => (
                     <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
                       <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
                       {' — '}
-                      <span className="font-medium">{entry.actionType}</span>
+                      <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                       {entry.prevStatus != null && (
                         <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                       )}
                       <p className="mt-1 text-gray-600">
-                        Performed by {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
+                        Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                       </p>
                       {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
                     </div>
@@ -288,7 +289,7 @@ export function S1WorkOrderDetailModal({
                 <p className="text-sm text-red-700">
                   {(returnMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
                     (rejectMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                    'Action failed'}
+                    'Radnja nije uspjela'}
                 </p>
               </div>
             )}

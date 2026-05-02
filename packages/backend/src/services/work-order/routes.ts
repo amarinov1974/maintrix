@@ -63,6 +63,7 @@ router.get('/', async (req, res) => {
     const companyId = req.session!.companyId;
     const workOrders = await workOrderService.listWorkOrders({
       companyId,
+      userType: req.session!.userType,
       vendorCompanyId,
       currentOwnerId,
       ticketId,
@@ -216,7 +217,7 @@ router.get('/:id', async (req, res) => {
   try {
     const wo = await workOrderService.getWorkOrder(
       parseInt(req.params.id, 10),
-      req.session!.companyId
+      { companyId: req.session!.companyId, userType: req.session!.userType }
     );
     res.json(wo);
   } catch (error: unknown) {

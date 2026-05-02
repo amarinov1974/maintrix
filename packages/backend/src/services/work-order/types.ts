@@ -28,7 +28,8 @@ export interface CheckOutRequest {
 export interface WorkReportRow {
   description: string;
   unit: string;
-  quantity: number;
+  /** Free-form (same semantics as handwritten paper work order line) */
+  quantity: string;
 }
 
 export interface SubmitCostProposalRequest {

@@ -83,34 +83,34 @@ export function AssignTechnicianModal({
 
   if (loadingWO || loadingTechs) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading...</p>
+          <p>Učitavanje...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-2xl w-full">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
-            Assign Technician - WO #{workOrderId}
+            Dodjela tehničara — RN #{workOrderId}
           </h2>
         </div>
 
         <div className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Technician *
+              Tehničar *
             </label>
             <select
               value={selectedTechId}
               onChange={(e) => setSelectedTechId(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg"
             >
-              <option value="">-- Select Technician --</option>
+              <option value="">-- Odaberi tehničara --</option>
               {technicians?.map((tech) => (
                 <option key={tech.id} value={tech.id}>
                   {tech.name}
@@ -122,7 +122,7 @@ export function AssignTechnicianModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                ETA Date *
+                Datum dolaska *
               </label>
               <input
                 type="date"
@@ -133,7 +133,7 @@ export function AssignTechnicianModal({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                ETA Time * — 30-minute increments (e.g. 18:00, 18:30)
+                Vrijeme dolaska * — u intervalima 30 min (npr. 18:00, 18:30)
               </label>
               <select
                 value={etaTime}
@@ -150,7 +150,7 @@ export function AssignTechnicianModal({
 
         <div className="p-6 border-t border-gray-200 flex gap-3">
           <Button type="button" variant="secondary" onClick={onClose}>
-            Cancel
+            Odustani
           </Button>
           <Button
             type="button"
@@ -160,7 +160,7 @@ export function AssignTechnicianModal({
             }
             className="flex-1"
           >
-            {assignMutation.isPending ? 'Assigning...' : 'Assign Technician'}
+            {assignMutation.isPending ? 'Dodjela...' : 'Dodijeli'}
           </Button>
         </div>
 

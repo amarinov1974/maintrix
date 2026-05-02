@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { workOrdersAPI } from '../../api/work-orders';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
+import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 
 interface AMMWorkOrderDetailModalProps {
   workOrderId: number;
@@ -113,7 +114,7 @@ export function AMMWorkOrderDetailModal({
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg p-6">
-          <p>Loading work order...</p>
+          <p>Učitavanje radnog naloga...</p>
         </div>
       </div>
     );
@@ -125,16 +126,16 @@ export function AMMWorkOrderDetailModal({
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Work Order Detail</h1>
+              <h1 className="text-xl font-bold text-gray-900">Detalji radnog naloga</h1>
               <p className="text-sm text-gray-600 mt-1">
-                WO #{wo.id} • Ticket #{wo.ticketId}
+                RN #{wo.id} • Prijava #{wo.ticketId}
               </p>
               <Badge variant={wo.urgent ? 'danger' : 'secondary'} className="mt-2">
-                {wo.urgent ? 'Urgent' : 'Non-Urgent'}
+                {wo.urgent ? 'Hitno' : 'Nije hitno'}
               </Badge>
             </div>
             <Button type="button" variant="secondary" onClick={onClose}>
-              Back
+              Natrag
             </Button>
           </div>
         </div>
@@ -142,20 +143,20 @@ export function AMMWorkOrderDetailModal({
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
           {/* 16.2 Read-only sections */}
           <section>
-            <h2 className="font-semibold text-gray-900 mb-2">Details</h2>
+            <h2 className="font-semibold text-gray-900 mb-2">Detalji</h2>
             <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-gray-600">Status:</span>
                 <Badge variant={wo.currentStatus === 'Cost Proposal Prepared' ? 'warning' : 'default'}>
-                  {wo.currentStatus ?? '—'}
+                  {wo.currentStatus != null ? formatStatus(wo.currentStatus) : '—'}
                 </Badge>
               </div>
               <div>
-                <span className="text-gray-600">Current owner:</span>{' '}
+                <span className="text-gray-600">Trenutni vlasnik:</span>{' '}
                 {wo.assignedTechnicianName != null && wo.assignedTechnicianName !== ''
                   ? wo.assignedTechnicianName
                   : wo.currentOwnerType === 'VENDOR'
-                    ? 'Vendor (S1)'
+                    ? 'Izvođač (S1)'
                     : 'AMM'}
               </div>
               <div>
@@ -164,18 +165,18 @@ export function AMMWorkOrderDetailModal({
                   ? new Date(wo.eta).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
                   : '—'}
               </div>
-              <div><span className="text-gray-600">Store:</span> {wo.storeName ?? '—'}</div>
+              <div><span className="text-gray-600">Poslovnica:</span> {wo.storeName ?? '—'}</div>
               {wo.storeAddress != null && wo.storeAddress !== '' && (
-                <div><span className="text-gray-600">Address:</span> {wo.storeAddress}</div>
+                <div><span className="text-gray-600">Adresa:</span> {wo.storeAddress}</div>
               )}
-              <div><span className="text-gray-600">Category:</span> {wo.category ?? '—'}</div>
-              <div><span className="text-gray-600">AMM comment:</span> {wo.commentToVendor ?? '—'}</div>
+              <div><span className="text-gray-600">Kategorija:</span> {wo.category ? formatCategory(wo.category) : '—'}</div>
+              <div><span className="text-gray-600">Komentar VMO-a:</span> {wo.commentToVendor ?? '—'}</div>
               {wo.assetDescription != null && wo.assetDescription !== '' && (
-                <div><span className="text-gray-600">Asset:</span> {wo.assetDescription}</div>
+                <div><span className="text-gray-600">Oprema:</span> {wo.assetDescription}</div>
               )}
               {wo.attachments != null && wo.attachments.length > 0 && (
                 <div>
-                  <span className="text-gray-600">Attachments:</span>
+                  <span className="text-gray-600">Prilozi:</span>
                   <ul className="list-disc list-inside mt-1">
                     {wo.attachments.map((a) => (
                       <li key={a.id}>{a.fileName}</li>
@@ -189,20 +190,20 @@ export function AMMWorkOrderDetailModal({
           {/* Returned by S1: AMM can resend to vendor or reject */}
           {isReturnedToAm && (
             <section className="space-y-4 border-t pt-4">
-              <h2 className="font-semibold text-gray-900">Actions (returned by vendor)</h2>
+              <h2 className="font-semibold text-gray-900">Akcije (vraćeno od izvođača)</h2>
               <p className="text-sm text-gray-600">
-                This work order was returned by the service provider (S1). Resend it to the vendor with an optional comment, or reject it.
+                Ovaj radni nalog vraćen je od izvođača (S1). Možete ga ponovno poslati izvođaču s neobaveznim komentarom ili ga odbiti.
               </p>
               <div className="grid gap-4 sm:grid-cols-1">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-medium text-blue-900 mb-2">Resend to vendor (S1)</h3>
+                  <h3 className="font-medium text-blue-900 mb-2">Pošalji ponovno izvođaču (S1)</h3>
                   <p className="text-sm text-blue-700 mb-3">
-                    Send the work order back to the vendor. You can add a comment (e.g. clarification) for them.
+                    Vratite radni nalog izvođaču. Možete dodati komentar (npr. pojašnjenje) za njih.
                   </p>
                   <textarea
                     value={resendComment}
                     onChange={(e) => setResendComment(e.target.value)}
-                    placeholder="Optional comment for vendor..."
+                    placeholder="Neobavezan komentar za izvođača..."
                     rows={2}
                     className="w-full p-3 border border-gray-300 rounded-lg mb-3"
                   />
@@ -211,31 +212,31 @@ export function AMMWorkOrderDetailModal({
                     onClick={() => resendToVendorMutation.mutate(resendComment)}
                     disabled={resendToVendorMutation.isPending}
                   >
-                    {resendToVendorMutation.isPending ? 'Sending...' : 'Resend to vendor'}
+                    {resendToVendorMutation.isPending ? 'Slanje...' : 'Pošalji ponovno'}
                   </Button>
                 </div>
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h3 className="font-medium text-red-900 mb-2">Reject work order</h3>
+                  <h3 className="font-medium text-red-900 mb-2">Odbij radni nalog</h3>
                   {!showRejectForm ? (
                     <>
                       <p className="text-sm text-red-700 mb-3">
-                        Reject this work order. Terminal state.
+                        Odbijte ovaj radni nalog. Konačno stanje.
                       </p>
                       <Button
                         type="button"
                         variant="danger"
                         onClick={() => setShowRejectForm(true)}
                       >
-                        Reject work order
+                        Odbij radni nalog
                       </Button>
                     </>
                   ) : (
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-red-900">Reason *</label>
+                      <label className="block text-sm font-medium text-red-900">Razlog *</label>
                       <textarea
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
-                        placeholder="Reason for rejection..."
+                        placeholder="Razlog odbijanja..."
                         rows={2}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                       />
@@ -246,7 +247,7 @@ export function AMMWorkOrderDetailModal({
                           onClick={() => rejectWoMutation.mutate(rejectReason)}
                           disabled={!rejectReason.trim() || rejectWoMutation.isPending}
                         >
-                          {rejectWoMutation.isPending ? 'Rejecting...' : 'Confirm reject'}
+                          {rejectWoMutation.isPending ? 'Odbijanje...' : 'Potvrdi odbijanje'}
                         </Button>
                         <Button
                           type="button"
@@ -256,7 +257,7 @@ export function AMMWorkOrderDetailModal({
                             setRejectReason('');
                           }}
                         >
-                          Cancel
+                          Odustani
                         </Button>
                       </div>
                     </div>
@@ -267,7 +268,7 @@ export function AMMWorkOrderDetailModal({
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
                   {(resendToVendorMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
                     (rejectWoMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                    'Action failed'}
+                    'Radnja nije uspjela'}
                 </div>
               )}
             </section>
@@ -275,15 +276,15 @@ export function AMMWorkOrderDetailModal({
 
           {wo.workReport != null && wo.workReport.length > 0 && (
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Technician work report (read-only)</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Izvještaj tehničara (samo pregled)</h2>
               <div className="overflow-x-auto border border-gray-200 rounded-lg">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="text-left p-2">#</th>
-                      <th className="text-left p-2">Description</th>
-                      <th className="text-left p-2">Unit</th>
-                      <th className="text-right p-2">Quantity</th>
+                      <th className="text-left p-2">Opis</th>
+                      <th className="text-left p-2">Jedinica</th>
+                      <th className="text-right p-2">Količina</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -304,17 +305,17 @@ export function AMMWorkOrderDetailModal({
           {/* 16.3 Invoice proposal table (read-only, highlighted rows if warning) */}
           {wo.invoiceRows != null && wo.invoiceRows.length > 0 && (
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Invoice proposal (from S3)</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Ponuda troška (od S3)</h2>
               <div className="overflow-x-auto border border-gray-200 rounded-lg">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="text-left p-2">#</th>
-                      <th className="text-left p-2">Description</th>
-                      <th className="text-left p-2">Unit</th>
-                      <th className="text-right p-2">Qty</th>
-                      <th className="text-right p-2">Price/Unit</th>
-                      <th className="text-right p-2">Line Total</th>
+                      <th className="text-left p-2">Opis</th>
+                      <th className="text-left p-2">Jedinica</th>
+                      <th className="text-right p-2">Kol.</th>
+                      <th className="text-right p-2">Cijena/jed.</th>
+                      <th className="text-right p-2">Ukupno</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -342,12 +343,12 @@ export function AMMWorkOrderDetailModal({
               </div>
               {wo.totalCost != null && (
                 <div className="mt-3 p-3 bg-gray-100 rounded-lg flex justify-between items-center">
-                  <span className="font-semibold text-gray-900">Grand total</span>
+                  <span className="font-semibold text-gray-900">Sveukupno</span>
                   <span className="text-lg font-bold">€{Number(wo.totalCost).toFixed(2)}</span>
                 </div>
               )}
               <p className="text-xs text-gray-600 mt-2">
-                Colors: light yellow = auto-generated (arrival/service time), light green = item from price list, light red = item not in price list.
+                Boje: svijetlo žuta = automatski generirano (vrijeme dolaska/servisa), svijetlo zelena = stavka iz cjenika, svijetlo crvena = stavka izvan cjenika.
               </p>
             </section>
           )}
@@ -355,44 +356,44 @@ export function AMMWorkOrderDetailModal({
           {/* 16.4–16.7 AMM action buttons */}
           {canAct && (
             <section className="space-y-4 border-t pt-4">
-              <h2 className="font-semibold text-gray-900">Actions</h2>
+              <h2 className="font-semibold text-gray-900">Akcije</h2>
               <div className="grid gap-4 sm:grid-cols-1">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <h3 className="font-medium text-green-900 mb-2">Approve Cost Proposal</h3>
+                  <h3 className="font-medium text-green-900 mb-2">Odobri ponudu troška</h3>
                   <p className="text-sm text-green-700 mb-3">
-                    Finalize this cost proposal. Work order moves to approved/archived. Ticket may be archived when all WOs are closed.
+                    Finalizirajte ovu ponudu troška. Radni nalog prelazi u odobreno/arhivirano. Prijava se može arhivirati kad svi radni nalozi budu zatvoreni.
                   </p>
                   <Button
                     type="button"
                     onClick={() => approveMutation.mutate()}
                     disabled={approveMutation.isPending}
                   >
-                    {approveMutation.isPending ? 'Approving...' : 'Approve Cost Proposal'}
+                    {approveMutation.isPending ? 'Odobravanje...' : 'Odobri ponudu troška'}
                   </Button>
                 </div>
 
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <h3 className="font-medium text-amber-900 mb-2">Request Cost Revision</h3>
+                  <h3 className="font-medium text-amber-900 mb-2">Zatraži reviziju ponude</h3>
                   {!showRevisionForm ? (
                     <>
                       <p className="text-sm text-amber-700 mb-3">
-                        Send back to S3 for changes. Comment is mandatory.
+                        Vrati S3 na izmjene. Komentar je obavezan.
                       </p>
                       <Button
                         type="button"
                         variant="secondary"
                         onClick={() => setShowRevisionForm(true)}
                       >
-                        Request Cost Revision
+                        Zatraži reviziju
                       </Button>
                     </>
                   ) : (
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-amber-900">Comment *</label>
+                      <label className="block text-sm font-medium text-amber-900">Komentar *</label>
                       <textarea
                         value={revisionComment}
                         onChange={(e) => setRevisionComment(e.target.value)}
-                        placeholder="Explain what needs to be revised..."
+                        placeholder="Objasnite što treba ispraviti..."
                         rows={3}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                       />
@@ -402,7 +403,7 @@ export function AMMWorkOrderDetailModal({
                           onClick={() => revisionMutation.mutate()}
                           disabled={!revisionComment.trim() || revisionMutation.isPending}
                         >
-                          {revisionMutation.isPending ? 'Sending...' : 'Send Revision Request'}
+                          {revisionMutation.isPending ? 'Slanje...' : 'Pošalji zahtjev za reviziju'}
                         </Button>
                         <Button
                           type="button"
@@ -412,7 +413,7 @@ export function AMMWorkOrderDetailModal({
                             setRevisionComment('');
                           }}
                         >
-                          Cancel
+                          Odustani
                         </Button>
                       </div>
                     </div>
@@ -420,24 +421,24 @@ export function AMMWorkOrderDetailModal({
                 </div>
 
                 <div className="bg-gray-100 border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">Close Without Cost</h3>
+                  <h3 className="font-medium text-gray-900 mb-2">Zatvori bez troška</h3>
                   {!showCloseConfirm ? (
                     <>
                       <p className="text-sm text-gray-700 mb-3">
-                        No invoice required (e.g. warranty, internal decision). Terminal state.
+                        Račun nije potreban (npr. jamstvo, interna odluka). Završno stanje.
                       </p>
                       <Button
                         type="button"
                         variant="secondary"
                         onClick={() => setShowCloseConfirm(true)}
                       >
-                        Close Without Cost
+                        Zatvori bez troška
                       </Button>
                     </>
                   ) : (
                     <div className="space-y-3">
                       <p className="text-sm text-gray-700">
-                        Are you sure? Status will be Closed Without Cost and the work order will be terminal.
+                        Jeste li sigurni? Status će biti Zatvoreno bez troška i radni nalog postaje konačan.
                       </p>
                       <div className="flex gap-2">
                         <Button
@@ -446,14 +447,14 @@ export function AMMWorkOrderDetailModal({
                           onClick={() => closeWithoutCostMutation.mutate()}
                           disabled={closeWithoutCostMutation.isPending}
                         >
-                          {closeWithoutCostMutation.isPending ? 'Closing...' : 'Confirm Close Without Cost'}
+                          {closeWithoutCostMutation.isPending ? 'Zatvaranje...' : 'Potvrdi zatvaranje bez troška'}
                         </Button>
                         <Button
                           type="button"
                           variant="secondary"
                           onClick={() => setShowCloseConfirm(false)}
                         >
-                          Cancel
+                          Odustani
                         </Button>
                       </div>
                     </div>
@@ -466,18 +467,18 @@ export function AMMWorkOrderDetailModal({
           {/* History — actions with comments, newest first */}
           {wo.auditLog != null && wo.auditLog.length > 0 && (
             <section>
-              <h3 className="font-semibold text-gray-900 mb-2">History</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Povijest</h3>
               <div className="space-y-2">
                 {wo.auditLog.map((entry) => (
                   <div key={entry.id} className="text-sm bg-gray-50 rounded-lg p-3">
                     <span className="text-gray-600">{new Date(entry.createdAt).toLocaleString()}</span>
                     {' — '}
-                    <span className="font-medium">{entry.actionType}</span>
+                    <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
                       <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
                     )}
                     <p className="mt-1 text-gray-600">
-                      Performed by {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
+                      Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}
                     </p>
                     {entry.comment != null && <p className="text-gray-600 mt-1">&quot;{entry.comment}&quot;</p>}
                   </div>
@@ -492,7 +493,7 @@ export function AMMWorkOrderDetailModal({
                 {(approveMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
                   (revisionMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
                   (closeWithoutCostMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                  'Action failed'}
+                  'Radnja nije uspjela'}
               </p>
             </div>
           )}

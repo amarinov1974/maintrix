@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/shared/Layout';
 import { apiClient } from '../../api/client';
 import { useSession } from '../../contexts/SessionContext';
+import { formatAssetStatus } from '../../utils/formatters';
 
 interface Asset {
   id: number;
@@ -36,13 +37,6 @@ const STATUS_COLORS: Record<string, string> = {
   FAULTY: 'bg-red-100 text-red-800',
   IN_SERVICE: 'bg-yellow-100 text-yellow-800',
   DECOMMISSIONED: 'bg-gray-100 text-gray-600',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'Active',
-  FAULTY: 'Faulty',
-  IN_SERVICE: 'In Service',
-  DECOMMISSIONED: 'Decommissioned',
 };
 
 export function AssetListPage() {
@@ -113,15 +107,15 @@ export function AssetListPage() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Assets</h1>
-          <p className="text-gray-600">Asset register for {session?.companyName}</p>
+          <h1 className="text-2xl font-bold text-gray-900">Registar opreme</h1>
+          <p className="text-gray-600">Registar opreme za {session?.companyName}</p>
         </div>
 
         {/* Filters */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <input
             type="text"
-            placeholder="Search name, serial, manufacturer..."
+            placeholder="Pretraži naziv, serijski br., proizvođača..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="col-span-2 border rounded-lg px-3 py-2 text-sm"
@@ -131,7 +125,7 @@ export function AssetListPage() {
             onChange={(e) => { setSelectedStore(e.target.value); setPage(1); }}
             className="border rounded-lg px-3 py-2 text-sm"
           >
-            <option value="">All Stores</option>
+            <option value="">Sve poslovnice</option>
             {stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
           <select
@@ -139,7 +133,7 @@ export function AssetListPage() {
             onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
             className="border rounded-lg px-3 py-2 text-sm"
           >
-            <option value="">All Categories</option>
+            <option value="">Sve kategorije</option>
             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
           <select
@@ -147,15 +141,15 @@ export function AssetListPage() {
             onChange={(e) => { setSelectedStatus(e.target.value); setPage(1); }}
             className="border rounded-lg px-3 py-2 text-sm"
           >
-            <option value="">All Statuses</option>
-            <option value="ACTIVE">Active</option>
-            <option value="FAULTY">Faulty</option>
-            <option value="IN_SERVICE">In Service</option>
-            <option value="DECOMMISSIONED">Decommissioned</option>
+            <option value="">Svi statusi</option>
+            <option value="ACTIVE">Aktivno</option>
+            <option value="FAULTY">Kvar</option>
+            <option value="IN_SERVICE">Na servisu</option>
+            <option value="DECOMMISSIONED">Otpisano</option>
           </select>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500">
-              {isLoading ? 'Loading...' : `${pagination?.total ?? assets.length} assets`}
+              {isLoading ? 'Učitavanje...' : `${pagination?.total ?? assets.length} opreme pronađeno`}
             </span>
             <select
               value={limit}
@@ -171,22 +165,22 @@ export function AssetListPage() {
 
         {/* Assets Table */}
         {isLoading ? (
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-gray-500">Učitavanje...</p>
         ) : assets.length === 0 ? (
-          <p className="text-gray-500">No assets found.</p>
+          <p className="text-gray-500">Nema opreme za prikaz.</p>
         ) : (
           <div className="border rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Asset</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Category</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Store</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Serial No.</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Warranty</th>
-                    <th className="px-4 py-3 text-right font-medium text-gray-700">Purchase Value</th>
-                    <th className="px-4 py-3 text-right font-medium text-gray-700">Book Value</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Oprema</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Kategorija</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Poslovnica</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Serijski br.</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Jamstvo</th>
+                    <th className="px-4 py-3 text-right font-medium text-gray-700">Nabavna vrijednost</th>
+                    <th className="px-4 py-3 text-right font-medium text-gray-700">Knjigovodstvena vrijednost</th>
                     <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
                     <th className="px-4 py-3"></th>
                   </tr>
@@ -225,11 +219,11 @@ export function AssetListPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[asset.status]}`}>
-                          {STATUS_LABELS[asset.status]}
+                          {formatAssetStatus(asset.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-blue-600 text-sm">View →</span>
+                        <span className="text-blue-600 text-sm">Pregled →</span>
                       </td>
                     </tr>
                   ))}

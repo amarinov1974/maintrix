@@ -11,6 +11,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import { WorkOrderStatus } from '../../types/statuses';
 import type { WorkOrder } from '../../api/work-orders';
+import { formatStatus } from '../../utils/formatters';
 
 function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
   if (status.includes('Approved')) return 'success';
@@ -37,29 +38,29 @@ export function AMMCostProposalWorkOrdersPage() {
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
   return (
-    <Layout screenTitle="Work Orders Awaiting Cost Proposal Review">
+    <Layout screenTitle="Radni nalozi — odobrenje ponude">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Work Orders Awaiting Cost Proposal Review
+              Radni nalozi — odobrenje ponude
             </h1>
             <p className="text-sm text-gray-600 mt-0.5">
-              Approve / Request Revision / Close Without Cost — newest first
+              Odobri / Zatraži reviziju / Zatvori bez troška — najnovije prvo
             </p>
           </div>
           <Link to="/amm">
             <Button type="button" variant="secondary">
-              Back to dashboard
+              Natrag na nadzornu ploču
             </Button>
           </Link>
         </div>
 
         {isLoading ? (
-          <p className="text-gray-500">Loading…</p>
+          <p className="text-gray-500">Učitavanje…</p>
         ) : costProposalWOs.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
-            No work orders awaiting cost proposal review.
+            Nema radnih naloga koji čekaju odobrenje ponude.
           </div>
         ) : (
           <ul className="space-y-2">
@@ -103,10 +104,10 @@ function WorkOrderPreviewRow({
       }}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold text-gray-900">Work Order #{workOrder.id}</span>
-        <span className="text-sm text-gray-600">Ticket #{workOrder.ticketId}</span>
+        <span className="font-semibold text-gray-900">Radni nalog #{workOrder.id}</span>
+        <span className="text-sm text-gray-600">Prijava #{workOrder.ticketId}</span>
         <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>
-          {workOrder.currentStatus}
+          {formatStatus(workOrder.currentStatus)}
         </Badge>
         <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>
         {workOrder.storeName && (
