@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04*
+*Zadnje ažurirano: 2026-05-04 (every() audit)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -57,7 +57,7 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 
 - [ ] **Centralizirati ticket status stringove** u `TicketStatus` enum/const. Trenutno hardkodirani Title-Case stringovi u frontendu (npr. `'Ticket Cost Estimation Approved'`) nisu zaštićeni od promjena formata u backendu.
 - [ ] **Centralizirati approval chain pragove.** Trenutno se €1.000 i €3.000 pojavljuju na backendu (`approval-chain-service`) i frontendu (`DirectorDashboard`, `AreaManagerDashboard`, `ApprovalChainInfo` modal). Razmotriti API endpoint ili shared config.
-- [ ] **Audit svih `every()` poziva u backendu** — provjeriti postoji li drugdje `every([]) === true` trap (kao u archiveTicket bugu).
+- [x] **Audit svih `every()` poziva u backendu** — pregledano 2026-05-04. Backend ima 2 `.every()` instance (oba u `ticket-service.ts`, linije 1445 i 1522 — `archiveTicket` i `tryAutoArchiveTicketIfAllWorkOrdersComplete`); obje su već zaštićene `length === 0` guardom prije poziva. Bonus pregled frontenda (4 instance: `S2WorkOrderDetailModal`, `CheckOutModal`, `S3WorkOrderDetailModal`, `AMMTicketDetailModal`) — sve guard-ane (`length > 0 &&`, `hasWorkOrders &&`, ili tip koji konstrukcijski uvijek ima ≥1 element). Nema preostalog `every([]) === true` rizika u repu.
 - [ ] **Audit log discipline review.** Verificirati da se audit unosi pišu na svim mutacijskim endpointima. Razmotriti helper funkciju ili Prisma extension koji forsira audit.
 - [ ] **Attachment serving authorization audit.** Provjeriti da download ruta provjerava session + scope nad parent ticketom/WO-om.
 - [ ] **State transition labels cure u UI Povijesti.** Vendor i internal korisnici vide tehničke labele tipa `ASSIGN TECHNICIAN`, `QR GENERATED (ACCEPTED_TECHNICIAN_ASSIGNED → ACCEPTED_TECHNICIAN_ASSIGNED)`, `CHECKIN (ACCEPTED_TECHNICIAN_ASSIGNED → Service In Progress)`. Treba mapping tablica koja prevodi action + status par u human-friendly HR string, ili backend šalje već lokaliziran log entry. Otkriveno u screenshot reviewu 2026-05-02.
