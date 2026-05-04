@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=@maintrix/backend & npm run dev --workspace=@maintrix/frontend",
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev --workspace=@maintrix/backend\" \"npm run dev --workspace=@maintrix/frontend\"",
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
     "db:migrate": "npm run db:migrate --workspace=@maintrix/backend",
@@ -14,6 +14,7 @@
     "db:studio": "npm run db:studio --workspace=@maintrix/backend"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "typescript": "^5.3.3"
   }
 }
