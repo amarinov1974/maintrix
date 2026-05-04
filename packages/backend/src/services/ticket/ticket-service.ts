@@ -502,7 +502,7 @@ export class TicketService {
         ? (ticket.urgent ? TicketStatus.UPDATED_SUBMITTED : TicketStatus.COST_ESTIMATION_NEEDED)
         : (validation.newStatus! as TicketStatusType);
 
-    const updateData: { currentStatus: any; currentOwnerUserId: number; description: string; clarificationRequestedByUserId?: null; assetId?: number } = {
+    const updateData: { currentStatus: PrismaTicketStatus; currentOwnerUserId: number; description: string; clarificationRequestedByUserId?: null; assetId?: number } = {
       currentStatus: toPrismaStatus(effectiveStatus),
       currentOwnerUserId: newOwner.id,
       description: request.updatedDescription ?? ticket.description,
