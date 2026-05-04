@@ -42,7 +42,7 @@ export function AssignTechnicianModal({
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   });
 
-  const { data: workOrder, isLoading: loadingWO } = useQuery({
+  const { data: _workOrder, isLoading: loadingWO } = useQuery({
     queryKey: ['work-order', workOrderId],
     queryFn: () => workOrdersAPI.getById(workOrderId),
   });

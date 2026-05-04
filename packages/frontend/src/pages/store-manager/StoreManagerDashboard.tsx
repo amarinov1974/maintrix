@@ -189,7 +189,6 @@ export function StoreManagerDashboard() {
     ...qrWorkOrdersFollowUp,
   ];
 
-  const actionRequiredCount = actionRequiredTickets?.length ?? 0;
   const clarificationTickets = actionRequiredTickets ?? [];
 
   const qrTicketsMap = (() => {
@@ -211,9 +210,6 @@ export function StoreManagerDashboard() {
     'Ticket Rejected',
     'Ticket Archived',
   ];
-  const isActionRequired = (t: { currentOwnerUserId: number | null; currentStatus: string }) =>
-    t.currentOwnerUserId === session?.userId &&
-    t.currentStatus === TicketStatus.AWAITING_CREATOR_RESPONSE;
 
   const { data: participatedTickets = [], isLoading: loadingParticipated } = useQuery({
     queryKey: ['tickets', 'store-manager', 'participated', session?.storeId, session?.userId],

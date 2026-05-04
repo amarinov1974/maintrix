@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { workOrdersAPI } from '../../../api/work-orders';
 import { useSession } from '../../../contexts/SessionContext';
-import { Layout, Card, Badge, Button } from '../../../components/shared';
+import { Layout, Card, Button } from '../../../components/shared';
 import { WorkOrderStatus } from '../../../types/statuses';
 import { S1WorkOrderList } from './S1WorkOrderList';
 import { S1WorkOrderDetailModal } from './S1WorkOrderDetailModal';
