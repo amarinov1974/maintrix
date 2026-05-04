@@ -10,7 +10,7 @@ const FROM_EMAIL = 'onboarding@resend.dev';
 const APP_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173';
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
+  if (!resend) {
     console.log('[Email] RESEND_API_KEY not set, skipping email');
     return;
   }

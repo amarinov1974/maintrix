@@ -3,6 +3,7 @@
  */
 
 import { Router } from 'express';
+import type { WorkOrderStatus as PrismaWorkOrderStatus } from '@prisma/client';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { workOrderService } from './work-order-service.js';
 import { ticketService } from '../ticket/ticket-service.js';
@@ -69,7 +70,7 @@ router.get('/', async (req, res) => {
       ticketId,
       storeId,
       regionId,
-      currentStatus: currentStatus as any,
+      currentStatus: currentStatus as PrismaWorkOrderStatus | undefined,
       currentOwnerType,
       urgent,
     });

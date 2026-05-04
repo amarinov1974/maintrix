@@ -25,7 +25,7 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-empty-function': ['warn', { allow: ['arrowFunctions'] }],
     'no-empty': ['warn', { allowEmptyCatch: true }],
     'no-constant-condition': ['error', { checkLoops: false }],
