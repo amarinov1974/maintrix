@@ -20,6 +20,7 @@ import adminRoutes from './services/admin/routes.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 import { apiKeyMiddleware } from './middleware/api-key.middleware.js';
 import { csrfMiddleware } from './middleware/csrf.middleware.js';
+import { scopeMiddleware } from './middleware/scope.middleware.js';
 import { prisma } from './config/database.js';
 
 
@@ -47,6 +48,8 @@ app.get('/api/health', (_req, res) => {
 // API key required for all routes below
 app.use(apiKeyMiddleware);
 app.use(csrfMiddleware);
+// Attach req.scopedPrisma when a valid session is present (after requireAuth in each router)
+app.use(scopeMiddleware);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
