@@ -208,7 +208,7 @@ router.get('/stores', async (req, res) => {
 
 router.post('/stores', async (req, res) => {
   try {
-    const { name, address, regionId, phone } = req.body;
+    const { name, address, regionId, phone: _phone } = req.body;
     if (!name || !regionId) {
       res.status(400).json({ error: 'Name and region are required' });
       return;

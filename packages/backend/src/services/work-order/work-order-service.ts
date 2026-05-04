@@ -1082,7 +1082,7 @@ export class WorkOrderService {
   /**
    * Record work order opened by S1 (read acknowledgment, internal flag)
    */
-  async recordWorkOrderOpened(workOrderId: number, userId: number): Promise<void> {
+  async recordWorkOrderOpened(workOrderId: number, _userId: number): Promise<void> {
     const wo = await prisma.workOrder.findUnique({
       where: { id: workOrderId },
       select: { id: true, openedAt: true, currentOwnerId: true },

@@ -7,7 +7,7 @@
 
 import { TicketStatus } from '../../types/statuses.js';
 import { InternalRoles } from '../../types/roles.js';
-import type { StateTransition, TransitionRequest, ValidationResult } from './types.js';
+import type { StateTransition, ValidationResult } from './types.js';
 
 export const TICKET_TRANSITIONS: StateTransition[] = [
   // ============================================================================
