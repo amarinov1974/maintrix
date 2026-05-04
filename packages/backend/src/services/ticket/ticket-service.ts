@@ -1537,7 +1537,7 @@ export class TicketService {
     }
 
     let actorId: number;
-    let actorRole: Role = InternalRoles.AREA_MAINTENANCE_MANAGER;
+    let _actorRole: Role = InternalRoles.AREA_MAINTENANCE_MANAGER;
     if (ticket.currentOwnerUserId != null) {
       const owner = await prisma.internalUser.findUnique({
         where: { id: ticket.currentOwnerUserId },
@@ -1545,7 +1545,7 @@ export class TicketService {
       });
       if (owner) {
         actorId = owner.id;
-        actorRole = owner.role as Role;
+        _actorRole = owner.role as Role;
       } else {
         const amm = await prisma.internalUser.findFirst({
           where: {

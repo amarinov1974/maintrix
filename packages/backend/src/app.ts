@@ -6,7 +6,6 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import rateLimit from 'express-rate-limit';
 import * as Sentry from '@sentry/node';
 import authRoutes from './services/auth/routes.js';
 import ticketRoutes from './services/ticket/routes.js';

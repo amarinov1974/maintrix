@@ -7,6 +7,7 @@
     "build": "prisma generate && tsc",
     "start": "prisma migrate deploy && node dist/index.js",
     "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
+    "lint": "eslint src/ --ext .ts",
     "test": "vitest run",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
+    "@sentry/node": "^10.50.0",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
@@ -25,7 +27,6 @@
     "@types/node": "^20.10.6",
     "@types/pdfkit": "^0.17.5",
     "@types/uuid": "^9.0.7",
-    "@sentry/node": "^10.50.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -45,6 +46,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
     "tsx": "^4.7.0",
     "vitest": "^1.1.0"
   }

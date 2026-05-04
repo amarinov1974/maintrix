@@ -28,6 +28,7 @@ export function verifyGateCredentials(username: string, password: string): boole
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function createGateToken(): string {
   const secret = process.env.SESSION_SECRET!;
   const payload = JSON.stringify({ t: Date.now() });
