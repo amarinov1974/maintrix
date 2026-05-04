@@ -11,7 +11,6 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Badge } from '../../components/shared';
 import { AMMTicketDetailModal } from './AMMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
-import type { Ticket } from '../../api/tickets';
 import { formatStatus } from '../../utils/formatters';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
