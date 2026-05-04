@@ -188,9 +188,6 @@ export function AMMTicketDetailModal({
     );
   }
 
-  const isUrgentFlow =
-    ticket.currentStatus === 'Ticket Submitted' && ticket.urgent;
-
   const isOwner =
     session?.userId != null && ticket.currentOwnerUserId === session.userId;
   const canReturnToRequester =
@@ -235,7 +232,6 @@ export function AMMTicketDetailModal({
   const allWorkOrdersTerminal = hasWorkOrders && workOrdersForTicket.every(
     (wo) => wo.currentStatus != null && terminalWorkOrderStatuses.includes(wo.currentStatus)
   );
-  const canArchive = archivableTicketStatus && hasWorkOrders && allWorkOrdersTerminal;
   const showArchiveSection = archivableTicketStatus && hasWorkOrders;
 
   const submittedAt =

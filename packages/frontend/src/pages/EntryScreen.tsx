@@ -64,7 +64,7 @@ export function EntryScreen() {
 
   const gateLoginMutation = useMutation({
     mutationFn: () => authAPI.gateLogin(gateUsername, gatePassword),
-    onSuccess: (data) => {
+    onSuccess: () => {
       setGateError(null);
       setGateUsername('');
       setGatePassword('');

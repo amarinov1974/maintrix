@@ -30,7 +30,7 @@ module.exports = {
     // Start lenient — tighten later as the codebase warrants.
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-empty-function': 'warn',
+    '@typescript-eslint/no-empty-function': ['warn', { allow: ['arrowFunctions'] }],
     'no-empty': ['warn', { allowEmptyCatch: true }],
     'no-constant-condition': ['error', { checkLoops: false }],
     'no-case-declarations': 'warn',

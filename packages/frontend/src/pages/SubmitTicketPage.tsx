@@ -46,8 +46,7 @@ export function SubmitTicketPage({ backLink, backLabel = 'Natrag' }: SubmitTicke
   const [description, setDescription] = useState('');
   const [urgent, setUrgent] = useState<boolean>(false);
   const [assetIdInput, setAssetIdInput] = useState('');
-  const [assetLookupMessage, setAssetLookupMessage] = useState<'idle' | 'found' | 'notfound' | null>(null);
-  const [assetDescription, setAssetDescription] = useState<string | null>(null);
+
   const effectiveStoreId = session?.role === 'SM'
     ? (session as { storeId?: number }).storeId ?? null
     : typeof storeId === 'number' ? storeId : null;
@@ -121,28 +120,6 @@ export function SubmitTicketPage({ backLink, backLabel = 'Natrag' }: SubmitTicke
 
   const resolvedStoreId = isSM ? session?.storeId : (storeId === '' ? null : Number(storeId));
 
-  const handleLookupAsset = async () => {
-    const id = parseInt(assetIdInput.trim(), 10);
-    if (Number.isNaN(id) || id < 1) {
-      setAssetLookupMessage(null);
-      setAssetDescription(null);
-      return;
-    }
-    setAssetLookupMessage('idle');
-    try {
-      const asset = await assetsAPI.getById(id);
-      if (asset) {
-        setAssetDescription(asset.description);
-        setAssetLookupMessage('found');
-      } else {
-        setAssetDescription(null);
-        setAssetLookupMessage('notfound');
-      }
-    } catch {
-      setAssetDescription(null);
-      setAssetLookupMessage('notfound');
-    }
-  };
 
   const handleAssetSelect = (asset: import('../api/assets').Asset) => {
     setSelectedAsset(asset);
@@ -161,8 +138,6 @@ export function SubmitTicketPage({ backLink, backLabel = 'Natrag' }: SubmitTicke
   const handleClearAsset = () => {
     setSelectedAsset(null);
     setAssetIdInput('');
-    setAssetLookupMessage(null);
-    setAssetDescription(null);
     setCategoryLocked(false);
   };
 

@@ -94,14 +94,14 @@ export function AMMDashboard() {
   const [ticketReadOnlyFilter, setTicketReadOnlyFilter] = useState<'active' | 'closed'>('active');
   const [woReadOnlyFilter, setWoReadOnlyFilter] = useState<'active' | 'closed'>('active');
 
-  const { data: ownedTickets = [], isLoading: loadingTickets } = useQuery({
+  const { data: ownedTickets = [], isLoading: _loadingTickets } = useQuery({
     queryKey: ['tickets', 'amm-owned', session?.userId],
     queryFn: () =>
       ticketsAPI.list({ currentOwnerUserId: session!.userId }),
     enabled: session?.userId != null,
   });
 
-  const { data: ownedWorkOrders = [], isLoading: loadingWOs } = useQuery({
+  const { data: ownedWorkOrders = [], isLoading: _loadingWOs } = useQuery({
     queryKey: ['work-orders', 'amm-owned', session?.userId],
     queryFn: () =>
       workOrdersAPI.list({

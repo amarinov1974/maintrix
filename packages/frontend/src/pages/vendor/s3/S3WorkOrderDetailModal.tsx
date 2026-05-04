@@ -8,7 +8,6 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   workOrdersAPI,
-  type WorkOrderDetail,
   type VendorPriceListItem,
 } from '../../../api/work-orders';
 import { useSession } from '../../../contexts/SessionContext';
