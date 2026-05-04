@@ -97,7 +97,7 @@ export function TicketDetailModal({
 
   const isOwner = session?.userId != null && ticket.currentOwnerUserId === session.userId;
   const isCreator = session?.userId != null && ticket.createdByUserId === session.userId;
-  const canSubmitDraft = isOwner && ticket.currentStatus === 'Draft';
+  const canSubmitDraft = isOwner && ticket.currentStatus === TicketStatus.DRAFT;
   // Only the ticket creator (SM who created it) can submit clarification; unlimited exchange with AMM.
   const isClarificationMode =
     isCreator &&
@@ -117,7 +117,7 @@ export function TicketDetailModal({
     (a) => !a.internalFlag
   );
 
-  const submittedAt = ticket.submittedAt ?? (ticket.currentStatus !== 'Draft' ? ticket.createdAt : null);
+  const submittedAt = ticket.submittedAt ?? (ticket.currentStatus !== TicketStatus.DRAFT ? ticket.createdAt : null);
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>

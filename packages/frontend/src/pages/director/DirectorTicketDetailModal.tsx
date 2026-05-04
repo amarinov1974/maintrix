@@ -9,6 +9,7 @@ import type { ApprovalRecord } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
 import { formatCategory } from '../../utils/formatters';
+import { TicketStatus } from '../../types/statuses';
 
 interface DirectorTicketDetailModalProps {
   ticketId: number;
@@ -83,7 +84,7 @@ export function DirectorTicketDetailModal({
   const isCurrentOwner =
     session?.userId != null && ticket.currentOwnerUserId === session.userId;
   const canApprove =
-    ticket.currentStatus === 'Cost Estimation Approval Needed' && isCurrentOwner;
+    ticket.currentStatus === TicketStatus.COST_ESTIMATION_APPROVAL_NEEDED && isCurrentOwner;
 
   const amount =
     costEstimation != null
@@ -193,7 +194,7 @@ export function DirectorTicketDetailModal({
             </div>
           )}
 
-          {ticket.currentStatus === 'Cost Estimation Approval Needed' && !isCurrentOwner && (
+          {ticket.currentStatus === TicketStatus.COST_ESTIMATION_APPROVAL_NEEDED && !isCurrentOwner && (
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-700">
                 Niste trenutni vlasnik ove prijave. Samo trenutni vlasnik može odobriti, vratiti na reviziju ili odbiti. Ovaj prikaz je samo za pregled.

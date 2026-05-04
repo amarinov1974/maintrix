@@ -191,7 +191,7 @@ export function AMMTicketDetailModal({
   const isOwner =
     session?.userId != null && ticket.currentOwnerUserId === session.userId;
   const canReturnToRequester =
-    ticket.currentStatus === 'Awaiting Ticket Creator Response' &&
+    ticket.currentStatus === TicketStatus.AWAITING_CREATOR_RESPONSE &&
     isOwner &&
     ticket.clarificationRequestedByUserId != null;
   // AMM can send back to SM (or other involved role) whenever ticket is with AMM in these statuses — urgent and non-urgent.
@@ -201,28 +201,28 @@ export function AMMTicketDetailModal({
     ticket.currentStatus === TicketStatus.COST_ESTIMATION_NEEDED;
 
   const canReject =
-    ticket.currentStatus === 'Ticket Submitted' ||
-    ticket.currentStatus === 'Updated Ticket Submitted' ||
-    ticket.currentStatus === 'Cost Estimation Needed';
+    ticket.currentStatus === TicketStatus.SUBMITTED ||
+    ticket.currentStatus === TicketStatus.UPDATED_SUBMITTED ||
+    ticket.currentStatus === TicketStatus.COST_ESTIMATION_NEEDED;
 
   // Urgent tickets skip cost estimation; only show for non-urgent.
   const canSubmitCost =
-    ticket.currentStatus === 'Cost Estimation Needed' && !ticket.urgent;
+    ticket.currentStatus === TicketStatus.COST_ESTIMATION_NEEDED && !ticket.urgent;
 
   // Urgent: create WO directly from Submitted, Updated Submitted, or Cost Estimation Needed (after clarification). Non-urgent: only after cost approved or WO in progress.
   const canCreateWO =
     (ticket.urgent &&
-      (ticket.currentStatus === 'Ticket Submitted' ||
-        ticket.currentStatus === 'Updated Ticket Submitted' ||
-        ticket.currentStatus === 'Cost Estimation Needed' ||
-        ticket.currentStatus === 'Work Order In Progress')) ||
+      (ticket.currentStatus === TicketStatus.SUBMITTED ||
+        ticket.currentStatus === TicketStatus.UPDATED_SUBMITTED ||
+        ticket.currentStatus === TicketStatus.COST_ESTIMATION_NEEDED ||
+        ticket.currentStatus === TicketStatus.WORK_ORDER_IN_PROGRESS)) ||
     (!ticket.urgent &&
-      (ticket.currentStatus === 'Ticket Cost Estimation Approved' ||
-        ticket.currentStatus === 'Work Order In Progress'));
+      (ticket.currentStatus === TicketStatus.COST_ESTIMATION_APPROVED ||
+        ticket.currentStatus === TicketStatus.WORK_ORDER_IN_PROGRESS));
 
   const archivableTicketStatus =
-    ticket.currentStatus === 'Ticket Cost Estimation Approved' ||
-    ticket.currentStatus === 'Work Order In Progress';
+    ticket.currentStatus === TicketStatus.COST_ESTIMATION_APPROVED ||
+    ticket.currentStatus === TicketStatus.WORK_ORDER_IN_PROGRESS;
   const hasWorkOrders = workOrdersForTicket.length > 0;
   const terminalWorkOrderStatuses: string[] = [
     WorkOrderStatus.COST_PROPOSAL_APPROVED,
@@ -236,7 +236,7 @@ export function AMMTicketDetailModal({
 
   const submittedAt =
     ticket.submittedAt ??
-    (ticket.currentStatus !== 'Draft' ? ticket.createdAt : null);
+    (ticket.currentStatus !== TicketStatus.DRAFT ? ticket.createdAt : null);
   const visibleAttachments = (ticket.attachments ?? []).filter(
     (a) => !a.internalFlag
   );
@@ -356,7 +356,7 @@ export function AMMTicketDetailModal({
                 {workOrdersForTicket.map((wo) => (
                   <li key={wo.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm bg-white rounded-lg p-3 border border-gray-200">
                     <span className="font-medium text-gray-900">{wo.vendorCompanyName}</span>
-                    <Badge variant={wo.currentStatus?.includes('Created') ? 'default' : 'warning'}>{wo.currentStatus != null ? formatStatus(wo.currentStatus) : '—'}</Badge>
+                    <Badge variant={wo.currentStatus === WorkOrderStatus.CREATED ? 'default' : 'warning'}>{wo.currentStatus != null ? formatStatus(wo.currentStatus) : '—'}</Badge>
                     <span className="text-gray-500">{new Date(wo.createdAt).toLocaleString()}</span>
                   </li>
                 ))}

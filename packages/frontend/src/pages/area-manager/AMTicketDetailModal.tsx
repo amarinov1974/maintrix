@@ -10,6 +10,7 @@ import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { TicketStatus } from '../../types/statuses';
 
 interface AMTicketDetailModalProps {
   ticketId: number;
@@ -114,16 +115,16 @@ export function AMTicketDetailModal({
   }
 
   const isInitialReview =
-    ticket.currentStatus === 'Ticket Submitted' ||
-    ticket.currentStatus === 'Updated Ticket Submitted';
+    ticket.currentStatus === TicketStatus.SUBMITTED ||
+    ticket.currentStatus === TicketStatus.UPDATED_SUBMITTED;
   const isApprovalChain =
-    ticket.currentStatus === 'Cost Estimation Approval Needed';
+    ticket.currentStatus === TicketStatus.COST_ESTIMATION_APPROVAL_NEEDED;
   const isOwner =
     session?.userId != null && ticket.currentOwnerUserId === session.userId;
 
   const canInitialReview = isInitialReview && isOwner;
   const canReturnToRequester =
-    ticket.currentStatus === 'Awaiting Ticket Creator Response' &&
+    ticket.currentStatus === TicketStatus.AWAITING_CREATOR_RESPONSE &&
     isOwner &&
     ticket.clarificationRequestedByUserId != null;
   const canApprovalChain = isApprovalChain && isOwner && ticket.costEstimation;
@@ -144,7 +145,7 @@ export function AMTicketDetailModal({
                 <span style={{ fontSize: '13px', color: '#6E6E73', marginTop: '2px' }}>Prijava #{ticket.id}</span>
                 <Badge
                   variant={
-                    ticket.currentStatus.includes('Approved')
+                    ticket.currentStatus === TicketStatus.COST_ESTIMATION_APPROVED
                       ? 'success'
                       : 'warning'
                   }
