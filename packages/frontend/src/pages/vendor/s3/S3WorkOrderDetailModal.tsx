@@ -14,7 +14,7 @@ import { useSession } from '../../../contexts/SessionContext';
 import { Button, Badge } from '../../../components/shared';
 import { WorkOrderStatus } from '../../../types/statuses';
 import { getS3WODraft, setS3WODraft, clearS3WODraft } from './s3Draft';
-import { formatCategory, formatHistoryAction } from '../../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatusAny } from '../../../utils/formatters';
 
 const NOT_IN_PRICELIST_VALUE = '__not_in_list__';
 
@@ -833,7 +833,7 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
                     {' — '}
                     <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
-                      <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
+                      <span className="text-gray-600"> ({formatStatusAny(entry.prevStatus)} → {formatStatusAny(entry.newStatus)})</span>
                     )}
                     <p className="mt-1 text-gray-600">
                       Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}

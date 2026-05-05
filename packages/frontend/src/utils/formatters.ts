@@ -20,18 +20,39 @@ export function formatCategory(value: string): string {
 
 export function formatHistoryAction(value: string): string {
   const map: Record<string, string> = {
+    // Ticket lifecycle
     CREATE: 'Kreirano',
     SUBMIT: 'Prijavljeno',
+    SUBMIT_UPDATED: 'Ponovno prijavljeno',
+    WITHDRAW: 'Povučeno',
     REQUEST_CLARIFICATION: 'Traženo pojašnjenje',
     PROVIDE_CLARIFICATION: 'Pojašnjenje dano',
     APPROVE_FOR_ESTIMATION: 'Odobreno za procjenu',
     REQUEST_APPROVAL: 'Poslano na odobrenje',
     ESCALATE: 'Eskalirano',
     APPROVE: 'Odobreno',
+    APPROVE_COST: 'Trošak odobren',
     REJECT: 'Odbijeno',
-    RETURN_TO_AMM: 'Vraćeno na VMO',
+    RETURN: 'Vraćeno',
+    RETURN_TO_AMM: 'Vraćeno voditelju održavanja',
+    RETURN_FOR_CLARIFICATION: 'Vraćeno na pojašnjenje',
     CREATE_WORK_ORDER: 'Kreiran radni nalog',
     ARCHIVE: 'Arhivirano',
+    // Work order lifecycle
+    CREATE_WO_FROM_PM: 'Kreiran iz plana održavanja',
+    RESEND_TO_VENDOR: 'Vraćeno izvođaču',
+    ASSIGN_TECHNICIAN: 'Dodijeljen tehničar',
+    RETURN_FOR_TECH_COUNT: 'Vraćeno radi broja tehničara',
+    QR_GENERATED: 'QR kod generiran',
+    CHECKIN: 'Dolazak na lokaciju',
+    CHECKOUT_FIXED: 'Odjava — popravljeno',
+    CHECKOUT_FOLLOW_UP: 'Odjava — potreban dodatni posjet',
+    CHECKOUT_NEW_WO_NEEDED: 'Odjava — potreban novi radni nalog',
+    CHECKOUT_UNSUCCESSFUL: 'Odjava — neuspjeli popravak',
+    SUBMIT_COST_PROPOSAL: 'Ponuda troška predana',
+    RESUBMIT_COST_PROPOSAL: 'Revidirana ponuda troška predana',
+    REQUEST_REVISION: 'Zatražena revizija troška',
+    CLOSE_WITHOUT_COST: 'Zatvoreno bez troška',
   };
   return map[value] ?? value.replace(/_/g, ' ');
 }
@@ -81,6 +102,26 @@ export function formatStatus(value: string): string {
     'Returned By Provider': 'Vraćeno od izvođača',
   };
   return map[value] ?? value;
+}
+
+const STATUS_ENUM_KEY_TO_DISPLAY: Record<string, string> = {
+  ...Object.fromEntries(
+    Object.entries(TicketStatus).map(([k, v]) => [k, v as string])
+  ),
+  ...Object.fromEntries(
+    Object.entries(WorkOrderStatus).map(([k, v]) => [k, v as string])
+  ),
+};
+
+/**
+ * Format a status value that may arrive as either an enum KEY
+ * (e.g. "ACCEPTED_TECHNICIAN_ASSIGNED" — Prisma column) or a display
+ * string (e.g. "Service In Progress" — state machine output).
+ * Returns the Croatian translation in both cases.
+ */
+export function formatStatusAny(value: string | null | undefined): string {
+  if (value == null || value === '') return '';
+  return formatStatus(STATUS_ENUM_KEY_TO_DISPLAY[value] ?? value);
 }
 
 export type StatusBadgeVariant = 'default' | 'success' | 'warning' | 'danger';
