@@ -11,6 +11,7 @@ import { Layout, Card, Badge, Button, ApprovalChainInfo } from '../../components
 import { AMTicketDetailModal } from './AMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import { formatCategory, formatStatus, getStatusBadgeVariant } from '../../utils/formatters';
+import { APPROVAL_THRESHOLDS, formatEuro } from '../../config/approval-thresholds';
 
 const TERMINAL_STATUSES = [
   TicketStatus.REJECTED,
@@ -82,7 +83,7 @@ export function AreaManagerDashboard() {
           </Link>
         </div>
 
-        <ApprovalChainInfo roleDescription="Odobravate procjene troška do €1.000." />
+        <ApprovalChainInfo roleDescription={`Odobravate procjene troška do ${formatEuro(APPROVAL_THRESHOLDS.AM_MAX)}.`} />
 
         {isLoading ? (
           <Card>

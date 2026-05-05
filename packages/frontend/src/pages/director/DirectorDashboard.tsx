@@ -13,6 +13,7 @@ import { DirectorTicketDetailModal } from './DirectorTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
 import { formatCategory, formatStatus, getInFlightStatusBadgeVariant } from '../../utils/formatters';
+import { APPROVAL_THRESHOLDS, formatEuro } from '../../config/approval-thresholds';
 
 function getRoleLabel(role: string) {
   if (role === 'D') return 'Direktor prodaje';
@@ -22,9 +23,10 @@ function getRoleLabel(role: string) {
 }
 
 function getRoleDescription(role: string) {
-  if (role === 'D') return 'Odobravate procjene troška od €1.001 do €3.000.';
-  if (role === 'C2') return 'Odobravate procjene troška od €1.001 do €3.000.';
-  if (role === 'BOD') return 'Odobravate procjene troška iznad €3.000.';
+  const directorRange = `od ${formatEuro(APPROVAL_THRESHOLDS.AM_MAX + 1)} do ${formatEuro(APPROVAL_THRESHOLDS.DIRECTOR_MAX)}`;
+  if (role === 'D') return `Odobravate procjene troška ${directorRange}.`;
+  if (role === 'C2') return `Odobravate procjene troška ${directorRange}.`;
+  if (role === 'BOD') return `Odobravate procjene troška iznad ${formatEuro(APPROVAL_THRESHOLDS.DIRECTOR_MAX)}.`;
   return 'Odobravate procjene troška.';
 }
 

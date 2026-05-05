@@ -6,6 +6,7 @@
 import type { InternalRole } from '@prisma/client';
 import { prisma } from '../../config/database.js';
 import { InternalRoles } from '../../types/roles.js';
+import { APPROVAL_THRESHOLDS } from '../../config/approval-thresholds.js';
 
 export interface ApprovalChainConfig {
   ticketId: number;
@@ -30,14 +31,14 @@ function decimalToNumber(value: unknown): number {
 
 export class ApprovalChainService {
   /**
-   * Determine approval chain based on cost threshold
-   * ≤1000: AM only; 1001-3000: AM → D → C2; >3000: AM → D → C2 → BOD
+   * Determine approval chain based on cost threshold.
+   * Thresholds in `config/approval-thresholds.ts`.
    */
   getRequiredApprovers(amount: number): string[] {
-    if (amount <= 1000) {
+    if (amount <= APPROVAL_THRESHOLDS.AM_MAX) {
       return [InternalRoles.AREA_MANAGER];
     }
-    if (amount <= 3000) {
+    if (amount <= APPROVAL_THRESHOLDS.DIRECTOR_MAX) {
       return [
         InternalRoles.AREA_MANAGER,
         InternalRoles.SALES_DIRECTOR,
