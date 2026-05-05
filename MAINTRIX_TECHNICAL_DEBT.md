@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04 (attachment scope check)*
+*Zadnje ažurirano: 2026-05-04 (drafts UI gap, login 401 noise)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -66,6 +66,8 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 
 ### Niski prioritet (UX / kozmetika / accessibility)
 
+- [ ] **Drafts su "write-only" za SM.** Otkriveno 2026-05-04. SM dashboard pokazuje "Nacrti prijava: N" kroz `BucketCard`, ali `BucketCard` za drafte nema `to` prop pa nije klikabilan, i nigdje u repu ne postoji stranica koja lista draftove. SM ih može kreirati ("Spremi kao nacrt" na `/store-manager/submit`) ali ne može kasnije pregledati / editirati / obrisati. Trebalo bi: nova stranica `/store-manager/drafts` koja koristi postojeći `ticketsAPI.list({ status: 'DRAFT' })` + DELETE endpoint (ili `archive` ako je to već dovoljno) + klikabilan `BucketCard`. ~1–2h.
+- [ ] **Login screen pokazuje 401 grešku u browser konzoli.** Otkriveno 2026-05-04. Entry stranica auto-poziva `GET /api/auth/session`; pošto korisnik nije prijavljen, server vraća 401, browser obvezno loga crveno. Funkcionalno OK, samo kozmetika. Fix: backend vrati 200 s `{ authenticated: false }` umjesto 401, ili frontend ne zove session check na entry route. ~15 min.
 - [ ] **Skrolanje unutar modala je nezgrapno.** “Detalji radnog naloga” i drugi veliki modali zahtijevaju puno skrolanja gore-dolje da bi se vidio aktivni gumb. Sticky action bar ili pametniji layout pri sljedećem redesignu modala. Otkriveno 2026-05-02.
 - [ ] **Accessibility prolaz na disabled gumbima** — tooltip preko `<div>` → `aria-label`/`aria-describedby` pattern.
 - [ ] **TS/JS duplikati u frontendu** — već većinski očišćeno u 2026-04-29 sesiji, ali povremeno provjeriti.
