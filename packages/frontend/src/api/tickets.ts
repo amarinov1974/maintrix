@@ -219,16 +219,12 @@ export const ticketsAPI = {
     const form = new FormData();
     form.append('file', file);
     form.append('internalFlag', String(internalFlag));
-    const baseURL = import.meta.env.VITE_API_URL ?? '/api';
-    const res = await fetch(`${baseURL}/tickets/${ticketId}/attachments`, {
-      method: 'POST',
-      credentials: 'include',
-      body: form,
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err?.error ?? 'Upload failed');
-    }
-    return res.json();
+    // Use apiClient so the request gets x-requested-with (CSRF),
+    // x-api-key, and x-session-id (iOS Safari) automatically.
+    const { data } = await apiClient.post<AttachmentEntry>(
+      `/tickets/${ticketId}/attachments`,
+      form
+    );
+    return data;
   },
 };
