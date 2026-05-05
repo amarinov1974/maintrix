@@ -214,6 +214,7 @@ router.post('/:id/attachments', uploadTicketAttachment.single('file'), async (re
       req.file.path,
       req.file.originalname || req.file.filename,
       req.session!.userId,
+      req.session!.companyId,
       internalFlag
     );
     res.status(201).json(result);

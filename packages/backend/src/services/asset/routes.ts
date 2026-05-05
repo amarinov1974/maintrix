@@ -44,6 +44,16 @@ const uploadAssetAttachment = multer({
 const router = Router();
 router.use(requireAuth);
 
+// Governance: vendors don't have asset access. Block at the router level
+// to keep this consistent with how ticket routes handle it.
+router.use((req, res, next) => {
+  if (req.session?.userType === 'VENDOR') {
+    res.status(403).json({ error: 'Vendors cannot access assets' });
+    return;
+  }
+  next();
+});
+
 /**
  * GET /api/assets
  * List all assets for the company, optionally filtered by storeId
@@ -187,7 +197,8 @@ router.post('/:id/attachments', uploadAssetAttachment.single('file'), async (req
       assetId,
       req.file.path,
       req.file.originalname || req.file.filename,
-      req.session!.userId
+      req.session!.userId,
+      req.session!.companyId
     );
     res.status(201).json(result);
   } catch (error: unknown) {
