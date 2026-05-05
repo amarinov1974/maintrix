@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import type { ApprovalRecord } from '../../api/tickets';
@@ -37,7 +38,11 @@ export function DirectorTicketDetailModal({
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
 
-  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/director');
+  });
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],

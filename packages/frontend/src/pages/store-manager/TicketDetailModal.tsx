@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
@@ -31,7 +32,11 @@ export function TicketDetailModal({
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
 
-  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/store-manager');
+  });
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],

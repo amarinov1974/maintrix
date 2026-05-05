@@ -4,6 +4,7 @@
  */
 
 import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
@@ -46,7 +47,11 @@ export function AMMTicketDetailModal({
   const costEstimationFileInputRef = useRef<HTMLInputElement>(null);
   const [showClarificationPopup, setShowClarificationPopup] = useState(false);
   const [woSuccessState, setWoSuccessState] = useState<'sent' | null>(null);
-  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/amm');
+  });
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],

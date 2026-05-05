@@ -5,6 +5,7 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
@@ -41,7 +42,11 @@ export function AMTicketDetailModal({
   const [returnComment, setReturnComment] = useState('');
   const [approveComment, setApproveComment] = useState('');
 
-  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/area-manager');
+  });
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
