@@ -8,7 +8,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { ticketService } from './ticket-service.js';
-import { addTicketAttachment } from '../attachment/attachment-service.js';
+import { addTicketAttachment, getAttachmentForDownload } from '../attachment/attachment-service.js';
 import type {
   CreateTicketRequest,
   RequestClarificationRequest,
@@ -214,6 +214,7 @@ router.post('/:id/attachments', uploadTicketAttachment.single('file'), async (re
       req.file.path,
       req.file.originalname || req.file.filename,
       req.session!.userId,
+      req.session!.companyId,
       internalFlag
     );
     res.status(201).json(result);
@@ -221,6 +222,29 @@ router.post('/:id/attachments', uploadTicketAttachment.single('file'), async (re
     const message = error instanceof Error ? error.message : 'Upload failed';
     console.error('Ticket attachment upload error:', error);
     res.status(400).json({ error: message });
+  }
+});
+
+router.get('/attachments/:id/download', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: 'Invalid attachment id' });
+      return;
+    }
+    const att = await getAttachmentForDownload(
+      id,
+      req.session!.companyId,
+      req.session!.userType
+    );
+    res.download(path.resolve(att.filePath), att.fileName, (err) => {
+      if (err && !res.headersSent) {
+        res.status(500).json({ error: 'Download failed' });
+      }
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Not found';
+    res.status(404).json({ error: message });
   }
 });
 

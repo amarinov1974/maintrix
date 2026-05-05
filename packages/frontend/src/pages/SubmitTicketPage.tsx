@@ -164,8 +164,12 @@ export function SubmitTicketPage({ backLink, backLabel = 'Natrag' }: SubmitTicke
       if (selectedFiles.length > 0) await uploadFilesToTicket(ticket.id);
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       setShowSuccess('draft');
-    } catch {
-      // Error via createMutation.isError
+    } catch (err) {
+      const msg =
+        (err as { response?: { data?: { error?: string } }; message?: string })?.response?.data?.error ??
+        (err as { message?: string })?.message ??
+        'Spremanje nije uspjelo.';
+      setSubmitError(msg);
     }
   };
 
@@ -194,8 +198,12 @@ export function SubmitTicketPage({ backLink, backLabel = 'Natrag' }: SubmitTicke
       }
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       setShowSuccess('submitted');
-    } catch {
-      //
+    } catch (err) {
+      const msg =
+        (err as { response?: { data?: { error?: string } }; message?: string })?.response?.data?.error ??
+        (err as { message?: string })?.message ??
+        'Slanje nije uspjelo.';
+      setSubmitError(msg);
     } finally {
       setIsSending(false);
     }

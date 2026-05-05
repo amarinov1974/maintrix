@@ -219,16 +219,30 @@ export const ticketsAPI = {
     const form = new FormData();
     form.append('file', file);
     form.append('internalFlag', String(internalFlag));
-    const baseURL = import.meta.env.VITE_API_URL ?? '/api';
-    const res = await fetch(`${baseURL}/tickets/${ticketId}/attachments`, {
-      method: 'POST',
-      credentials: 'include',
-      body: form,
+    // Use apiClient so the request gets x-requested-with (CSRF),
+    // x-api-key, and x-session-id (iOS Safari) automatically.
+    const { data } = await apiClient.post<AttachmentEntry>(
+      `/tickets/${ticketId}/attachments`,
+      form
+    );
+    return data;
+  },
+
+  /**
+   * Download an attachment via apiClient (carries CSRF + session headers),
+   * then trigger a browser save with the original file name.
+   */
+  downloadAttachment: async (attachmentId: number, fileName: string): Promise<void> => {
+    const res = await apiClient.get<Blob>(`/tickets/attachments/${attachmentId}/download`, {
+      responseType: 'blob',
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err?.error ?? 'Upload failed');
-    }
-    return res.json();
+    const url = URL.createObjectURL(res.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   },
 };
