@@ -3,15 +3,17 @@
  * Header, read-only core block, Create WO / Request Clarification / Reject.
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
 import { authAPI } from '../../api/auth';
 import { useSession } from '../../contexts/SessionContext';
 import { TicketStatus, WorkOrderStatus } from '../../types/statuses';
-import { Button, Badge } from '../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../components/shared';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface AMMTicketDetailModalProps {
   ticketId: number;
@@ -45,9 +47,11 @@ export function AMMTicketDetailModal({
   const costEstimationFileInputRef = useRef<HTMLInputElement>(null);
   const [showClarificationPopup, setShowClarificationPopup] = useState(false);
   const [woSuccessState, setWoSuccessState] = useState<'sent' | null>(null);
-  const [showCostSubmittedSuccess, setShowCostSubmittedSuccess] = useState(false);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/amm');
+  });
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
@@ -81,7 +85,7 @@ export function AMMTicketDetailModal({
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       setClarificationComment('');
       setShowClarificationPopup(false);
-      onClose();
+      showSuccess('Prijava vraćena na pojašnjenje.');
     },
   });
 
@@ -91,7 +95,7 @@ export function AMMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Prijava poslana sljedećem odobravatelju.');
     },
   });
 
@@ -99,7 +103,7 @@ export function AMMTicketDetailModal({
     mutationFn: (reason: string) => ticketsAPI.reject(ticketId, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Prijava odbijena.');
     },
   });
 
@@ -110,17 +114,9 @@ export function AMMTicketDetailModal({
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       setCostAmount('');
-      setShowCostSubmittedSuccess(true);
+      showSuccess('Procjena troška poslana voditelju regije na odobrenje.');
     },
   });
-
-  useEffect(() => {
-    if (!showCostSubmittedSuccess) return;
-    const t = setTimeout(() => {
-      onCloseRef.current();
-    }, 2000);
-    return () => clearTimeout(t);
-  }, [showCostSubmittedSuccess]);
 
   const handleCostEstimationFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -158,7 +154,7 @@ export function AMMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Prijava arhivirana.');
     },
   });
 
@@ -243,6 +239,9 @@ export function AMMTicketDetailModal({
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      {successMessage ? (
+        <SuccessOverlay message={successMessage} />
+      ) : (
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         {/* 11.1 Screen Header */}
         <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
@@ -258,19 +257,6 @@ export function AMMTicketDetailModal({
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
-          {showCostSubmittedSuccess ? (
-            <div className="flex flex-col items-center justify-center py-8">
-              <div className="bg-green-100 border-2 border-green-500 rounded-lg p-6 max-w-md w-full text-center">
-                <p className="text-green-800 font-semibold text-xl mb-2">
-                  ✓ Procjena troška poslana voditelju regije na odobrenje.
-                </p>
-                <p className="text-green-700 text-sm">
-                  Povratak na nadzornu ploču za 2 sekunde...
-                </p>
-              </div>
-            </div>
-          ) : (
-          <>
           {/* 11.2 Ticket Core Information (Read-Only Block) */}
           <section>
             <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h2>
@@ -649,14 +635,13 @@ export function AMMTicketDetailModal({
               </div>
             </section>
           )}
-          </>
-          )}
         </div>
 
         <div className="p-6 border-t border-gray-200 sticky bottom-0 bg-white shrink-0">
           <Button type="button" variant="secondary" onClick={onClose} className="w-full">Natrag</Button>
         </div>
       </div>
+      )}
     </div>
   );
 }

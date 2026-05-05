@@ -5,12 +5,14 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
-import { Button, Badge } from '../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../components/shared';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
 import { TicketStatus } from '../../types/statuses';
+import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface AMTicketDetailModalProps {
   ticketId: number;
@@ -40,6 +42,12 @@ export function AMTicketDetailModal({
   const [returnComment, setReturnComment] = useState('');
   const [approveComment, setApproveComment] = useState('');
 
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/area-manager');
+  });
+
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
     queryFn: () => ticketsAPI.getById(ticketId),
@@ -50,7 +58,7 @@ export function AMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Prijava poslana voditelju održavanja na procjenu troška.');
     },
   });
 
@@ -62,7 +70,7 @@ export function AMTicketDetailModal({
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       setClarificationComment('');
       setShowClarificationForm(false);
-      onClose();
+      showSuccess('Prijava vraćena na pojašnjenje.');
     },
   });
 
@@ -70,7 +78,7 @@ export function AMTicketDetailModal({
     mutationFn: (reason: string) => ticketsAPI.reject(ticketId, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Prijava odbijena.');
     },
   });
 
@@ -80,7 +88,7 @@ export function AMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Procjena troška odobrena.');
     },
   });
 
@@ -90,7 +98,7 @@ export function AMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Procjena troška vraćena voditelju održavanja.');
     },
   });
 
@@ -100,7 +108,7 @@ export function AMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Prijava poslana sljedećem odobravatelju.');
     },
   });
 
@@ -136,6 +144,9 @@ export function AMTicketDetailModal({
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      {successMessage ? (
+        <SuccessOverlay message={successMessage} />
+      ) : (
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
           <div className="flex justify-between items-start">
@@ -484,6 +495,7 @@ export function AMTicketDetailModal({
           </Button>
         </div>
       </div>
+      )}
     </div>
   );
 }

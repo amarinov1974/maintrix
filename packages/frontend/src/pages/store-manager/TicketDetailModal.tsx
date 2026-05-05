@@ -4,14 +4,16 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
 import { useSession } from '../../contexts/SessionContext';
-import { Button, Badge } from '../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../components/shared';
 import { TicketStatus } from '../../types/statuses';
 import { QRGenerationModal } from './QRGenerationModal';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface TicketDetailModalProps {
   ticketId: number;
@@ -30,6 +32,12 @@ export function TicketDetailModal({
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
 
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/store-manager');
+  });
+
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
     queryFn: () => ticketsAPI.getById(ticketId),
@@ -46,6 +54,7 @@ export function TicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
+      showSuccess('Prijava poslana voditelju održavanja.');
     },
   });
 
@@ -61,7 +70,7 @@ export function TicketDetailModal({
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       setClarificationText('');
       setClarificationAssetId('');
-      onClose();
+      showSuccess('Pojašnjenje poslano.');
     },
   });
 
@@ -69,7 +78,7 @@ export function TicketDetailModal({
     mutationFn: () => ticketsAPI.withdraw(ticketId, withdrawReason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Prijava povučena.');
     },
   });
 
@@ -121,6 +130,9 @@ export function TicketDetailModal({
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      {successMessage ? (
+        <SuccessOverlay message={successMessage} />
+      ) : (
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         {/* 9.1 Screen Header */}
         <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
@@ -402,6 +414,7 @@ export function TicketDetailModal({
           </Button>
         </div>
       </div>
+      )}
 
       {showQRModal && relatedWorkOrders.length > 0 && (
         <QRGenerationModal

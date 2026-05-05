@@ -3,14 +3,16 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import type { ApprovalRecord } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
-import { Button, Badge } from '../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../components/shared';
 import { formatCategory } from '../../utils/formatters';
 import { TicketStatus } from '../../types/statuses';
 import { APPROVAL_THRESHOLDS, getApprovalChainLabel } from '../../config/approval-thresholds';
+import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface DirectorTicketDetailModalProps {
   ticketId: number;
@@ -36,6 +38,12 @@ export function DirectorTicketDetailModal({
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
 
+  const navigate = useNavigate();
+  const { message: successMessage, showSuccess } = useSuccessOverlay(() => {
+    onClose();
+    navigate('/director');
+  });
+
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
     queryFn: () => ticketsAPI.getById(ticketId),
@@ -47,7 +55,7 @@ export function DirectorTicketDetailModal({
     mutationFn: () => ticketsAPI.approveCostEstimation(ticketId, comment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Procjena troška odobrena.');
     },
   });
 
@@ -56,7 +64,7 @@ export function DirectorTicketDetailModal({
       ticketsAPI.returnCostEstimation(ticketId, returnComment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Procjena troška vraćena voditelju održavanja.');
     },
   });
 
@@ -64,7 +72,7 @@ export function DirectorTicketDetailModal({
     mutationFn: () => ticketsAPI.reject(ticketId, rejectReason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Prijava odbijena.');
     },
   });
 
@@ -94,6 +102,9 @@ export function DirectorTicketDetailModal({
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      {successMessage ? (
+        <SuccessOverlay message={successMessage} />
+      ) : (
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
           <div className="flex justify-between items-start">
@@ -471,6 +482,7 @@ export function DirectorTicketDetailModal({
           </Button>
         </div>
       </div>
+      )}
     </div>
   );
 }

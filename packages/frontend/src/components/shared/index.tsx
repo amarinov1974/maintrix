@@ -7,3 +7,4 @@ export { Button } from './Button';
 export { Card } from './Card';
 export { Badge } from './Badge';
 export { ApprovalChainInfo } from './ApprovalChainInfo';
+export { SuccessOverlay } from './SuccessOverlay';
