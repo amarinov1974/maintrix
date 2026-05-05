@@ -227,4 +227,22 @@ export const ticketsAPI = {
     );
     return data;
   },
+
+  /**
+   * Download an attachment via apiClient (carries CSRF + session headers),
+   * then trigger a browser save with the original file name.
+   */
+  downloadAttachment: async (attachmentId: number, fileName: string): Promise<void> => {
+    const res = await apiClient.get<Blob>(`/tickets/attachments/${attachmentId}/download`, {
+      responseType: 'blob',
+    });
+    const url = URL.createObjectURL(res.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
 };

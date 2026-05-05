@@ -252,9 +252,14 @@ export function TicketDetailModal({
               <ul className="bg-gray-50 rounded-lg p-4 space-y-2">
                 {visibleAttachments.map((a) => (
                   <li key={a.id} className="flex items-center justify-between text-sm">
-                    <span>{a.fileName}</span>
+                    <button
+                      type="button"
+                      onClick={() => ticketsAPI.downloadAttachment(a.id, a.fileName)}
+                      className="text-left text-blue-600 hover:underline"
+                    >
+                      {a.fileName}
+                    </button>
                     <span className="text-gray-500">{new Date(a.createdAt).toLocaleDateString()}</span>
-                    {/* View/Download placeholder - no delete/modify */}
                   </li>
                 ))}
               </ul>

@@ -155,6 +155,26 @@ export function DirectorTicketDetailModal({
             </div>
           </div>
 
+          {ticket.attachments != null && ticket.attachments.filter((a) => !a.internalFlag).length > 0 && (
+            <section>
+              <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Privici</h3>
+              <ul className="bg-gray-50 rounded-lg p-4 space-y-2">
+                {ticket.attachments.filter((a) => !a.internalFlag).map((a) => (
+                  <li key={a.id} className="flex items-center justify-between text-sm">
+                    <button
+                      type="button"
+                      onClick={() => ticketsAPI.downloadAttachment(a.id, a.fileName)}
+                      className="text-left text-blue-600 hover:underline"
+                    >
+                      {a.fileName}
+                    </button>
+                    <span className="text-gray-500">{new Date(a.createdAt).toLocaleDateString()}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {costEstimation != null && (
             <div>
               <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>

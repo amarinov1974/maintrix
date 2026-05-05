@@ -1,8 +1,15 @@
 /**
- * Attachment service — upload and link files to tickets (and work orders).
+ * Attachment service — upload, link, and serve files for tickets and assets.
  */
 
 import { prisma } from '../../config/database.js';
+
+export interface AttachmentDownloadInfo {
+  id: number;
+  fileName: string;
+  filePath: string;
+  internalFlag: boolean;
+}
 
 export interface TicketAttachmentResult {
   id: number;
@@ -96,6 +103,51 @@ export async function addAssetAttachment(
     fileName: attachment.fileName,
     createdAt: attachment.createdAt,
     internalFlag: attachment.internalFlag,
+  };
+}
+
+/**
+ * Look up an attachment for download. Verifies the parent (ticket or asset)
+ * belongs to the actor's company. Throws "Attachment not found" on miss
+ * (same message as cross-tenant or non-existent — don't leak which case).
+ */
+export async function getAttachmentForDownload(
+  attachmentId: number,
+  actorCompanyId: number,
+  actorUserType: 'INTERNAL' | 'VENDOR'
+): Promise<AttachmentDownloadInfo> {
+  const att = await prisma.attachment.findUnique({
+    where: { id: attachmentId },
+    select: {
+      id: true,
+      fileName: true,
+      filePath: true,
+      internalFlag: true,
+      entityType: true,
+      ticket: { select: { companyId: true } },
+      asset: { select: { store: { select: { companyId: true } } } },
+    },
+  });
+  if (!att) throw new Error('Attachment not found');
+
+  let parentCompanyId: number | undefined;
+  if (att.entityType === 'TICKET') parentCompanyId = att.ticket?.companyId;
+  else if (att.entityType === 'ASSET') parentCompanyId = att.asset?.store.companyId;
+
+  if (parentCompanyId == null || parentCompanyId !== actorCompanyId) {
+    throw new Error('Attachment not found');
+  }
+
+  // Vendors don't have ticket / asset attachment access in the current model.
+  if (actorUserType === 'VENDOR') {
+    throw new Error('Attachment not found');
+  }
+
+  return {
+    id: att.id,
+    fileName: att.fileName,
+    filePath: att.filePath,
+    internalFlag: att.internalFlag,
   };
 }
 

@@ -313,9 +313,17 @@ export function AMMTicketDetailModal({
               {visibleAttachments.length > 0 && (
                 <div style={{ marginTop: '12px' }}>
                   <p style={{ fontSize: '11px', color: '#6E6E73', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '2px' }}>Privici</p>
-                  <ul className="mt-1 text-sm text-gray-900 list-disc list-inside">
+                  <ul className="mt-1 text-sm list-disc list-inside">
                     {visibleAttachments.map((a) => (
-                      <li key={a.id}>{a.fileName}</li>
+                      <li key={a.id}>
+                        <button
+                          type="button"
+                          onClick={() => ticketsAPI.downloadAttachment(a.id, a.fileName)}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {a.fileName}
+                        </button>
+                      </li>
                     ))}
                   </ul>
                 </div>
