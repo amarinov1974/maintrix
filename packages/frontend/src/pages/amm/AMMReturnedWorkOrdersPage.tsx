@@ -13,7 +13,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import { WorkOrderStatus } from '../../types/statuses';
 import type { WorkOrder } from '../../api/work-orders';
-import { formatStatus } from '../../utils/formatters';
+import { formatStatus, getInFlightStatusBadgeVariant } from '../../utils/formatters';
 
 const COMMENT_PREVIEW_WORDS = 25;
 
@@ -22,12 +22,6 @@ function commentPreview(text: string | null | undefined): string {
   const words = String(text).trim().split(/\s+/);
   if (words.length <= COMMENT_PREVIEW_WORDS) return words.join(' ');
   return words.slice(0, COMMENT_PREVIEW_WORDS).join(' ') + '…';
-}
-
-function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
-  if (status.includes('Approved')) return 'success';
-  if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
-  return 'warning';
 }
 
 function formatEta(eta: string | null | undefined): string {
@@ -132,7 +126,7 @@ function WorkOrderPreviewRow({
         {workOrder.urgent && (
           <Badge variant="danger">Hitno</Badge>
         )}
-        <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>
+        <Badge variant={getInFlightStatusBadgeVariant(workOrder.currentStatus)}>
           {formatStatus(workOrder.currentStatus)}
         </Badge>
         <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>

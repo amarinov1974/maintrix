@@ -1,3 +1,5 @@
+import { TicketStatus, WorkOrderStatus } from '../types/statuses';
+
 export function formatCategory(value: string): string {
   const map: Record<string, string> = {
     ELECTRICAL_INSTALLATIONS: 'Elektroinstalacije',
@@ -79,4 +81,48 @@ export function formatStatus(value: string): string {
     'Returned By Provider': 'Vraćeno od izvođača',
   };
   return map[value] ?? value;
+}
+
+export type StatusBadgeVariant = 'default' | 'success' | 'warning' | 'danger';
+
+const SUCCESS_STATUSES: readonly string[] = [
+  TicketStatus.COST_ESTIMATION_APPROVED,
+  WorkOrderStatus.COST_PROPOSAL_APPROVED,
+];
+
+const DANGER_STATUSES: readonly string[] = [
+  TicketStatus.REJECTED,
+  TicketStatus.WITHDRAWN,
+  WorkOrderStatus.REJECTED,
+];
+
+const WARNING_STATUSES: readonly string[] = [
+  TicketStatus.SUBMITTED,
+  TicketStatus.UPDATED_SUBMITTED,
+  TicketStatus.AWAITING_CREATOR_RESPONSE,
+];
+
+function classifyStatus(status: string): StatusBadgeVariant | null {
+  if (status === TicketStatus.DRAFT) return 'default';
+  if (SUCCESS_STATUSES.includes(status)) return 'success';
+  if (DANGER_STATUSES.includes(status)) return 'danger';
+  if (WARNING_STATUSES.includes(status)) return 'warning';
+  return null;
+}
+
+/**
+ * Badge variant for pages that show terminal / fully-resolved tickets and WOs.
+ * Anything not categorized falls back to neutral 'default'.
+ */
+export function getStatusBadgeVariant(status: string): StatusBadgeVariant {
+  return classifyStatus(status) ?? 'default';
+}
+
+/**
+ * Badge variant for pages that primarily list in-flight items (cost
+ * proposal review, follow-up WOs, etc.). Uncategorized in-flight
+ * statuses get 'warning' to signal "needs attention".
+ */
+export function getInFlightStatusBadgeVariant(status: string): StatusBadgeVariant {
+  return classifyStatus(status) ?? 'warning';
 }

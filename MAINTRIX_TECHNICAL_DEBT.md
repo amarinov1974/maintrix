@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04 (status enums u modalima)*
+*Zadnje ažurirano: 2026-05-04 (centralizirani getStatusBadgeVariant)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -55,7 +55,7 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 
 ### Srednji prioritet
 
-- [ ] **Centralizirati ticket status stringove** u `TicketStatus` enum/const. Trenutno hardkodirani Title-Case stringovi u frontendu (npr. `'Ticket Cost Estimation Approved'`) nisu zaštićeni od promjena formata u backendu.
+- [x] **Centralizirati ticket status stringove** u `TicketStatus` enum/const. ~~Trenutno hardkodirani Title-Case stringovi u frontendu (npr. `'Ticket Cost Estimation Approved'`) nisu zaštićeni od promjena formata u backendu.~~ Riješeno (2026-05-04): PR #11 zamijenio je literale u 7 detail modala; ovaj follow-up zatvorio je preostale slučajeve — 11 duplikatskih `getStatusBadgeVariant` funkcija (substring `.includes('Approved')` i sl.) ekstrahirane u dva imena u `utils/formatters.ts` (`getStatusBadgeVariant` za default-default semantiku, `getInFlightStatusBadgeVariant` za default-warning), `'Draft'` literali zamijenjeni s `TicketStatus.DRAFT`, lokalni `terminalStatuses` array u `StoreManagerDashboard` zamijenjen s `TerminalTicketStatuses`. Sve usporedbe sad idu kroz enum konstante.
 - [ ] **Centralizirati approval chain pragove.** Trenutno se €1.000 i €3.000 pojavljuju na backendu (`approval-chain-service`) i frontendu (`DirectorDashboard`, `AreaManagerDashboard`, `ApprovalChainInfo` modal). Razmotriti API endpoint ili shared config.
 - [x] **Audit svih `every()` poziva u backendu** — pregledano 2026-05-04. Backend ima 2 `.every()` instance (oba u `ticket-service.ts`, linije 1445 i 1522 — `archiveTicket` i `tryAutoArchiveTicketIfAllWorkOrdersComplete`); obje su već zaštićene `length === 0` guardom prije poziva. Bonus pregled frontenda (4 instance: `S2WorkOrderDetailModal`, `CheckOutModal`, `S3WorkOrderDetailModal`, `AMMTicketDetailModal`) — sve guard-ane (`length > 0 &&`, `hasWorkOrders &&`, ili tip koji konstrukcijski uvijek ima ≥1 element). Nema preostalog `every([]) === true` rizika u repu.
 - [ ] **Audit log discipline review.** Verificirati da se audit unosi pišu na svim mutacijskim endpointima. Razmotriti helper funkciju ili Prisma extension koji forsira audit.

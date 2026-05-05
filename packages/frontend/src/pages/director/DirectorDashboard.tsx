@@ -12,7 +12,7 @@ import { Layout, Card, Badge, Button, ApprovalChainInfo } from '../../components
 import { DirectorTicketDetailModal } from './DirectorTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
-import { formatCategory, formatStatus } from '../../utils/formatters';
+import { formatCategory, formatStatus, getInFlightStatusBadgeVariant } from '../../utils/formatters';
 
 function getRoleLabel(role: string) {
   if (role === 'D') return 'Direktor prodaje';
@@ -26,12 +26,6 @@ function getRoleDescription(role: string) {
   if (role === 'C2') return 'Odobravate procjene troška od €1.001 do €3.000.';
   if (role === 'BOD') return 'Odobravate procjene troška iznad €3.000.';
   return 'Odobravate procjene troška.';
-}
-
-function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
-  if (status.includes('Approved')) return 'success';
-  if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
-  return 'warning';
 }
 
 export function DirectorDashboard() {
@@ -208,7 +202,7 @@ function TicketRow({ ticket, onClick }: { ticket: Ticket; onClick: () => void })
     >
       <span className="font-semibold text-gray-900">Prijava #{ticket.id}</span>
       {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
+      <Badge variant={getInFlightStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
       <span className="text-sm text-gray-600">{ticket.storeName}</span>
       <span className="text-sm text-gray-500">{new Date(ticket.createdAt).toLocaleDateString()}</span>
     </button>

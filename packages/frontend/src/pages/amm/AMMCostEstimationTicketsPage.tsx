@@ -11,7 +11,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMTicketDetailModal } from './AMMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
-import { formatStatus } from '../../utils/formatters';
+import { formatStatus, getInFlightStatusBadgeVariant } from '../../utils/formatters';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
 
@@ -19,12 +19,6 @@ function descriptionPreview(description: string): string {
   const trimmed = description.trim();
   if (trimmed.length <= DESCRIPTION_PREVIEW_LENGTH) return trimmed;
   return trimmed.slice(0, DESCRIPTION_PREVIEW_LENGTH).trim() + '…';
-}
-
-function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
-  if (status.includes('Approved')) return 'success';
-  if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
-  return 'warning';
 }
 
 export function AMMCostEstimationTicketsPage() {
@@ -106,7 +100,7 @@ function TicketPreviewRow({ ticket, onOpen }: { ticket: Ticket; onOpen: () => vo
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className="font-semibold text-gray-900">Ticket #{ticket.id}</span>
         {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-        <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
+        <Badge variant={getInFlightStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
         <span className="text-sm text-gray-600">{ticket.storeName}</span>
         <span className="text-sm text-gray-500">
           {new Date(ticket.createdAt).toLocaleDateString()}

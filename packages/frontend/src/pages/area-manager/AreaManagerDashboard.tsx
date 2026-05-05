@@ -10,16 +10,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Card, Badge, Button, ApprovalChainInfo } from '../../components/shared';
 import { AMTicketDetailModal } from './AMTicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
-import { formatCategory, formatStatus } from '../../utils/formatters';
-
-function getStatusBadgeVariant(
-  status: string
-): 'default' | 'success' | 'warning' | 'danger' {
-  if (status.includes('Submitted')) return 'warning';
-  if (status.includes('Approved')) return 'success';
-  if (status.includes('Rejected')) return 'danger';
-  return 'default';
-}
+import { formatCategory, formatStatus, getStatusBadgeVariant } from '../../utils/formatters';
 
 const TERMINAL_STATUSES = [
   TicketStatus.REJECTED,
