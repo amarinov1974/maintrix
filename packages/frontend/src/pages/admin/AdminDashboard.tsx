@@ -6,6 +6,7 @@
 import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Layout } from '../../components/shared/Layout';
+import { AlertModal, ConfirmModal } from '../../components/shared';
 import { apiClient } from '../../api/client';
 import {
   preventiveMaintenanceAPI,
@@ -87,6 +88,22 @@ export function AdminDashboard() {
   const [parseErrors, setParseErrors] = useState<string[]>([]);
   const [importSummary, setImportSummary] = useState('');
   const [selectedPlanIds, setSelectedPlanIds] = useState<Set<number>>(new Set());
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [pendingDeactivate, setPendingDeactivate] = useState<
+    | { kind: 'internal-user' | 'vendor-user' | 'store' | 'asset'; id: number; name: string }
+    | null
+  >(null);
+
+  const confirmDeactivate = () => {
+    if (pendingDeactivate == null) return;
+    switch (pendingDeactivate.kind) {
+      case 'internal-user': deactivateInternalUser.mutate(pendingDeactivate.id); break;
+      case 'vendor-user':   deactivateVendorUser.mutate(pendingDeactivate.id); break;
+      case 'store':         deactivateStore.mutate(pendingDeactivate.id); break;
+      case 'asset':         deactivateAsset.mutate(pendingDeactivate.id); break;
+    }
+    setPendingDeactivate(null);
+  };
   const queryClient = useQueryClient();
 
   const { data: internalUsers = [], isLoading: loadingInternal } = useQuery({
@@ -304,7 +321,7 @@ export function AdminDashboard() {
       setSelectedPlanIds(new Set());
       queryClient.invalidateQueries({ queryKey: ['preventive-maintenance-plans'] });
       queryClient.invalidateQueries({ queryKey: ['work-orders'] });
-      alert(result.summary);
+      setAlertMessage(result.summary);
     },
   });
 
@@ -599,7 +616,7 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingUser(user)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {user.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${user.name}?`)) deactivateInternalUser.mutate(user.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'internal-user', id: user.id, name: user.name })}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deaktiviraj
@@ -754,7 +771,7 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingVendor(user)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {user.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${user.name}?`)) deactivateVendorUser.mutate(user.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'vendor-user', id: user.id, name: user.name })}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deaktiviraj
@@ -881,7 +898,7 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingStore(store)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {store.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${store.name}?`)) deactivateStore.mutate(store.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'store', id: store.id, name: store.name })}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deaktiviraj
@@ -1060,7 +1077,7 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingAsset(asset)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {asset.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${asset.name}?`)) deactivateAsset.mutate(asset.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'asset', id: asset.id, name: asset.name })}
                               className="text-red-600 hover:underline text-xs"
                             >Deaktiviraj</button>
                           ) : (
@@ -1304,6 +1321,25 @@ export function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {alertMessage != null && (
+        <AlertModal
+          title="Uvoz dovršen"
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+        />
+      )}
+
+      {pendingDeactivate != null && (
+        <ConfirmModal
+          title="Deaktivacija"
+          message={`Deaktiviraj "${pendingDeactivate.name}"?`}
+          confirmLabel="Deaktiviraj"
+          variant="danger"
+          onConfirm={confirmDeactivate}
+          onCancel={() => setPendingDeactivate(null)}
+        />
+      )}
     </Layout>
   );
 }

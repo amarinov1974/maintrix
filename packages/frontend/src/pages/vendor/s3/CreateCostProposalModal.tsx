@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { workOrdersAPI } from '../../../api/work-orders';
-import { Button } from '../../../components/shared';
+import { Button, AlertModal } from '../../../components/shared';
 
 interface CreateCostProposalModalProps {
   workOrderId: number;
@@ -26,6 +26,7 @@ export function CreateCostProposalModal({
 }: CreateCostProposalModalProps) {
   const queryClient = useQueryClient();
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [invoiceRows, setInvoiceRows] = useState<InvoiceRowInput[]>([
     {
       description: 'Dolazak na lokaciju',
@@ -82,7 +83,7 @@ export function CreateCostProposalModal({
       (r) => r.description.trim() && r.pricePerUnit > 0
     );
     if (validRows.length === 0) {
-      alert('Dodajte barem jednu stavku.');
+      setValidationError('Dodajte barem jednu stavku.');
       return;
     }
 
@@ -261,6 +262,13 @@ export function CreateCostProposalModal({
           </Button>
         </div>
       </div>
+
+      {validationError != null && (
+        <AlertModal
+          message={validationError}
+          onClose={() => setValidationError(null)}
+        />
+      )}
     </div>
   );
 }
