@@ -155,11 +155,11 @@ export function DirectorTicketDetailModal({
             </div>
           </div>
 
-          {ticket.attachments != null && ticket.attachments.filter((a) => !a.internalFlag).length > 0 && (
+          {ticket.attachments != null && ticket.attachments.length > 0 && (
             <section>
               <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Privici</h3>
               <ul className="bg-gray-50 rounded-lg p-4 space-y-2">
-                {ticket.attachments.filter((a) => !a.internalFlag).map((a) => (
+                {ticket.attachments.map((a) => (
                   <li key={a.id} className="flex items-center justify-between text-sm">
                     <button
                       type="button"

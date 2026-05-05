@@ -233,9 +233,9 @@ export function AMMTicketDetailModal({
   const submittedAt =
     ticket.submittedAt ??
     (ticket.currentStatus !== TicketStatus.DRAFT ? ticket.createdAt : null);
-  const visibleAttachments = (ticket.attachments ?? []).filter(
-    (a) => !a.internalFlag
-  );
+  // AMM is part of the internal team — sees both SM-uploaded (public) and
+  // internal attachments (e.g. cost estimation files AMM uploaded).
+  const visibleAttachments = ticket.attachments ?? [];
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
