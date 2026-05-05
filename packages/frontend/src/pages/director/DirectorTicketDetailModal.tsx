@@ -10,20 +10,18 @@ import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
 import { formatCategory } from '../../utils/formatters';
 import { TicketStatus } from '../../types/statuses';
+import { APPROVAL_THRESHOLDS, getApprovalChainLabel } from '../../config/approval-thresholds';
 
 interface DirectorTicketDetailModalProps {
   ticketId: number;
   onClose: () => void;
 }
 
-function getThresholdInfo(amount: number) {
-  if (amount <= 1000) {
-    return { chain: 'Samo AM', color: 'text-green-700' };
-  }
-  if (amount <= 3000) {
-    return { chain: 'AM → D → C2', color: 'text-yellow-700' };
-  }
-  return { chain: 'AM → D → C2 → BOD', color: 'text-red-700' };
+function getThresholdInfo(amount: number): { chain: string; color: string } {
+  const chain = getApprovalChainLabel(amount);
+  if (amount <= APPROVAL_THRESHOLDS.AM_MAX) return { chain, color: 'text-green-700' };
+  if (amount <= APPROVAL_THRESHOLDS.DIRECTOR_MAX) return { chain, color: 'text-yellow-700' };
+  return { chain, color: 'text-red-700' };
 }
 
 export function DirectorTicketDetailModal({

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { APPROVAL_THRESHOLDS, formatEuro } from '../../config/approval-thresholds';
 
 interface ApprovalChainInfoProps {
   roleDescription: string;
@@ -95,9 +96,9 @@ export function ApprovalChainInfo({ roleDescription }: ApprovalChainInfoProps) {
             </div>
             <div style={{ padding: '18px 24px 22px' }}>
               <ul style={{ margin: 0, paddingLeft: '18px', color: '#3C3C43', fontSize: '14px', lineHeight: 1.9 }}>
-                <li>≤ €1.000: AM</li>
-                <li>€1.001 – €3.000: AM → D → C2</li>
-                <li>&gt; €3.000: AM → D → C2 → BOD</li>
+                <li>≤ {formatEuro(APPROVAL_THRESHOLDS.AM_MAX)}: AM</li>
+                <li>{formatEuro(APPROVAL_THRESHOLDS.AM_MAX + 1)} – {formatEuro(APPROVAL_THRESHOLDS.DIRECTOR_MAX)}: AM → D → C2</li>
+                <li>&gt; {formatEuro(APPROVAL_THRESHOLDS.DIRECTOR_MAX)}: AM → D → C2 → BOD</li>
               </ul>
             </div>
           </div>
