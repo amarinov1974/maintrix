@@ -3,15 +3,16 @@
  * Header, read-only core block, Create WO / Request Clarification / Reject.
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
 import { authAPI } from '../../api/auth';
 import { useSession } from '../../contexts/SessionContext';
 import { TicketStatus, WorkOrderStatus } from '../../types/statuses';
-import { Button, Badge } from '../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../components/shared';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface AMMTicketDetailModalProps {
   ticketId: number;
@@ -45,9 +46,7 @@ export function AMMTicketDetailModal({
   const costEstimationFileInputRef = useRef<HTMLInputElement>(null);
   const [showClarificationPopup, setShowClarificationPopup] = useState(false);
   const [woSuccessState, setWoSuccessState] = useState<'sent' | null>(null);
-  const [showCostSubmittedSuccess, setShowCostSubmittedSuccess] = useState(false);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
@@ -81,7 +80,7 @@ export function AMMTicketDetailModal({
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       setClarificationComment('');
       setShowClarificationPopup(false);
-      onClose();
+      showSuccess('Prijava vraćena na pojašnjenje.');
     },
   });
 
@@ -91,7 +90,7 @@ export function AMMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Prijava poslana sljedećem odobravatelju.');
     },
   });
 
@@ -99,7 +98,7 @@ export function AMMTicketDetailModal({
     mutationFn: (reason: string) => ticketsAPI.reject(ticketId, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Prijava odbijena.');
     },
   });
 
@@ -110,17 +109,9 @@ export function AMMTicketDetailModal({
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       setCostAmount('');
-      setShowCostSubmittedSuccess(true);
+      showSuccess('Procjena troška poslana voditelju regije na odobrenje.');
     },
   });
-
-  useEffect(() => {
-    if (!showCostSubmittedSuccess) return;
-    const t = setTimeout(() => {
-      onCloseRef.current();
-    }, 2000);
-    return () => clearTimeout(t);
-  }, [showCostSubmittedSuccess]);
 
   const handleCostEstimationFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -158,7 +149,7 @@ export function AMMTicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
-      onClose();
+      showSuccess('Prijava arhivirana.');
     },
   });
 
@@ -258,17 +249,8 @@ export function AMMTicketDetailModal({
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
-          {showCostSubmittedSuccess ? (
-            <div className="flex flex-col items-center justify-center py-8">
-              <div className="bg-green-100 border-2 border-green-500 rounded-lg p-6 max-w-md w-full text-center">
-                <p className="text-green-800 font-semibold text-xl mb-2">
-                  ✓ Procjena troška poslana voditelju regije na odobrenje.
-                </p>
-                <p className="text-green-700 text-sm">
-                  Povratak na nadzornu ploču za 2 sekunde...
-                </p>
-              </div>
-            </div>
+          {successMessage ? (
+            <SuccessOverlay message={successMessage} />
           ) : (
           <>
           {/* 11.2 Ticket Core Information (Read-Only Block) */}

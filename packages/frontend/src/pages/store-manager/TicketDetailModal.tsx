@@ -8,10 +8,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { workOrdersAPI } from '../../api/work-orders';
 import { useSession } from '../../contexts/SessionContext';
-import { Button, Badge } from '../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../components/shared';
 import { TicketStatus } from '../../types/statuses';
 import { QRGenerationModal } from './QRGenerationModal';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface TicketDetailModalProps {
   ticketId: number;
@@ -30,6 +31,8 @@ export function TicketDetailModal({
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
 
+  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
+
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
     queryFn: () => ticketsAPI.getById(ticketId),
@@ -46,6 +49,7 @@ export function TicketDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
+      showSuccess('Prijava poslana voditelju održavanja.');
     },
   });
 
@@ -61,7 +65,7 @@ export function TicketDetailModal({
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       setClarificationText('');
       setClarificationAssetId('');
-      onClose();
+      showSuccess('Pojašnjenje poslano.');
     },
   });
 
@@ -69,7 +73,7 @@ export function TicketDetailModal({
     mutationFn: () => ticketsAPI.withdraw(ticketId, withdrawReason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Prijava povučena.');
     },
   });
 
@@ -138,6 +142,10 @@ export function TicketDetailModal({
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto">
+          {successMessage ? (
+            <SuccessOverlay message={successMessage} />
+          ) : (
+          <>
           {readOnly && (
             <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-sm text-gray-700">
               Niste vlasnik ove prijave. Samo pregled — bez izmjena.
@@ -394,6 +402,8 @@ export function TicketDetailModal({
 
           {/* 9.11 Visibility: SM must not see cost estimation, approval chain, vendor pricing */}
           {/* Sections costEstimation and approvalRecords are intentionally not rendered for SM */}
+          </>
+          )}
         </div>
 
         <div className="p-6 border-t border-gray-200 sticky bottom-0 bg-white shrink-0">

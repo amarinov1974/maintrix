@@ -7,10 +7,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import type { ApprovalRecord } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
-import { Button, Badge } from '../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../components/shared';
 import { formatCategory } from '../../utils/formatters';
 import { TicketStatus } from '../../types/statuses';
 import { APPROVAL_THRESHOLDS, getApprovalChainLabel } from '../../config/approval-thresholds';
+import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface DirectorTicketDetailModalProps {
   ticketId: number;
@@ -36,6 +37,8 @@ export function DirectorTicketDetailModal({
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
 
+  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
+
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket', ticketId],
     queryFn: () => ticketsAPI.getById(ticketId),
@@ -47,7 +50,7 @@ export function DirectorTicketDetailModal({
     mutationFn: () => ticketsAPI.approveCostEstimation(ticketId, comment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Procjena troška odobrena.');
     },
   });
 
@@ -56,7 +59,7 @@ export function DirectorTicketDetailModal({
       ticketsAPI.returnCostEstimation(ticketId, returnComment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Procjena troška vraćena voditelju održavanja.');
     },
   });
 
@@ -64,7 +67,7 @@ export function DirectorTicketDetailModal({
     mutationFn: () => ticketsAPI.reject(ticketId, rejectReason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      onClose();
+      showSuccess('Prijava odbijena.');
     },
   });
 
@@ -122,6 +125,10 @@ export function DirectorTicketDetailModal({
         </div>
 
         <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto">
+          {successMessage ? (
+            <SuccessOverlay message={successMessage} />
+          ) : (
+          <>
           <div>
               <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h3>
             <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px' }}>
@@ -457,6 +464,8 @@ export function DirectorTicketDetailModal({
                   'Odbijanje nije uspjelo'}
               </p>
             </div>
+          )}
+          </>
           )}
         </div>
 
