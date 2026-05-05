@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04 (centralizirani approval thresholds)*
+*Zadnje ažurirano: 2026-05-04 (cookie hardening — env-aware secure/sameSite)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -51,7 +51,7 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 - [ ] **CI/CD pipeline.** GitHub Actions: lint, typecheck, prisma migrate validate, vitest run. Bez ovoga svaki push u `main` je rizik.
 - [ ] **Better Auth (real per-user login)** prije prvog ugovora. Demo gate ostaje za demo deployment.
 - [ ] **Pagination svuda** (tickets, WOs, assets, audit log).
-- [ ] **Cookie hardening + custom domena** (`sameSite: strict`).
+- [ ] **Cookie hardening + custom domena** (`sameSite: strict`). Djelomično (2026-05-04): session cookie sad koristi `getCookieOpts()` na `SessionManager`-u, koji vraća env-aware konfiguraciju (`secure: false / sameSite: 'lax'` u devu zbog Vite proxy-a, `secure: true / sameSite: 'none'` u produkciji zbog cross-site Railway subdomena). Prije je bilo hardkodirano `secure: true, sameSite: 'none'` što je razbijalo dev cookie postavku. Cookie `maxAge` sad reflektira `SESSION_TIMEOUT_MINUTES` env var. **Preostaje:** kad frontend i backend dijele custom domenu, prebaciti `sameSite` na `'strict'` za pun CSRF zaštitu.
 
 ### Srednji prioritet
 

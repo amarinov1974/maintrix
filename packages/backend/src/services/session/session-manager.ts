@@ -87,6 +87,40 @@ export class SessionManager {
     } while (cursor !== '0');
     return count;
   }
+
+  getCookieName(): string {
+    return this.config.cookieName;
+  }
+
+  /**
+   * Cookie options for the session cookie.
+   *
+   * Env-aware:
+   *   development → `secure: false`, `sameSite: 'lax'` so the cookie is set
+   *     over plain HTTP via the Vite proxy.
+   *   production  → `secure: true`,  `sameSite: 'none'` because frontend and
+   *     backend live on different Railway subdomains today, so the browser
+   *     treats them as cross-site. `sameSite: 'none'` requires `secure: true`.
+   *
+   * Once frontend and backend share a custom domain (e.g. both on
+   * `*.maintrix.app`), bump `sameSite` to `'strict'` for full CSRF protection.
+   */
+  getCookieOpts(): {
+    httpOnly: true;
+    secure: boolean;
+    sameSite: 'lax' | 'strict' | 'none';
+    maxAge: number;
+    path: string;
+  } {
+    const isProd = process.env.NODE_ENV === 'production';
+    return {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      maxAge: this.config.timeoutMinutes * 60 * 1000,
+      path: '/',
+    };
+  }
 }
 
 export const sessionManager = new SessionManager({
