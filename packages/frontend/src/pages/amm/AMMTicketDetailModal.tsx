@@ -234,6 +234,9 @@ export function AMMTicketDetailModal({
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      {successMessage ? (
+        <SuccessOverlay message={successMessage} />
+      ) : (
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         {/* 11.1 Screen Header */}
         <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
@@ -249,10 +252,6 @@ export function AMMTicketDetailModal({
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
-          {successMessage ? (
-            <SuccessOverlay message={successMessage} />
-          ) : (
-          <>
           {/* 11.2 Ticket Core Information (Read-Only Block) */}
           <section>
             <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h2>
@@ -631,14 +630,13 @@ export function AMMTicketDetailModal({
               </div>
             </section>
           )}
-          </>
-          )}
         </div>
 
         <div className="p-6 border-t border-gray-200 sticky bottom-0 bg-white shrink-0">
           <Button type="button" variant="secondary" onClick={onClose} className="w-full">Natrag</Button>
         </div>
       </div>
+      )}
     </div>
   );
 }

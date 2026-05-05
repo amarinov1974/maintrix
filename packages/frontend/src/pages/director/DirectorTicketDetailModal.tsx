@@ -97,6 +97,9 @@ export function DirectorTicketDetailModal({
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50, overflowY: 'auto', backdropFilter: 'blur(4px)' }}>
+      {successMessage ? (
+        <SuccessOverlay message={successMessage} />
+      ) : (
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', maxWidth: '760px', width: '100%', margin: '32px auto', display: 'flex', flexDirection: 'column', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
         <div style={{ padding: '20px 28px', borderBottom: '1px solid #E8E8ED', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', flexShrink: 0, borderRadius: '16px 16px 0 0' }}>
           <div className="flex justify-between items-start">
@@ -125,10 +128,6 @@ export function DirectorTicketDetailModal({
         </div>
 
         <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto">
-          {successMessage ? (
-            <SuccessOverlay message={successMessage} />
-          ) : (
-          <>
           <div>
               <h3 style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Informacije o prijavi</h3>
             <div style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px' }}>
@@ -465,8 +464,6 @@ export function DirectorTicketDetailModal({
               </p>
             </div>
           )}
-          </>
-          )}
         </div>
 
         <div className="p-6 border-t border-gray-200 sticky bottom-0 bg-white">
@@ -480,6 +477,7 @@ export function DirectorTicketDetailModal({
           </Button>
         </div>
       </div>
+      )}
     </div>
   );
 }
