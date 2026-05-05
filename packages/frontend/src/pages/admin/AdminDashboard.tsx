@@ -6,7 +6,8 @@
 import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Layout } from '../../components/shared/Layout';
-import { AlertModal, ConfirmModal } from '../../components/shared';
+import { AlertModal, ConfirmModal, Toast } from '../../components/shared';
+import { useToast } from '../../hooks/useToast';
 import { apiClient } from '../../api/client';
 import {
   preventiveMaintenanceAPI,
@@ -93,14 +94,16 @@ export function AdminDashboard() {
     | { kind: 'internal-user' | 'vendor-user' | 'store' | 'asset'; id: number; name: string }
     | null
   >(null);
+  const { message: toastMessage, showToast } = useToast();
 
   const confirmDeactivate = () => {
     if (pendingDeactivate == null) return;
+    const opts = { onSuccess: () => showToast('Deaktivirano.') };
     switch (pendingDeactivate.kind) {
-      case 'internal-user': deactivateInternalUser.mutate(pendingDeactivate.id); break;
-      case 'vendor-user':   deactivateVendorUser.mutate(pendingDeactivate.id); break;
-      case 'store':         deactivateStore.mutate(pendingDeactivate.id); break;
-      case 'asset':         deactivateAsset.mutate(pendingDeactivate.id); break;
+      case 'internal-user': deactivateInternalUser.mutate(pendingDeactivate.id, opts); break;
+      case 'vendor-user':   deactivateVendorUser.mutate(pendingDeactivate.id, opts); break;
+      case 'store':         deactivateStore.mutate(pendingDeactivate.id, opts); break;
+      case 'asset':         deactivateAsset.mutate(pendingDeactivate.id, opts); break;
     }
     setPendingDeactivate(null);
   };
@@ -623,7 +626,7 @@ export function AdminDashboard() {
                             </button>
                           ) : (
                             <button
-                              onClick={() => updateInternalUser.mutate({ id: user.id, data: { active: true } })}
+                              onClick={() => updateInternalUser.mutate({ id: user.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >
                               Aktiviraj
@@ -778,7 +781,7 @@ export function AdminDashboard() {
                             </button>
                           ) : (
                             <button
-                              onClick={() => updateVendorUser.mutate({ id: user.id, data: { active: true } })}
+                              onClick={() => updateVendorUser.mutate({ id: user.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >
                               Aktiviraj
@@ -905,7 +908,7 @@ export function AdminDashboard() {
                             </button>
                           ) : (
                             <button
-                              onClick={() => updateStore.mutate({ id: store.id, data: { active: true } })}
+                              onClick={() => updateStore.mutate({ id: store.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >
                               Aktiviraj
@@ -1082,7 +1085,7 @@ export function AdminDashboard() {
                             >Deaktiviraj</button>
                           ) : (
                             <button
-                              onClick={() => updateAsset.mutate({ id: asset.id, data: { active: true } })}
+                              onClick={() => updateAsset.mutate({ id: asset.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >Aktiviraj</button>
                           )}
@@ -1321,6 +1324,8 @@ export function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {toastMessage != null && <Toast message={toastMessage} />}
 
       {alertMessage != null && (
         <AlertModal
