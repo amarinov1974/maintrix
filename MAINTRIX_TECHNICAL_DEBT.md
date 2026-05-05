@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04 (cookie hardening — env-aware secure/sameSite)*
+*Zadnje ažurirano: 2026-05-04 (zamjena native window.alert/confirm s app modalima)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -61,7 +61,7 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 - [ ] **Audit log discipline review.** Verificirati da se audit unosi pišu na svim mutacijskim endpointima. Razmotriti helper funkciju ili Prisma extension koji forsira audit.
 - [ ] **Attachment serving authorization audit.** Provjeriti da download ruta provjerava session + scope nad parent ticketom/WO-om.
 - [ ] **State transition labels cure u UI Povijesti.** Vendor i internal korisnici vide tehničke labele tipa `ASSIGN TECHNICIAN`, `QR GENERATED (ACCEPTED_TECHNICIAN_ASSIGNED → ACCEPTED_TECHNICIAN_ASSIGNED)`, `CHECKIN (ACCEPTED_TECHNICIAN_ASSIGNED → Service In Progress)`. Treba mapping tablica koja prevodi action + status par u human-friendly HR string, ili backend šalje već lokaliziran log entry. Otkriveno u screenshot reviewu 2026-05-02.
-- [ ] **Native browser alert za check-in potvrdu.** Trenutno koristi `window.confirm`/`alert` koji se ne može prevesti (`"Your arrival on site has been registered. You can now start work."`). Zamijeniti app-level toast/modal porukom u HR.
+- [x] **Native browser alert za check-in potvrdu.** ~~Trenutno koristi `window.confirm`/`alert` koji se ne može prevesti (`"Your arrival on site has been registered. You can now start work."`). Zamijeniti app-level toast/modal porukom u HR.~~ Riješeno (2026-05-04): nove shared komponente `AlertModal` i `ConfirmModal` u `components/shared/`. Zamjena svih native poziva: S2 check-in potvrda sad koristi `SuccessOverlay` s HR porukom; AdminDashboard 4 `confirm()` poziva (deaktivacija korisnika/vendora/poslovnice/asseta) → `ConfirmModal` s `variant="danger"`; AdminDashboard PM import summary `alert()` → `AlertModal`; CreateCostProposalModal `alert('Dodajte barem jednu stavku.')` → `AlertModal`. 0 preostalih `window.alert`/`window.confirm` u repu.
 - [x] **Audit: hardkodirani `currentStatus` / `ticket.currentStatus` string literali (2026-05-04).** ~~Nekoliko modala i komponenti još uspoređuju statuse s literalima umjesto `WorkOrderStatus` / `TicketStatus` enuma — rizik istog razreda kao bug na S3 dashboardu ako stringovi divergiraju.~~ Riješeno (2026-05-04): zamijenjeno svih ~30 literala u 7 modala (`QRGenerationModal`, `S3WorkOrderDetailModal`, `AMMWorkOrderDetailModal`, `AMMTicketDetailModal`, `AMTicketDetailModal`, `DirectorTicketDetailModal`, `TicketDetailModal`). Bonus: `wo.currentStatus?.includes('Created')` u `AMMTicketDetailModal:359` bio je dead branch (nijedan WO status ne sadrži "Created"), zamijenjen točnom usporedbom s `WorkOrderStatus.CREATED`.
 
 ### Niski prioritet (UX / kozmetika / accessibility)

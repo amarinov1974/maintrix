@@ -6,6 +6,8 @@
 import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Layout } from '../../components/shared/Layout';
+import { AlertModal, ConfirmModal, Toast } from '../../components/shared';
+import { useToast } from '../../hooks/useToast';
 import { apiClient } from '../../api/client';
 import {
   preventiveMaintenanceAPI,
@@ -87,6 +89,24 @@ export function AdminDashboard() {
   const [parseErrors, setParseErrors] = useState<string[]>([]);
   const [importSummary, setImportSummary] = useState('');
   const [selectedPlanIds, setSelectedPlanIds] = useState<Set<number>>(new Set());
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [pendingDeactivate, setPendingDeactivate] = useState<
+    | { kind: 'internal-user' | 'vendor-user' | 'store' | 'asset'; id: number; name: string }
+    | null
+  >(null);
+  const { message: toastMessage, showToast } = useToast();
+
+  const confirmDeactivate = () => {
+    if (pendingDeactivate == null) return;
+    const opts = { onSuccess: () => showToast('Deaktivirano.') };
+    switch (pendingDeactivate.kind) {
+      case 'internal-user': deactivateInternalUser.mutate(pendingDeactivate.id, opts); break;
+      case 'vendor-user':   deactivateVendorUser.mutate(pendingDeactivate.id, opts); break;
+      case 'store':         deactivateStore.mutate(pendingDeactivate.id, opts); break;
+      case 'asset':         deactivateAsset.mutate(pendingDeactivate.id, opts); break;
+    }
+    setPendingDeactivate(null);
+  };
   const queryClient = useQueryClient();
 
   const { data: internalUsers = [], isLoading: loadingInternal } = useQuery({
@@ -304,7 +324,7 @@ export function AdminDashboard() {
       setSelectedPlanIds(new Set());
       queryClient.invalidateQueries({ queryKey: ['preventive-maintenance-plans'] });
       queryClient.invalidateQueries({ queryKey: ['work-orders'] });
-      alert(result.summary);
+      setAlertMessage(result.summary);
     },
   });
 
@@ -599,14 +619,14 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingUser(user)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {user.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${user.name}?`)) deactivateInternalUser.mutate(user.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'internal-user', id: user.id, name: user.name })}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deaktiviraj
                             </button>
                           ) : (
                             <button
-                              onClick={() => updateInternalUser.mutate({ id: user.id, data: { active: true } })}
+                              onClick={() => updateInternalUser.mutate({ id: user.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >
                               Aktiviraj
@@ -754,14 +774,14 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingVendor(user)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {user.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${user.name}?`)) deactivateVendorUser.mutate(user.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'vendor-user', id: user.id, name: user.name })}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deaktiviraj
                             </button>
                           ) : (
                             <button
-                              onClick={() => updateVendorUser.mutate({ id: user.id, data: { active: true } })}
+                              onClick={() => updateVendorUser.mutate({ id: user.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >
                               Aktiviraj
@@ -881,14 +901,14 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingStore(store)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {store.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${store.name}?`)) deactivateStore.mutate(store.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'store', id: store.id, name: store.name })}
                               className="text-red-600 hover:underline text-xs"
                             >
                               Deaktiviraj
                             </button>
                           ) : (
                             <button
-                              onClick={() => updateStore.mutate({ id: store.id, data: { active: true } })}
+                              onClick={() => updateStore.mutate({ id: store.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >
                               Aktiviraj
@@ -1060,12 +1080,12 @@ export function AdminDashboard() {
                           <button onClick={() => setEditingAsset(asset)} className="text-blue-600 hover:underline text-xs">Uredi</button>
                           {asset.active ? (
                             <button
-                              onClick={() => { if (confirm(`Deaktiviraj ${asset.name}?`)) deactivateAsset.mutate(asset.id); }}
+                              onClick={() => setPendingDeactivate({ kind: 'asset', id: asset.id, name: asset.name })}
                               className="text-red-600 hover:underline text-xs"
                             >Deaktiviraj</button>
                           ) : (
                             <button
-                              onClick={() => updateAsset.mutate({ id: asset.id, data: { active: true } })}
+                              onClick={() => updateAsset.mutate({ id: asset.id, data: { active: true } }, { onSuccess: () => showToast('Aktivirano.') })}
                               className="text-green-600 hover:underline text-xs"
                             >Aktiviraj</button>
                           )}
@@ -1304,6 +1324,27 @@ export function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {toastMessage != null && <Toast message={toastMessage} />}
+
+      {alertMessage != null && (
+        <AlertModal
+          title="Uvoz dovršen"
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+        />
+      )}
+
+      {pendingDeactivate != null && (
+        <ConfirmModal
+          title="Deaktivacija"
+          message={`Deaktiviraj "${pendingDeactivate.name}"?`}
+          confirmLabel="Deaktiviraj"
+          variant="danger"
+          onConfirm={confirmDeactivate}
+          onCancel={() => setPendingDeactivate(null)}
+        />
+      )}
     </Layout>
   );
 }

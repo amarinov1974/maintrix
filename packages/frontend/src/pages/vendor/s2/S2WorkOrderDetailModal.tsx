@@ -8,11 +8,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { workOrdersAPI, type WorkReportRow } from '../../../api/work-orders';
 import { useSession } from '../../../contexts/SessionContext';
-import { Button, Badge } from '../../../components/shared';
+import { Button, Badge, SuccessOverlay } from '../../../components/shared';
 import { WorkOrderStatus } from '../../../types/statuses';
 import { CheckInModal } from './CheckInModal';
 import { CheckOutModal } from './CheckOutModal';
 import { getS2WODraft, setS2WODraft, clearS2WODraft } from './s2Draft';
+import { useSuccessOverlay } from '../../../hooks/useSuccessOverlay';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../../utils/formatters';
 
 interface S2WorkOrderDetailModalProps {
@@ -43,6 +44,7 @@ export function S2WorkOrderDetailModal({
   const [showCheckOut, setShowCheckOut] = useState(false);
   const [workReport, setWorkReport] = useState<WorkReportRow[]>([]);
   const [reportCompleted, setReportCompleted] = useState(false);
+  const { message: successMessage, showSuccess } = useSuccessOverlay(onClose);
 
   const { data: wo, isLoading } = useQuery({
     queryKey: ['work-order', workOrderId],
@@ -135,8 +137,7 @@ export function S2WorkOrderDetailModal({
     queryClient.invalidateQueries({ queryKey: ['work-orders'] });
     queryClient.invalidateQueries({ queryKey: ['work-order', workOrderId] });
     setShowCheckIn(false);
-    window.alert('Your arrival on site has been registered. You can now start work.');
-    onClose();
+    showSuccess('Vaš dolazak na lokaciju je registriran. Sada možete započeti rad.');
   };
 
   const onCheckOutSuccess = () => {
@@ -162,6 +163,9 @@ export function S2WorkOrderDetailModal({
   return (
     <>
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+        {successMessage ? (
+          <SuccessOverlay message={successMessage} />
+        ) : (
         <div className="bg-white rounded-lg max-w-2xl w-full my-8">
           <div className="p-6 border-b border-gray-200">
             <div className="flex justify-between items-start">
@@ -354,6 +358,7 @@ export function S2WorkOrderDetailModal({
             )}
           </div>
         </div>
+        )}
       </div>
 
       {showCheckIn && (
