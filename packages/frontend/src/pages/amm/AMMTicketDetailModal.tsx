@@ -12,7 +12,7 @@ import { authAPI } from '../../api/auth';
 import { useSession } from '../../contexts/SessionContext';
 import { TicketStatus, WorkOrderStatus } from '../../types/statuses';
 import { Button, Badge, SuccessOverlay } from '../../components/shared';
-import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus, formatStatusAny } from '../../utils/formatters';
 import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
 interface AMMTicketDetailModalProps {
@@ -624,7 +624,7 @@ export function AMMTicketDetailModal({
                     {' — '}
                     <span style={{ fontSize: '12px', color: '#6E6E73' }}>{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
-                      <span style={{ fontSize: '12px', color: '#6E6E73' }}> ({entry.prevStatus} → {entry.newStatus})</span>
+                      <span style={{ fontSize: '12px', color: '#6E6E73' }}> ({formatStatusAny(entry.prevStatus)} → {formatStatusAny(entry.newStatus)})</span>
                     )}
                     <p style={{ fontSize: '13px', color: '#1D1D1F', fontWeight: 500, marginTop: '4px' }}>
                       Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}

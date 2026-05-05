@@ -14,7 +14,7 @@ import { CheckInModal } from './CheckInModal';
 import { CheckOutModal } from './CheckOutModal';
 import { getS2WODraft, setS2WODraft, clearS2WODraft } from './s2Draft';
 import { useSuccessOverlay } from '../../../hooks/useSuccessOverlay';
-import { formatCategory, formatHistoryAction, formatStatus } from '../../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus, formatStatusAny } from '../../../utils/formatters';
 
 interface S2WorkOrderDetailModalProps {
   workOrderId: number;
@@ -345,7 +345,7 @@ export function S2WorkOrderDetailModal({
                       {' — '}
                       <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                       {entry.prevStatus != null && (
-                        <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
+                        <span className="text-gray-600"> ({formatStatusAny(entry.prevStatus)} → {formatStatusAny(entry.newStatus)})</span>
                       )}
                       <p className="mt-1 text-gray-600">
                         Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}

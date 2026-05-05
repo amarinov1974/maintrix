@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { workOrdersAPI } from '../../api/work-orders';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
-import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus, formatStatusAny } from '../../utils/formatters';
 import { WorkOrderStatus } from '../../types/statuses';
 
 interface AMMWorkOrderDetailModalProps {
@@ -476,7 +476,7 @@ export function AMMWorkOrderDetailModal({
                     {' — '}
                     <span className="font-medium">{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
-                      <span className="text-gray-600"> ({entry.prevStatus} → {entry.newStatus})</span>
+                      <span className="text-gray-600"> ({formatStatusAny(entry.prevStatus)} → {formatStatusAny(entry.newStatus)})</span>
                     )}
                     <p className="mt-1 text-gray-600">
                       Izvršio {entry.actorName}{entry.actorRole != null ? ` (${entry.actorRole})` : ''}

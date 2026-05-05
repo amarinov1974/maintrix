@@ -10,7 +10,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsAPI } from '../../api/tickets';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge, SuccessOverlay } from '../../components/shared';
-import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { formatCategory, formatHistoryAction, formatStatus, formatStatusAny } from '../../utils/formatters';
 import { TicketStatus } from '../../types/statuses';
 import { useSuccessOverlay } from '../../hooks/useSuccessOverlay';
 
@@ -456,7 +456,7 @@ export function AMTicketDetailModal({
                     {' — '}
                     <span style={{ fontSize: '12px', color: '#6E6E73' }}>{formatHistoryAction(entry.actionType)}</span>
                     {entry.prevStatus != null && (
-                      <span style={{ fontSize: '12px', color: '#6E6E73' }}> ({entry.prevStatus} → {entry.newStatus})</span>
+                      <span style={{ fontSize: '12px', color: '#6E6E73' }}> ({formatStatusAny(entry.prevStatus)} → {formatStatusAny(entry.newStatus)})</span>
                     )}
                     {entry.actorRole != null && (
                       <p style={{ fontSize: '13px', color: '#1D1D1F', fontWeight: 500, marginTop: '4px' }}>Izvršio {entry.actorName} ({entry.actorRole})</p>
