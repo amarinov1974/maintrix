@@ -12,6 +12,7 @@ import {
 } from '../../../api/work-orders';
 import { useSession } from '../../../contexts/SessionContext';
 import { Button, Badge } from '../../../components/shared';
+import { WorkOrderStatus } from '../../../types/statuses';
 import { getS3WODraft, setS3WODraft, clearS3WODraft } from './s3Draft';
 import { formatCategory, formatHistoryAction } from '../../../utils/formatters';
 
@@ -122,7 +123,7 @@ export function S3WorkOrderDetailModal({ workOrderId, onClose }: S3WorkOrderDeta
   );
 
   const isEditable =
-    wo?.currentStatus === 'Service Completed' || wo?.currentStatus === 'Cost Revision Requested';
+    wo?.currentStatus === WorkOrderStatus.SERVICE_COMPLETED || wo?.currentStatus === WorkOrderStatus.COST_REVISION_REQUESTED;
   const isOwner = session?.userId != null && wo?.currentOwnerId === session.userId;
   const canEditAndSubmit = isEditable && isOwner;
   const techCount = Math.max(1, wo?.declaredTechCount ?? 1);

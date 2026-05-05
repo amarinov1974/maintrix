@@ -9,6 +9,7 @@ import { workOrdersAPI } from '../../api/work-orders';
 import { useSession } from '../../contexts/SessionContext';
 import { Button, Badge } from '../../components/shared';
 import { formatCategory, formatHistoryAction, formatStatus } from '../../utils/formatters';
+import { WorkOrderStatus } from '../../types/statuses';
 
 interface AMMWorkOrderDetailModalProps {
   workOrderId: number;
@@ -86,13 +87,13 @@ export function AMMWorkOrderDetailModal({
   });
 
   const isCostProposalPrepared =
-    wo?.currentStatus === 'Cost Proposal Prepared';
+    wo?.currentStatus === WorkOrderStatus.COST_PROPOSAL_PREPARED;
   const isOwner = session?.userId != null && wo?.currentOwnerId === session.userId;
   const canAct = isCostProposalPrepared && isOwner;
 
   // Returned by S1 to AMM: status Awaiting Service Provider, owner is INTERNAL (AMM)
   const isReturnedToAm =
-    wo?.currentStatus === 'Awaiting Service Provider' &&
+    wo?.currentStatus === WorkOrderStatus.CREATED &&
     wo?.currentOwnerType === 'INTERNAL' &&
     isOwner;
 
@@ -147,7 +148,7 @@ export function AMMWorkOrderDetailModal({
             <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-gray-600">Status:</span>
-                <Badge variant={wo.currentStatus === 'Cost Proposal Prepared' ? 'warning' : 'default'}>
+                <Badge variant={wo.currentStatus === WorkOrderStatus.COST_PROPOSAL_PREPARED ? 'warning' : 'default'}>
                   {wo.currentStatus != null ? formatStatus(wo.currentStatus) : '—'}
                 </Badge>
               </div>

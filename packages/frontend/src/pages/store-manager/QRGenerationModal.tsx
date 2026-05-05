@@ -11,6 +11,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { qrAPI } from '../../api/qr';
 import type { WorkOrder } from '../../api/work-orders';
 import { Button } from '../../components/shared';
+import { WorkOrderStatus } from '../../types/statuses';
 
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes (Section 18.5)
 
@@ -59,7 +60,7 @@ export function QRGenerationModal({
   const wo = selectedWorkOrderId
     ? workOrders.find((w) => w.id === selectedWorkOrderId)
     : null;
-  const isCheckout = wo?.currentStatus === 'Service In Progress';
+  const isCheckout = wo?.currentStatus === WorkOrderStatus.SERVICE_IN_PROGRESS;
   const techCountNum = parseInt(techCount, 10);
   const isCheckIn = !isCheckout; // Service Visit Scheduled or Follow-Up Visit Requested
   const techCountOk = isCheckout || (!isNaN(techCountNum) && techCountNum >= 1);
@@ -79,8 +80,8 @@ export function QRGenerationModal({
   // Auto-refresh QR every 5 minutes when a QR is displayed (Section 18.5)
   useEffect(() => {
     if (generated == null || !wo) return;
-    const isCheckoutWo = wo.currentStatus === 'Service In Progress';
-    const isCheckInWo = wo.currentStatus === 'Service Visit Scheduled' || wo.currentStatus === 'Follow-Up Visit Requested';
+    const isCheckoutWo = wo.currentStatus === WorkOrderStatus.SERVICE_IN_PROGRESS;
+    const isCheckInWo = wo.currentStatus === WorkOrderStatus.ACCEPTED_TECHNICIAN_ASSIGNED || wo.currentStatus === WorkOrderStatus.FOLLOW_UP_REQUESTED;
     if (!isCheckoutWo && !isCheckInWo) return;
     if (isCheckInWo && (isNaN(techCountNum) || techCountNum < 1)) return;
     const workOrderId = wo.id;
@@ -159,7 +160,7 @@ export function QRGenerationModal({
             </div>
           )}
 
-          {wo?.currentStatus !== 'Service In Progress' && (
+          {wo?.currentStatus !== WorkOrderStatus.SERVICE_IN_PROGRESS && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Broj tehničara koji su stigli *
@@ -186,7 +187,7 @@ export function QRGenerationModal({
           ) : (
             <div className="space-y-4 pt-2">
               <p className="text-sm text-green-700 font-medium">
-                {wo?.currentStatus === 'Service In Progress'
+                {wo?.currentStatus === WorkOrderStatus.SERVICE_IN_PROGRESS
                   ? 'QR za odjavu s posla. Osvježava se svakih 5 minuta; nevažeći nakon upotrebe.'
                   : 'QR za prijavu dolaska. Osvježava se svakih 5 minuta; nevažeći nakon upotrebe.'}
               </p>
