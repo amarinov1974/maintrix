@@ -7,6 +7,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { authService } from './auth-service.js';
 import type { DemoLoginRequest } from './types.js';
 import { prisma } from '../../config/database.js';
+import { sessionManager } from '../session/session-manager.js';
 import {
   isGateEnabled,
   verifyGateCredentials,
@@ -99,13 +100,7 @@ router.post('/demo-login', requireGate, async (req, res) => {
     const result = await authService.demoLogin(request);
 
     if (result.success && result.sessionId) {
-      res.cookie('cmms_session', result.sessionId, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 10 * 60 * 1000, // 10 minutes
-      });
-
+      res.cookie(sessionManager.getCookieName(), result.sessionId, sessionManager.getCookieOpts());
       res.json(result);
     } else {
       res.status(401).json(result);
