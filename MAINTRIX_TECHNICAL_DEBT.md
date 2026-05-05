@@ -1,8 +1,23 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04 (drafts UI gap, login 401 noise)*
+*Zadnje ažurirano: 2026-05-04 (PR #6–#18 sweep)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
+
+Sažetak rada 2026-05-04 (PR #6–#18, mergano u main):
+
+- Backend ESLint setup + `no-explicit-any: error` (#6, #9)
+- Cross-platform `npm run dev` + lazy Resend init (#8)
+- `every()` audit (#10)
+- Status enums u modalima + centralizirani `getStatusBadgeVariant` (#11, #12)
+- Centralizirani approval thresholds €1000/€3000 (#13)
+- Konzistentni success overlay na svim ticket akcijama (#14)
+- Cookie hardening — env-aware secure/sameSite (#15)
+- Native `window.alert`/`confirm` → app-level modali + toast (#16)
+- HR labele u UI Povijesti (action + status) (#17)
+- Attachment upload tenant scope check + download endpoint + AM/Director attachment lista (#18)
+
+Backend testovi: 12 → 66. Frontend testovi: 0 → 9.
 
 ---
 
@@ -44,7 +59,11 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
   - cross-tenant access (vendor pokušava dohvatiti WO druge vendor firme) je blokiran — pokriveno (`work-order-service.scope.test.ts`)
   - get-by-id varijante svih navedenih — pokriveno (WO + ticket, `cce5962`)
   - ticket scope (listTickets/getTicket po `companyId`, cross-tenant blokiran) — pokriveno (`ticket-service.scope.test.ts`, `cce5962`)
-  - preostalo: auth middleware testovi (session/role guards), attachment download scope, admin endpointi
+  - auth middleware testovi (session/role guards) — pokriveno (`auth.middleware.test.ts`, 13 testova)
+  - attachment upload scope (cross-tenant odbacivanje) — pokriveno (`attachment-service.scope.test.ts`, 6 testova, PR #18)
+  - approval chain routing po pragovima — pokriveno (`approval-chain.test.ts`, 5 testova)
+  - session cookie env-aware konfiguracija — pokriveno (`session-cookie.test.ts`, 3 testa)
+  - preostalo: admin endpointi (deactivate, store/asset CRUD), invoice batch download scope
 - [x] **Vitest/PostCSS config ne radi lokalno.** ~~Testovi se trenutno ne mogu pokrenuti zbog BOM/JSON parse errora u PostCSS configu.~~ Riješeno (`4f468fd`). Stvarni uzrok bio je UTF-8 BOM (`EF BB BF`) na početku **root `package.json`**, ne PostCSS configa — BOM je razbijao npm-ov JSON parser pri workspace resolution-u. Frontend vitest sada starta čisto (`passWithNoTests: true` dok se ne dodaju testovi).
 - [x] **WO scope testovi nisu zapravo trčali u CI/lokalno.** Testovi iz `ab8c49c` postojali su, ali `vi.mock('../src/config/database.js', ...)` referencirao je top-level `prismaMock` koji se zbog vitest hoistinga koristio prije inicijalizacije — cijela suite je collapsala s `ReferenceError` i 0 testova se izvršavalo. Riješeno prelaskom na `vi.hoisted()` (`cce5962`). Sada 15/15 prolazi.
 - [ ] **Centralizirani authorization middleware.** Trenutno svaki endpoint mora ručno primijeniti `companyId` filter. To je krhko — jedan zaboravljen filter = tenant data leak ili (kao u ovom incidentu) potpuno mrtav flow. Treba layer koji forsira scope automatski.
