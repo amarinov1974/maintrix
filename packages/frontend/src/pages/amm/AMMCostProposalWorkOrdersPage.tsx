@@ -11,13 +11,7 @@ import { Layout, Button, Badge } from '../../components/shared';
 import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import { WorkOrderStatus } from '../../types/statuses';
 import type { WorkOrder } from '../../api/work-orders';
-import { formatStatus } from '../../utils/formatters';
-
-function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
-  if (status.includes('Approved')) return 'success';
-  if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
-  return 'warning';
-}
+import { formatStatus, getInFlightStatusBadgeVariant } from '../../utils/formatters';
 
 export function AMMCostProposalWorkOrdersPage() {
   const { session } = useSession();
@@ -106,7 +100,7 @@ function WorkOrderPreviewRow({
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-semibold text-gray-900">Radni nalog #{workOrder.id}</span>
         <span className="text-sm text-gray-600">Prijava #{workOrder.ticketId}</span>
-        <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>
+        <Badge variant={getInFlightStatusBadgeVariant(workOrder.currentStatus)}>
           {formatStatus(workOrder.currentStatus)}
         </Badge>
         <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>

@@ -15,7 +15,7 @@ import { AMMWorkOrderDetailModal } from './AMMWorkOrderDetailModal';
 import { TicketStatus, WorkOrderStatus, TerminalWorkOrderStatuses } from '../../types/statuses';
 import type { Ticket } from '../../api/tickets';
 import type { WorkOrder } from '../../api/work-orders';
-import { formatStatus } from '../../utils/formatters';
+import { formatStatus, getInFlightStatusBadgeVariant } from '../../utils/formatters';
 
 function BucketCard({
   title,
@@ -79,12 +79,6 @@ function BucketCard({
     return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
   }
   return inner;
-}
-
-function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'danger' {
-  if (status.includes('Approved')) return 'success';
-  if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
-  return 'warning';
 }
 
 export function AMMDashboard() {
@@ -423,7 +417,7 @@ function TicketRow({ ticket, onClick }: { ticket: Ticket; onClick: () => void })
     >
       <span className="font-semibold text-gray-900">Prijava #{ticket.id}</span>
       {ticket.urgent && <Badge variant="urgent">URGENT</Badge>}
-      <Badge variant={getStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
+      <Badge variant={getInFlightStatusBadgeVariant(ticket.currentStatus)}>{formatStatus(ticket.currentStatus)}</Badge>
       <span className="text-sm text-gray-600">{ticket.storeName}</span>
       <span className="text-sm text-gray-500">{new Date(ticket.createdAt).toLocaleDateString()}</span>
     </button>
@@ -443,7 +437,7 @@ function WorkOrderRow({ workOrder, onSelect }: { workOrder: WorkOrder; onSelect:
     >
       <span className="font-semibold text-gray-900">Work Order #{workOrder.id}</span>
       <span className="text-sm text-gray-600">Prijava #{workOrder.ticketId}</span>
-      <Badge variant={getStatusBadgeVariant(workOrder.currentStatus)}>{formatStatus(workOrder.currentStatus)}</Badge>
+      <Badge variant={getInFlightStatusBadgeVariant(workOrder.currentStatus)}>{formatStatus(workOrder.currentStatus)}</Badge>
       <span className="text-sm text-gray-600">{workOrder.vendorCompanyName}</span>
       <span className="text-sm text-gray-500">{new Date(workOrder.updatedAt).toLocaleDateString()}</span>
     </button>

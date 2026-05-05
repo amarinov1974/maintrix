@@ -12,7 +12,8 @@ import { useSession } from '../../contexts/SessionContext';
 import { Layout, Button, Card, Badge } from '../../components/shared';
 import { TicketDetailModal } from './TicketDetailModal';
 import { TicketStatus } from '../../types/statuses';
-import { formatCategory, formatStatus } from '../../utils/formatters';
+import { formatCategory, formatStatus, getStatusBadgeVariant } from '../../utils/formatters';
+import { TerminalTicketStatuses } from '../../types/statuses';
 
 function BucketCard({
   title,
@@ -76,16 +77,6 @@ function BucketCard({
     return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
   }
   return inner;
-}
-
-function getStatusBadgeVariant(
-  status: string
-): 'default' | 'success' | 'warning' | 'danger' {
-  if (status === 'Draft') return 'default';
-  if (status.includes('Submitted') || status.includes('Awaiting')) return 'warning';
-  if (status.includes('Approved')) return 'success';
-  if (status.includes('Rejected') || status.includes('Withdrawn')) return 'danger';
-  return 'default';
 }
 
 export function StoreManagerDashboard() {
@@ -205,11 +196,7 @@ export function StoreManagerDashboard() {
   const qrRequiredTickets = qrTicketIds;
 
   const [myTicketsFilter, setMyTicketsFilter] = useState<'active' | 'closed'>('active');
-  const terminalStatuses = [
-    'Ticket Withdrawn',
-    'Ticket Rejected',
-    'Ticket Archived',
-  ];
+  const terminalStatuses = TerminalTicketStatuses;
 
   const { data: participatedTickets = [], isLoading: loadingParticipated } = useQuery({
     queryKey: ['tickets', 'store-manager', 'participated', session?.storeId, session?.userId],
