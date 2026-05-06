@@ -33,6 +33,7 @@ import { approvalChainService } from '../approval-chain/approval-chain-service.j
 import type { InternalRole } from '@prisma/client';
 import { WorkOrderStatus as PrismaWorkOrderStatus } from '@prisma/client';
 import { notifyNewOwner } from '../email/email-service.js';
+import { writeTicketAudit, writeWorkOrderAudit } from '../audit/audit-service.js';
 
 /** Prisma stores enum keys (DRAFT); state machine uses display values (Draft). */
 function toOurStatus(prismaStatus: string): TicketStatusType {
@@ -164,17 +165,13 @@ export class TicketService {
       }
     }
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: null,
-        newStatus: TicketStatus.DRAFT,
-        actionType: 'CREATE',
-        actorType: 'INTERNAL',
-        actorId: userId,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: null,
+      newStatus: TicketStatus.DRAFT,
+      actionType: 'CREATE',
+      actorType: 'INTERNAL',
+      actorId: userId,
     });
 
     return this.mapTicketToResponse(ticket);
@@ -254,18 +251,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus!,
-        actionType: 'SUBMIT',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: ticket.urgent ? 'Routed to AMM (urgent)' : 'Routed to AM (non-urgent)',
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus!,
+      actionType: 'SUBMIT',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: ticket.urgent ? 'Proslijeđeno voditelju održavanja (hitno)' : 'Proslijeđeno voditelju regije (nije hitno)',
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -389,18 +382,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus!,
-        actionType: 'REQUEST_CLARIFICATION',
-        actorType: 'INTERNAL',
-        actorId: userId,
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus!,
+      actionType: 'REQUEST_CLARIFICATION',
+      actorType: 'INTERNAL',
+      actorId: userId,
         comment,
-      },
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -533,18 +522,14 @@ export class TicketService {
       });
     }
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: effectiveStatus,
-        actionType: 'SUBMIT_UPDATED',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.comment,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: effectiveStatus,
+      actionType: 'SUBMIT_UPDATED',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.comment,
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -620,18 +605,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus!,
-        actionType: 'APPROVE_FOR_ESTIMATION',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: 'Approved for cost estimation',
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus!,
+      actionType: 'APPROVE_FOR_ESTIMATION',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: 'Odobreno za procjenu troška',
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -697,18 +678,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus!,
-        actionType: 'REJECT',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.reason,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus!,
+      actionType: 'REJECT',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.reason,
     });
 
     return this.mapTicketToResponse(updated);
@@ -769,18 +746,14 @@ export class TicketService {
       });
     }
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus!,
-        actionType: 'WITHDRAW',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.reason,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus!,
+      actionType: 'WITHDRAW',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.reason,
     });
 
     return this.mapTicketToResponse(updated);
@@ -1043,18 +1016,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'REQUEST_APPROVAL',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: `Cost estimation: €${request.estimatedAmount}`,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'REQUEST_APPROVAL',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: `Procjena troška: €${request.estimatedAmount}`,
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -1198,18 +1167,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: newStatusOur,
-        actionType: action,
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.comment ?? `${role} approved`,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: newStatusOur,
+      actionType: action,
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.comment ?? `${role} approved`,
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -1292,18 +1257,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'RETURN',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.comment,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'RETURN',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.comment,
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -1385,18 +1346,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: workOrder.id,
-        workOrderId: workOrder.id,
-        prevStatus: null,
-        newStatus: WorkOrderStatus.CREATED,
-        actionType: 'CREATE',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.description,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: workOrder.id,
+      prevStatus: null,
+      newStatus: WorkOrderStatus.CREATED,
+      actionType: 'CREATE',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.description,
     });
 
     // Governance: ticket status becomes Work Order In Progress; owner stays AMM (no update to currentOwnerUserId).
@@ -1479,17 +1436,13 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'ARCHIVE',
-        actorType: 'INTERNAL',
-        actorId: userId,
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'ARCHIVE',
+      actorType: 'INTERNAL',
+      actorId: userId,
     });
 
     return this.mapTicketToResponse(updated);
@@ -1596,18 +1549,14 @@ export class TicketService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'TICKET',
-        entityId: ticket.id,
-        ticketId: ticket.id,
-        prevStatus: ticket.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'ARCHIVE',
-        actorType: 'INTERNAL',
-        actorId,
-        comment: 'Auto-archived (all work orders complete)',
-      },
+    await writeTicketAudit({
+      ticketId: ticket.id,
+      prevStatus: ticket.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'ARCHIVE',
+      actorType: 'INTERNAL',
+      actorId,
+      comment: 'Automatski arhivirano (svi radni nalozi završeni)',
     });
   }
 

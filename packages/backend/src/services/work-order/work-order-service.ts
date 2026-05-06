@@ -26,6 +26,7 @@ import type {
   WorkOrderResponse,
   WorkOrderDetailResponse,
 } from './types.js';
+import { writeWorkOrderAudit } from '../audit/audit-service.js';
 
 /** Map Prisma enum key to display status (state machine uses display strings). */
 function toOurStatus(prismaStatus: string): WorkOrderStatusType {
@@ -119,18 +120,14 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'ASSIGN_TECHNICIAN',
-        actorType: 'VENDOR',
-        actorId: userId,
-        comment: `Assigned to ${updated.assignedTechnician?.name ?? 'technician'}, ETA: ${request.eta.toISOString()}`,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'ASSIGN_TECHNICIAN',
+      actorType: 'VENDOR',
+      actorId: userId,
+      comment: `Dodijeljen tehničar ${updated.assignedTechnician?.name ?? '—'}, predviđeni dolazak: ${request.eta.toLocaleString('hr-HR')}`,
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
@@ -213,18 +210,14 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'CHECKIN',
-        actorType: 'VENDOR',
-        actorId: userId,
-        comment: `Checked in with ${techCount ?? 0} technician(s)`,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'CHECKIN',
+      actorType: 'VENDOR',
+      actorId: userId,
+      comment: `Prijava na lokaciji s ${techCount ?? 0} tehničar(a)`,
     });
 
     return this.mapWorkOrderToResponse(updated);
@@ -372,18 +365,16 @@ export class WorkOrderService {
       });
     }
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: action,
-        actorType: 'VENDOR',
-        actorId: userId,
-        comment: request.comment ?? `Outcome: ${request.outcome}`,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: action,
+      actorType: 'VENDOR',
+      actorId: userId,
+      comment: request.comment ?? `Ishod: ${
+        ({ FIXED: 'popravljeno', FOLLOW_UP: 'potreban dodatni posjet', NEW_WO_NEEDED: 'potreban novi radni nalog', UNSUCCESSFUL: 'neuspjeli popravak' } as Record<string, string>)[request.outcome] ?? request.outcome
+      }`,
     });
 
     return this.mapWorkOrderToResponse(updated);
@@ -526,17 +517,13 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: action,
-        actorType: 'VENDOR',
-        actorId: userId,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: action,
+      actorType: 'VENDOR',
+      actorId: userId,
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
@@ -591,17 +578,13 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'APPROVE_COST',
-        actorType: 'INTERNAL',
-        actorId: userId,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'APPROVE_COST',
+      actorType: 'INTERNAL',
+      actorId: userId,
     });
 
     return this.mapWorkOrderToResponse(updated);
@@ -663,18 +646,14 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'REQUEST_REVISION',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.comment,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'REQUEST_REVISION',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.comment,
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
@@ -729,17 +708,13 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'CLOSE_WITHOUT_COST',
-        actorType: 'INTERNAL',
-        actorId: userId,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'CLOSE_WITHOUT_COST',
+      actorType: 'INTERNAL',
+      actorId: userId,
     });
 
     return this.mapWorkOrderToResponse(updated);
@@ -803,18 +778,14 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'RETURN_FOR_CLARIFICATION',
-        actorType: 'VENDOR',
-        actorId: userId,
-        comment: request.comment,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'RETURN_FOR_CLARIFICATION',
+      actorType: 'VENDOR',
+      actorId: userId,
+      comment: request.comment,
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
@@ -890,18 +861,14 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'RESEND_TO_VENDOR',
-        actorType: 'INTERNAL',
-        actorId: userId,
-        comment: request.comment ?? undefined,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'RESEND_TO_VENDOR',
+      actorType: 'INTERNAL',
+      actorId: userId,
+      comment: request.comment ?? undefined,
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
@@ -972,18 +939,14 @@ export class WorkOrderService {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'RETURN_FOR_TECH_COUNT',
-        actorType: 'VENDOR',
-        actorId: userId,
-        comment: request.comment ?? 'Returned to store to correct number of technicians',
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'RETURN_FOR_TECH_COUNT',
+      actorType: 'VENDOR',
+      actorId: userId,
+      comment: request.comment ?? 'Vraćeno u poslovnicu radi ispravnog broja tehničara',
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
@@ -1055,18 +1018,14 @@ export class WorkOrderService {
     });
 
     const actorType = role === 'AMM' ? 'INTERNAL' : 'VENDOR';
-    await prisma.auditLog.create({
-      data: {
-        entityType: 'WORK_ORDER',
-        entityId: wo.id,
-        workOrderId: wo.id,
-        prevStatus: wo.currentStatus,
-        newStatus: validation.newStatus! as string,
-        actionType: 'REJECT',
-        actorType,
-        actorId: userId,
-        comment: request.reason,
-      },
+    await writeWorkOrderAudit({
+      workOrderId: wo.id,
+      prevStatus: wo.currentStatus,
+      newStatus: validation.newStatus! as string,
+      actionType: 'REJECT',
+      actorType,
+      actorId: userId,
+      comment: request.reason,
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
