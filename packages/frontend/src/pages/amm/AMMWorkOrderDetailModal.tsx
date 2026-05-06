@@ -188,6 +188,117 @@ export function AMMWorkOrderDetailModal({
             </div>
           </section>
 
+          {/* 16.4–16.7 AMM action buttons — placed near top so they're visible without scrolling past long invoice/work-report tables */}
+          {canAct && (
+            <section className="space-y-4 border-t pt-4">
+              <h2 className="font-semibold text-gray-900">Akcije</h2>
+              <div className="grid gap-4 sm:grid-cols-1">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h3 className="font-medium text-green-900 mb-2">Odobri ponudu troška</h3>
+                  <p className="text-sm text-green-700 mb-3">
+                    Finalizirajte ovu ponudu troška. Radni nalog prelazi u odobreno/arhivirano. Prijava se može arhivirati kad svi radni nalozi budu zatvoreni.
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => approveMutation.mutate()}
+                    disabled={approveMutation.isPending}
+                  >
+                    {approveMutation.isPending ? 'Odobravanje...' : 'Odobri ponudu troška'}
+                  </Button>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <h3 className="font-medium text-amber-900 mb-2">Zatraži reviziju ponude</h3>
+                  {!showRevisionForm ? (
+                    <>
+                      <p className="text-sm text-amber-700 mb-3">
+                        Vrati S3 na izmjene. Komentar je obavezan.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => setShowRevisionForm(true)}
+                      >
+                        Zatraži reviziju
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-amber-900">Komentar *</label>
+                      <textarea
+                        value={revisionComment}
+                        onChange={(e) => setRevisionComment(e.target.value)}
+                        placeholder="Objasnite što treba ispraviti..."
+                        rows={3}
+                        className="w-full p-3 border border-gray-300 rounded-lg"
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          onClick={() => revisionMutation.mutate()}
+                          disabled={!revisionComment.trim() || revisionMutation.isPending}
+                        >
+                          {revisionMutation.isPending ? 'Slanje...' : 'Pošalji zahtjev za reviziju'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => {
+                            setShowRevisionForm(false);
+                            setRevisionComment('');
+                          }}
+                        >
+                          Odustani
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-gray-100 border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-2">Zatvori bez troška</h3>
+                  {!showCloseConfirm ? (
+                    <>
+                      <p className="text-sm text-gray-700 mb-3">
+                        Račun nije potreban (npr. jamstvo, interna odluka). Završno stanje.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => setShowCloseConfirm(true)}
+                      >
+                        Zatvori bez troška
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-700">
+                        Jeste li sigurni? Status će biti Zatvoreno bez troška i radni nalog postaje konačan.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="danger"
+                          onClick={() => closeWithoutCostMutation.mutate()}
+                          disabled={closeWithoutCostMutation.isPending}
+                        >
+                          {closeWithoutCostMutation.isPending ? 'Zatvaranje...' : 'Potvrdi zatvaranje bez troška'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => setShowCloseConfirm(false)}
+                        >
+                          Odustani
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Returned by S1: AMM can resend to vendor or reject */}
           {isReturnedToAm && (
             <section className="space-y-4 border-t pt-4">
@@ -351,117 +462,6 @@ export function AMMWorkOrderDetailModal({
               <p className="text-xs text-gray-600 mt-2">
                 Boje: svijetlo žuta = automatski generirano (vrijeme dolaska/servisa), svijetlo zelena = stavka iz cjenika, svijetlo crvena = stavka izvan cjenika.
               </p>
-            </section>
-          )}
-
-          {/* 16.4–16.7 AMM action buttons */}
-          {canAct && (
-            <section className="space-y-4 border-t pt-4">
-              <h2 className="font-semibold text-gray-900">Akcije</h2>
-              <div className="grid gap-4 sm:grid-cols-1">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <h3 className="font-medium text-green-900 mb-2">Odobri ponudu troška</h3>
-                  <p className="text-sm text-green-700 mb-3">
-                    Finalizirajte ovu ponudu troška. Radni nalog prelazi u odobreno/arhivirano. Prijava se može arhivirati kad svi radni nalozi budu zatvoreni.
-                  </p>
-                  <Button
-                    type="button"
-                    onClick={() => approveMutation.mutate()}
-                    disabled={approveMutation.isPending}
-                  >
-                    {approveMutation.isPending ? 'Odobravanje...' : 'Odobri ponudu troška'}
-                  </Button>
-                </div>
-
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <h3 className="font-medium text-amber-900 mb-2">Zatraži reviziju ponude</h3>
-                  {!showRevisionForm ? (
-                    <>
-                      <p className="text-sm text-amber-700 mb-3">
-                        Vrati S3 na izmjene. Komentar je obavezan.
-                      </p>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => setShowRevisionForm(true)}
-                      >
-                        Zatraži reviziju
-                      </Button>
-                    </>
-                  ) : (
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-amber-900">Komentar *</label>
-                      <textarea
-                        value={revisionComment}
-                        onChange={(e) => setRevisionComment(e.target.value)}
-                        placeholder="Objasnite što treba ispraviti..."
-                        rows={3}
-                        className="w-full p-3 border border-gray-300 rounded-lg"
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          onClick={() => revisionMutation.mutate()}
-                          disabled={!revisionComment.trim() || revisionMutation.isPending}
-                        >
-                          {revisionMutation.isPending ? 'Slanje...' : 'Pošalji zahtjev za reviziju'}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => {
-                            setShowRevisionForm(false);
-                            setRevisionComment('');
-                          }}
-                        >
-                          Odustani
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-gray-100 border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">Zatvori bez troška</h3>
-                  {!showCloseConfirm ? (
-                    <>
-                      <p className="text-sm text-gray-700 mb-3">
-                        Račun nije potreban (npr. jamstvo, interna odluka). Završno stanje.
-                      </p>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => setShowCloseConfirm(true)}
-                      >
-                        Zatvori bez troška
-                      </Button>
-                    </>
-                  ) : (
-                    <div className="space-y-3">
-                      <p className="text-sm text-gray-700">
-                        Jeste li sigurni? Status će biti Zatvoreno bez troška i radni nalog postaje konačan.
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="danger"
-                          onClick={() => closeWithoutCostMutation.mutate()}
-                          disabled={closeWithoutCostMutation.isPending}
-                        >
-                          {closeWithoutCostMutation.isPending ? 'Zatvaranje...' : 'Potvrdi zatvaranje bez troška'}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => setShowCloseConfirm(false)}
-                        >
-                          Odustani
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
             </section>
           )}
 
