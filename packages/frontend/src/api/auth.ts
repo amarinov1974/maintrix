@@ -48,7 +48,7 @@ export interface SessionResponse {
     regionId?: number;
     regionName?: string;
     servicedCompanyName?: string;
-  };
+  } | null;
 }
 
 export const authAPI = {
