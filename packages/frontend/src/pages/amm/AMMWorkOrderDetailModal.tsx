@@ -354,7 +354,7 @@ export function AMMWorkOrderDetailModal({
             </section>
           )}
 
-          {/* 16.4–16.7 AMM action buttons */}
+          {/* 16.4–16.7 AMM action buttons — review (work report + cost proposal) above, decide here */}
           {canAct && (
             <section className="space-y-4 border-t pt-4">
               <h2 className="font-semibold text-gray-900">Akcije</h2>
