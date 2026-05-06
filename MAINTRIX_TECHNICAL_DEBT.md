@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04 (drafts list page + clickable BucketCard)*
+*Zadnje ažurirano: 2026-05-04 (login 401 noise riješen)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -86,7 +86,7 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 ### Niski prioritet (UX / kozmetika / accessibility)
 
 - [ ] **Drafts su "write-only" za SM.** Djelomično riješeno (2026-05-04): nova stranica `/store-manager/drafts` lista DRAFT prijave koje je trenutni SM kreirao; klik otvara `TicketDetailModal` koji već ima "Pošalji prijavu" gumb (`canSubmitDraft`). `BucketCard` "Nacrti prijava" sad je klikabilan i vodi na novu stranicu. **Preostaje:** brisanje draftova. Backend trenutno nema delete endpoint za DRAFT (state machine WITHDRAW radi samo iz `AWAITING_CREATOR_RESPONSE`). Treba ili dodati `DELETE /api/tickets/:id` endpoint koji dopušta brisanje samo ako je status DRAFT i caller je creator, ili proširiti WITHDRAW transition na DRAFT.
-- [ ] **Login screen pokazuje 401 grešku u browser konzoli.** Otkriveno 2026-05-04. Entry stranica auto-poziva `GET /api/auth/session`; pošto korisnik nije prijavljen, server vraća 401, browser obvezno loga crveno. Funkcionalno OK, samo kozmetika. Fix: backend vrati 200 s `{ authenticated: false }` umjesto 401, ili frontend ne zove session check na entry route. ~15 min.
+- [x] **Login screen pokazuje 401 grešku u browser konzoli.** ~~Entry stranica auto-poziva `GET /api/auth/session`; pošto korisnik nije prijavljen, server vraća 401, browser obvezno loga crveno.~~ Riješeno (2026-05-04): `GET /api/auth/session` sad vraća `200 { session: null }` kad nema session-a. Konzola čista na entry screenu. `requireAuth` middleware na zaštićenim rutama i dalje vraća 401 za neautentirane pozive — to je očekivano i frontend interceptor pravilno preusmjerava na `/`.
 - [ ] **Skrolanje unutar modala je nezgrapno.** “Detalji radnog naloga” i drugi veliki modali zahtijevaju puno skrolanja gore-dolje da bi se vidio aktivni gumb. Sticky action bar ili pametniji layout pri sljedećem redesignu modala. Otkriveno 2026-05-02.
 - [ ] **Accessibility prolaz na disabled gumbima** — tooltip preko `<div>` → `aria-label`/`aria-describedby` pattern.
 - [ ] **TS/JS duplikati u frontendu** — već većinski očišćeno u 2026-04-29 sesiji, ali povremeno provjeriti.

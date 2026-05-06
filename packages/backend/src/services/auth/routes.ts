@@ -127,20 +127,23 @@ router.post('/logout', async (req, res) => {
 
 /**
  * GET /api/auth/session
- * Get current session info
+ * Get current session info. Returns `{ session: null }` (200) when no
+ * session is present so the entry screen's auto-check doesn't surface
+ * a 401 in the browser console — `requireAuth` on protected routes
+ * still returns 401 as expected for unauthenticated callers.
  */
 router.get('/session', async (req, res) => {
   let sessionId = req.cookies?.cmms_session ?? req.headers['x-session-id'];
   if (Array.isArray(sessionId)) sessionId = sessionId[0];
   if (typeof sessionId !== 'string' || !sessionId.trim()) {
-    res.status(401).json({ error: 'No session' });
+    res.json({ session: null });
     return;
   }
 
   const session = await authService.validateSession(sessionId.trim());
 
   if (!session) {
-    res.status(401).json({ error: 'Invalid or expired session' });
+    res.json({ session: null });
     return;
   }
 
