@@ -6,6 +6,7 @@
 import { prisma } from '../../config/database.js';
 import type { PmScheduleType } from '@prisma/client';
 import * as XLSX from 'xlsx';
+import { writeTicketAudit } from '../audit/audit-service.js';
 
 export interface ParsedPmRow {
   asset_name: string;
@@ -319,17 +320,13 @@ export async function createWorkOrdersFromPlans(
         data: { currentStatus: 'WORK_ORDER_IN_PROGRESS' },
       });
 
-      await prisma.auditLog.create({
-        data: {
-          entityType: 'TICKET',
-          entityId: ticket.id,
-          ticketId: ticket.id,
-          prevStatus: 'Ticket Cost Estimation Approved',
-          newStatus: 'Work Order In Progress',
-          actionType: 'CREATE_WO_FROM_PM',
-          actorType: 'INTERNAL',
-          actorId: createdByUserId,
-        },
+      await writeTicketAudit({
+        ticketId: ticket.id,
+        prevStatus: 'Ticket Cost Estimation Approved',
+        newStatus: 'Work Order In Progress',
+        actionType: 'CREATE_WO_FROM_PM',
+        actorType: 'INTERNAL',
+        actorId: createdByUserId,
       });
 
       created++;
