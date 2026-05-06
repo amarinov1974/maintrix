@@ -1,6 +1,6 @@
 # Maintrix — Tehnički dug i lessons learned
 
-*Zadnje ažurirano: 2026-05-04 (AMM WO modal — akcije iznad cost proposal review-a)*
+*Zadnje ažurirano: 2026-05-04 (a11y na disabled archive button)*
 
 Ovaj dokument prati tehničke odluke koje su odgođene, bug paterne koji se ponavljaju, i konkretne incidente koji su naučili nešto vrijedno za buduće odluke.
 
@@ -88,7 +88,7 @@ Sljedeći put kad se postavi pitanje “jesu li mi testovi vrijedni vremena”, 
 - [ ] **Drafts su "write-only" za SM.** Djelomično riješeno (2026-05-04): nova stranica `/store-manager/drafts` lista DRAFT prijave koje je trenutni SM kreirao; klik otvara `TicketDetailModal` koji već ima "Pošalji prijavu" gumb (`canSubmitDraft`). `BucketCard` "Nacrti prijava" sad je klikabilan i vodi na novu stranicu. **Preostaje:** brisanje draftova. Backend trenutno nema delete endpoint za DRAFT (state machine WITHDRAW radi samo iz `AWAITING_CREATOR_RESPONSE`). Treba ili dodati `DELETE /api/tickets/:id` endpoint koji dopušta brisanje samo ako je status DRAFT i caller je creator, ili proširiti WITHDRAW transition na DRAFT.
 - [x] **Login screen pokazuje 401 grešku u browser konzoli.** ~~Entry stranica auto-poziva `GET /api/auth/session`; pošto korisnik nije prijavljen, server vraća 401, browser obvezno loga crveno.~~ Riješeno (2026-05-04): `GET /api/auth/session` sad vraća `200 { session: null }` kad nema session-a. Konzola čista na entry screenu. `requireAuth` middleware na zaštićenim rutama i dalje vraća 401 za neautentirane pozive — to je očekivano i frontend interceptor pravilno preusmjerava na `/`.
 - [ ] **Skrolanje unutar modala je nezgrapno.** Djelomično (2026-05-04): u `AMMWorkOrderDetailModal` AMM action section (Odobri / Zatraži reviziju / Zatvori bez troška) premještena je odmah ispod sekcije "Detalji", ispred dugog Cost Proposal review-a + work report-a. Sad je primarni gumb vidljiv bez skrolanja. **Preostaje:** isto razmotriti za S2/S3 WO modale i druge velike detail modale ako se pokaže potreba; razmotriti i pravi sticky action bar pri sljedećem redesignu.
-- [ ] **Accessibility prolaz na disabled gumbima** — tooltip preko `<div>` → `aria-label`/`aria-describedby` pattern.
+- [x] **Accessibility prolaz na disabled gumbima** — ~~tooltip preko `<div>` → `aria-label`/`aria-describedby` pattern.~~ Riješeno (2026-05-04): jedini eksplicitni primjer u repu (`AMMTicketDetailModal` arhive gumb omotan `<div title="Nije moguće arhivirati...">`) zamijenjen je s `aria-describedby` koji vodi na vidljivi explanation paragraf koji već postoji iznad gumba. Wrapper `div` uklonjen. `Button` komponenta već prosljeđuje sve `aria-*` propove kroz spread, pa nije bilo potrebe ništa dirati u njoj. Drugi disabled gumbi u repu (forma-validacija → mutation pending) ne trebaju explanation tooltips — disablement razlog je jasan iz lokalnog forma stanja.
 - [ ] **TS/JS duplikati u frontendu** — već većinski očišćeno u 2026-04-29 sesiji, ali povremeno provjeriti.
 
 ### Operativno
