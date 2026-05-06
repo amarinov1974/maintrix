@@ -582,7 +582,7 @@ export function AMMTicketDetailModal({
 
           {showArchiveSection && (
             <section className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700 mb-2">
+              <p id={`archive-reason-${ticket.id}`} className="text-sm text-gray-700 mb-2">
                 {allWorkOrdersTerminal
                   ? 'Prijava je odobrena. Arhivirajte kada su svi radni nalozi završeni.'
                   : 'Nije moguće arhivirati — postoje aktivni radni nalozi.'}
@@ -593,11 +593,15 @@ export function AMMTicketDetailModal({
                     'Archive failed'}
                 </div>
               )}
-              <div title={!allWorkOrdersTerminal ? 'Nije moguće arhivirati — postoje aktivni radni nalozi.' : undefined} style={{ display: 'inline-block' }}>
-                <Button type="button" variant="secondary" onClick={() => archiveMutation.mutate()} disabled={archiveMutation.isPending || !allWorkOrdersTerminal}>
-                  {archiveMutation.isPending ? 'Arhiviranje...' : 'Arhiviraj prijavu'}
-                </Button>
-              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => archiveMutation.mutate()}
+                disabled={archiveMutation.isPending || !allWorkOrdersTerminal}
+                aria-describedby={`archive-reason-${ticket.id}`}
+              >
+                {archiveMutation.isPending ? 'Arhiviranje...' : 'Arhiviraj prijavu'}
+              </Button>
             </section>
           )}
 
