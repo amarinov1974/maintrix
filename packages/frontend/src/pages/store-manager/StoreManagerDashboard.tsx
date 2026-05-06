@@ -251,6 +251,7 @@ export function StoreManagerDashboard() {
           title="Nacrti prijava"
           count={draftTickets.length}
           accentColor="#6E6E73"
+          to="/store-manager/drafts"
         />
 
         {/* Section 3 — Action Required */}

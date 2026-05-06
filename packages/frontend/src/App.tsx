@@ -7,6 +7,7 @@ import { EntryScreen } from './pages/EntryScreen';
 import { StoreManagerDashboard } from './pages/store-manager/StoreManagerDashboard';
 import { SMActionRequiredPage } from './pages/store-manager/SMActionRequiredPage';
 import { SMQRRequiredPage } from './pages/store-manager/SMQRRequiredPage';
+import { SMDraftsPage } from './pages/store-manager/SMDraftsPage';
 import { AMMDashboard } from './pages/amm/AMMDashboard';
 import { AMMUrgentTicketsPage } from './pages/amm/AMMUrgentTicketsPage';
 import { AMMCostEstimationTicketsPage } from './pages/amm/AMMCostEstimationTicketsPage';
@@ -58,6 +59,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['SM']}>
                   <SMActionRequiredPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/store-manager/drafts"
+              element={
+                <ProtectedRoute allowedRoles={['SM']}>
+                  <SMDraftsPage />
                 </ProtectedRoute>
               }
             />
