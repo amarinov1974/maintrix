@@ -444,6 +444,64 @@ export function AMMTicketDetailModal({
             </section>
           )}
 
+          {canSubmitCost && (
+            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Predaja procjene troška</h3>
+              <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Unesite procijenjeni trošak i opcijski priložite dokumentaciju. Prijava će proći kroz lanac odobrenja.</p>
+              <div className="space-y-3">
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Procijenjeni iznos (EUR)</label>
+                  <input
+                    type="number"
+                    value={costAmount}
+                    onChange={(e) => setCostAmount(e.target.value)}
+                    placeholder="Iznos u EUR"
+                    min="0"
+                    step="0.01"
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Dokumenti (opcionalno)</label>
+                  <p className="text-xs text-gray-600 mb-2">Priložite prateću dokumentaciju za procjenu troška.</p>
+                  <input
+                    ref={costEstimationFileInputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.heic,image/*"
+                    className="hidden"
+                    onChange={handleCostEstimationFileChange}
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => costEstimationFileInputRef.current?.click()}
+                    disabled={uploadingAttachment}
+                  >
+                    {uploadingAttachment ? 'Učitavanje...' : 'Dodaj dokument(e)'}
+                  </Button>
+                  {ticket.attachments != null && ticket.attachments.length > 0 && (
+                    <ul className="mt-2 text-sm text-gray-600 list-disc list-inside">
+                      {ticket.attachments.map((a) => (
+                        <li key={a.id}>{a.fileName}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    type="button"
+                    onClick={() => submitCostMutation.mutate(parseFloat(costAmount))}
+                    disabled={!costAmount || parseFloat(costAmount) <= 0 || submitCostMutation.isPending}
+                  >
+                    {submitCostMutation.isPending ? 'Slanje...' : 'Pošalji na odobrenje'}
+                  </Button>
+                </div>
+              </div>
+            </section>
+          )}
+
           {canRequestClarification && (
             <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #FF9500' }}>
               <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Zahtjev za pojašnjenje</h3>
@@ -519,64 +577,6 @@ export function AMMTicketDetailModal({
                   </div>
                 </div>
               )}
-            </section>
-          )}
-
-          {canSubmitCost && (
-            <section style={{ backgroundColor: '#F5F5F7', borderRadius: '12px', padding: '16px 20px', borderLeft: '4px solid #0071E3' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1D1D1F', marginBottom: '6px' }}>Predaja procjene troška</h3>
-              <p style={{ fontSize: '12px', color: '#6E6E73', marginBottom: '12px' }}>Unesite procijenjeni trošak i opcijski priložite dokumentaciju. Prijava će proći kroz lanac odobrenja.</p>
-              <div className="space-y-3">
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Procijenjeni iznos (EUR)</label>
-                  <input
-                    type="number"
-                    value={costAmount}
-                    onChange={(e) => setCostAmount(e.target.value)}
-                    placeholder="Iznos u EUR"
-                    min="0"
-                    step="0.01"
-                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #D2D2D7', borderRadius: '10px', fontSize: '14px', color: '#1D1D1F', outline: 'none', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6E6E73', marginBottom: '6px' }}>Dokumenti (opcionalno)</label>
-                  <p className="text-xs text-gray-600 mb-2">Priložite prateću dokumentaciju za procjenu troška.</p>
-                  <input
-                    ref={costEstimationFileInputRef}
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.heic,image/*"
-                    className="hidden"
-                    onChange={handleCostEstimationFileChange}
-                  />
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => costEstimationFileInputRef.current?.click()}
-                    disabled={uploadingAttachment}
-                  >
-                    {uploadingAttachment ? 'Učitavanje...' : 'Dodaj dokument(e)'}
-                  </Button>
-                  {ticket.attachments != null && ticket.attachments.length > 0 && (
-                    <ul className="mt-2 text-sm text-gray-600 list-disc list-inside">
-                      {ticket.attachments.map((a) => (
-                        <li key={a.id}>{a.fileName}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <Button
-                    type="button"
-                    onClick={() => submitCostMutation.mutate(parseFloat(costAmount))}
-                    disabled={!costAmount || parseFloat(costAmount) <= 0 || submitCostMutation.isPending}
-                  >
-                    {submitCostMutation.isPending ? 'Slanje...' : 'Pošalji na odobrenje'}
-                  </Button>
-                </div>
-              </div>
             </section>
           )}
 

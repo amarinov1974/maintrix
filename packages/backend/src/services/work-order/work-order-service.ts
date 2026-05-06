@@ -127,7 +127,7 @@ export class WorkOrderService {
       actionType: 'ASSIGN_TECHNICIAN',
       actorType: 'VENDOR',
       actorId: userId,
-      comment: `Assigned to ${updated.assignedTechnician?.name ?? 'technician'}, ETA: ${request.eta.toISOString()}`,
+      comment: `Dodijeljen tehničar ${updated.assignedTechnician?.name ?? '—'}, predviđeni dolazak: ${request.eta.toLocaleString('hr-HR')}`,
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',
@@ -217,7 +217,7 @@ export class WorkOrderService {
       actionType: 'CHECKIN',
       actorType: 'VENDOR',
       actorId: userId,
-      comment: `Checked in with ${techCount ?? 0} technician(s)`,
+      comment: `Prijava na lokaciji s ${techCount ?? 0} tehničar(a)`,
     });
 
     return this.mapWorkOrderToResponse(updated);
@@ -372,7 +372,9 @@ export class WorkOrderService {
       actionType: action,
       actorType: 'VENDOR',
       actorId: userId,
-      comment: request.comment ?? `Outcome: ${request.outcome}`,
+      comment: request.comment ?? `Ishod: ${
+        ({ FIXED: 'popravljeno', FOLLOW_UP: 'potreban dodatni posjet', NEW_WO_NEEDED: 'potreban novi radni nalog', UNSUCCESSFUL: 'neuspjeli popravak' } as Record<string, string>)[request.outcome] ?? request.outcome
+      }`,
     });
 
     return this.mapWorkOrderToResponse(updated);
@@ -944,7 +946,7 @@ export class WorkOrderService {
       actionType: 'RETURN_FOR_TECH_COUNT',
       actorType: 'VENDOR',
       actorId: userId,
-      comment: request.comment ?? 'Returned to store to correct number of technicians',
+      comment: request.comment ?? 'Vraćeno u poslovnicu radi ispravnog broja tehničara',
     });
     await notifyNewOwner({
       entityType: 'WORK_ORDER',

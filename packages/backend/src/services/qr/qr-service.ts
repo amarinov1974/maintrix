@@ -153,8 +153,8 @@ export class QRService {
           actorType: 'INTERNAL',
           actorId,
           comment: scanType === 'CHECKIN'
-            ? `Declared technician count: ${request.techCountConfirmed}`
-            : 'Check-out QR generated',
+            ? `Prijavljeni broj tehničara: ${request.techCountConfirmed}`
+            : 'QR kod za odjavu generiran',
         },
       }),
     ]);

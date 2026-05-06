@@ -298,7 +298,7 @@ export async function createWorkOrdersFromPlans(
           approverUserId: amm.id,
           role: 'AMM',
           decision: 'APPROVED',
-          comment: 'Auto-approved from preventive maintenance plan',
+          comment: 'Automatski odobreno iz plana preventivnog održavanja',
         },
       });
 

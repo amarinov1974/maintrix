@@ -258,7 +258,7 @@ export class TicketService {
       actionType: 'SUBMIT',
       actorType: 'INTERNAL',
       actorId: userId,
-      comment: ticket.urgent ? 'Routed to AMM (urgent)' : 'Routed to AM (non-urgent)',
+      comment: ticket.urgent ? 'Proslijeđeno voditelju održavanja (hitno)' : 'Proslijeđeno voditelju regije (nije hitno)',
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -612,7 +612,7 @@ export class TicketService {
       actionType: 'APPROVE_FOR_ESTIMATION',
       actorType: 'INTERNAL',
       actorId: userId,
-      comment: 'Approved for cost estimation',
+      comment: 'Odobreno za procjenu troška',
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -1023,7 +1023,7 @@ export class TicketService {
       actionType: 'REQUEST_APPROVAL',
       actorType: 'INTERNAL',
       actorId: userId,
-      comment: `Cost estimation: €${request.estimatedAmount}`,
+      comment: `Procjena troška: €${request.estimatedAmount}`,
     });
     await notifyNewOwner({
       entityType: 'TICKET',
@@ -1556,7 +1556,7 @@ export class TicketService {
       actionType: 'ARCHIVE',
       actorType: 'INTERNAL',
       actorId,
-      comment: 'Auto-archived (all work orders complete)',
+      comment: 'Automatski arhivirano (svi radni nalozi završeni)',
     });
   }
 
