@@ -1,57 +1,58 @@
-# Maintrix — Sažetak sesije i nastavak rada
+# Maintrix — Handoff dokument
 
-*Spremljeno: 2026-05-07 (kraj sesije)*
-
-Ovaj dokument služi kao "checkpoint" za nastavak rada u novoj Claude Code sesiji. Paste-aj ga (ili samo putanju do njega) u novi chat da se Claude brzo orijentira.
+*Zadnje ažurirano: 2026-05-07*
 
 ---
 
-## Trenutno stanje main grane
+## Kratki opis projekta
 
-Posljednji merge: **PR #29** (phase 2 — nested-relation scope + asset route migration).
-Otvoren PR za merge: **refactor/auth-middleware-phase-3** (phase 3 — vendor-side invoice batch).
+Maintrix je CMMS (Computerized Maintenance Management System) za retail lance.
+Pokriva cijeli tok: SM prijavi kvar → ticket ide kroz approval chain (AM → Director ovisno o iznosu) → vendor dobiva work order → izvodi radove → podnosi cost proposal → AMM odobrava → vendor kreira invoice batch.
 
-Mergani PR-ovi u ovoj seriji rada (PR #6 → #29):
-
-| # | Naslov | Što |
-|---|---|---|
-| 6 | ci(backend): add ESLint config and lint step | Backend ESLint setup |
-| 8 | fix(dev): cross-platform npm run dev + lazy Resend init | Windows kompatibilnost |
-| 9 | refactor(backend): replace remaining no-explicit-any | `no-explicit-any: error` |
-| 10 | docs(tech-debt): mark every() audit complete | Audit `[].every()` patterna |
-| 11 | refactor(frontend): replace currentStatus string literals with enums in modals | 7 modala |
-| 12 | refactor(frontend): centralize getStatusBadgeVariant | 11 duplikata u 2 helpera |
-| 13 | refactor: centralize approval chain thresholds (€1000 / €3000) | Backend + frontend config |
-| 14 | feat(frontend): consistent success overlay on ticket actions across all roles | useSuccessOverlay hook |
-| 15 | security(backend): env-aware cookie hardening for session | secure/sameSite per env |
-| 16 | feat(frontend): replace native window.alert/confirm with app modals | AlertModal, ConfirmModal, Toast |
-| 17 | feat(frontend): translate state transition labels in audit history | formatStatusAny + 19 actions |
-| 18 | security(backend): tenant scope check on attachment uploads + downloads + internal-team visibility | + download endpoint, AM/Director attachment lista |
-| 19/20 | docs(tech-debt): refresh after PR #6–#18 sweep | Doc-only ažuriranje |
-| 21 | refactor(backend): centralize audit-log writes | writeTicketAudit/writeWorkOrderAudit + HR translacije + AMM action reorder |
-| 22 | feat(frontend): drafts list page for SM + clickable bucket card | Nova /store-manager/drafts ruta |
-| 23 | fix: GET /api/auth/session returns 200 with null instead of 401 | Login screen 401 noise |
-| 24 | fix(frontend): AMM WO modal — review-then-decide ordering | Akcije ispod cost proposal review |
-| 25 | fix(frontend): use aria-describedby on AMM archive button instead of div title | A11y |
-| 26 | docs: discovery + 3-phase plan for centralized auth middleware | Plan za centralizirani auth middleware |
-| 27 | docs: STATE.md checkpoint for new-session handoff | Session checkpoint |
-| 28 | refactor(backend): phase 1 — adopt scopedPrisma in route handlers | Faza 1: route layer (admin, asset, store, pm) |
-| 29 | refactor(backend): phase 2 — nested-relation scope + asset route migration | Faza 2: nested scope + asset migracija |
-| ~30~ | refactor(backend): phase 3 — vendor-side scopedPrisma in invoice-batch | **Faza 3: vendor invoice-batch (PR otvoren)** |
-
-Statistika testova: backend 12 → 81 testova, frontend 0 → 9 testova.
+**Multi-tenant:** svaka retail firma (company) vidi samo svoje podatke. Vendori vide samo svoje work ordere.
 
 ---
 
-## Lokalni setup (status na korisnikovom Windows laptopu)
+## Arhitektura
 
-- Repo na: `C:\code\maintrix` (premjestio s OneDrive-a zbog file watcher problema)
-- Postgres + Redis: u Dockeru
-  - `maintrix-postgres` (postgres:17, port 5432, password=postgres, db=maintrix)
-  - `maintrix-redis` (redis:7, port 6379)
-- Native Windows Postgres servis je zaustavljen i postavljen na manual startup (kolizija na portu 5432)
-- Baza punjena s pg_dump-om iz Railway-a (live podaci umjesto seeda)
-- `.env` u `packages/backend/.env`:
+```
+packages/
+  backend/   Node.js + Express + Prisma + PostgreSQL + Redis (session)
+  frontend/  React + Vite + TanStack Query
+```
+
+- **Auth:** Express-session s Redis store. Demo gate — jedan login po roli (nema pravih per-user lozinki). Better Auth planiran za nakon prvog klijenta.
+- **Tenant scope:** `req.scopedPrisma` — Prisma extension koji automatski injektira `companyId` / `vendorCompanyId` u sve upite. Detalji u `packages/backend/src/lib/scoped-prisma.ts`.
+- **CI/CD:** GitHub Actions (`.github/workflows/ci.yml`) — backend + frontend lint + typecheck + vitest na svakom push/PR.
+- **Deploy:** Railway (live demo postoji na domeni).
+
+---
+
+## Stanje main grane (2026-05-07)
+
+Sve 30 PR-ova mergano. **Main je čist, CI zelen, 81 backend test + 9 frontend testova.**
+
+| PR | Što |
+|----|-----|
+| #6–#18 | ESLint, Windows fix, enumi, thresholds, success overlay, cookie hardening, modali, HR prijevodi, attachment scope |
+| #19–#20 | Docs refresh |
+| #21 | Centralizirani audit-log writes |
+| #22 | SM drafts lista |
+| #23 | Session endpoint fix (200 umjesto 401) |
+| #24 | AMM WO modal ordering |
+| #25 | A11y (aria-describedby) |
+| #26–#27 | Auth middleware discovery + STATE checkpoint |
+| #28 | Faza 1: scopedPrisma u route handlers (admin, store, pm, asset/categories) |
+| #29 | Faza 2: nested-relation scope + kompletna asset migracija |
+| #30 | Faza 3: vendor-side scopedPrisma (invoice-batch service + routes) |
+
+---
+
+## Lokalni setup
+
+- Repo: `C:\code\maintrix`
+- Postgres + Redis u Dockeru: `docker start maintrix-postgres maintrix-redis`
+- `packages/backend/.env`:
   ```
   NODE_ENV=development
   PORT=3000
@@ -60,65 +61,91 @@ Statistika testova: backend 12 → 81 testova, frontend 0 → 9 testova.
   REDIS_URL="redis://localhost:6379"
   QR_EXPIRATION_MINUTES=5
   ```
-- Pokretanje: `npm run dev` (jedan terminal — koristi `concurrently`)
-- Frontend: `localhost:5173`, backend: `localhost:3000`
+- Pokretanje: `npm run dev` (frontend: localhost:5173, backend: localhost:3000)
 
-**Prije rada:**
-1. Pokreni Docker Desktop, čekaj zelenu Whale ikonu
-2. `docker start maintrix-postgres maintrix-redis`
-3. `cd C:\code\maintrix && git pull origin main` 
-4. `npm run dev`
+**Prije rada:** Docker Desktop → `docker start maintrix-postgres maintrix-redis` → `git pull origin main` → `npm run dev`
 
 ---
 
-## Centralized auth middleware — status
+## Što je namjerno ostalo na globalnom prisma (nije bug)
 
-Sve tri faze su završene (branch otvoren za merge):
-
-| Faza | PR | Što |
-|------|-----|-----|
-| Faza 1 ✅ | #28 | Route layer flat scope: admin, asset/categories, store, pm |
-| Faza 2 ✅ | #29 | Nested scope + asset route kompletna migracija |
-| Faza 3 ✅ | ~#30~ (otvoren) | Vendor-side: invoice-batch service + routes |
-
-### Što je OSTALO na globalnom prisma (namjerno):
-
-- **`auth-service.ts` + `auth/routes.ts` demo dropdowns** — pre-auth, mora vidjeti sve tenante
-- **`admin/routes.ts` vendorUser/vendorCompany** — cross-company by design
-- **Service layer** (`ticket-service.ts`, `work-order-service.ts`, `preventive-maintenance-service.ts`) — primaju `companyId` kao parametar; preuredba zahtijeva signature promjene u ~3000 redaka koda → poseban PR
-- **`invoice-batch-service.ts` callback transaction** — `prisma.$transaction(async tx => {...})` ostaje unscoped (design limitation); explicit `vendorCompanyId` u `updateMany` where čuva ispravnost
-- **AuditLog scope** — dual-path OR logika (ticketId OR workOrderId) nije podržana jednostavnim `withNestedWhere` → deferred
-- **QR service** — SM (INTERNAL) čita workOrder koji je u VENDOR_SCOPE; mora ostati na globalnom prisma
+| Gdje | Zašto |
+|------|-------|
+| `auth-service.ts` — demo dropdowns | Pre-auth, mora vidjeti sve tenante |
+| `admin/routes.ts` — vendorUser/vendorCompany | Cross-company by design (admin upravlja svim vendorima) |
+| `ticket-service.ts`, `work-order-service.ts` | Servisni layer prima `companyId` kao param, nema `req`. Reads su zaštićeni parametrom iz sessiona; writes su zaštićeni FK lancima. Migracija bi zahtijevala promjenu potpisa ~3000 redaka — poseban PR. |
+| `invoice-batch-service.ts` callback tx | `prisma.$transaction(async tx => {...})` je uvijek unscoped; explicit `vendorCompanyId` u `updateMany` where-clausi čuva ispravnost |
+| QR service | SM (INTERNAL) čita workOrder koji je u VENDOR_SCOPE; mora ostati na globalnom prisma |
 
 ---
 
-## Otvoreni tech debt
+## Otvoreni tehnički dug (prioritiziran)
 
-Vidi `MAINTRIX_TECHNICAL_DEBT.md` u repu za potpuni popis. Glavne stavke:
+### Prije prvog plaćenog klijenta
 
-**Visoki:**
-- Service layer scopedPrisma (`ticket-service.ts`, `work-order-service.ts`) — veliki zahvat, poseban PR
-- CI/CD pipeline (već postoji, eventualno proširenje)
-- Better Auth (massive — pravi per-user login, nakon prvog ugovora)
-- Pagination svuda
+| Stavka | Napomena |
+|--------|----------|
+| **Better Auth** | Pravi per-user login. Scope definirati s klijentom (samo username/password? email invite? SSO?). Tjedan–nekoliko tjedana ovisno o scope-u. |
 
-**Srednji:**
-- Admin endpointi i invoice batch download — preostali test coverage gap
-- AuditLog tenant scope (OR logika)
+### Može čekati (postfirst-client v1.1)
 
-**Niski:**
-- Drafts: delete endpoint za DRAFT (DELETE /api/tickets/:id ili WITHDRAW transition iz DRAFT)
-- TS/JS duplikati u frontendu (povremena provjera)
-
-**Operativno:**
-- Demo seed strategy
-- Backup procedure
-- Strukturirani logovi (pino + log shipping)
+| Stavka | Napomena |
+|--------|----------|
+| Service layer scopedPrisma | `ticket-service.ts` (1607 redaka), `work-order-service.ts` (1330 redaka) — veliki zahvat |
+| Pagination | Svuda: tickets, WOs, assets, audit log |
+| Test coverage gap | Admin endpointi (deactivate, store/asset CRUD) i invoice-batch download scope |
+| AuditLog tenant scope | OR logika (ticketId OR workOrderId) — nije podržana jednostavnim `withNestedWhere` |
+| Admin audit trail | `AuditLog` schema podržava samo TICKET/WORK_ORDER entitete; admin CRUD nema trail |
+| Drafts brisanje | `DELETE /api/tickets/:id` samo za DRAFT status |
+| Cookie `sameSite: strict` | Tek kad frontend + backend dijele custom domenu |
+| Strukturirani logovi | pino + log shipping |
+| Demo seed strategy | Odlučiti hoće li seed kreirati demo tickete/WO-e |
+| Backup procedure | Dokumentirati + testirati |
 
 ---
 
-## Kako otvoriti novi chat za nastavak
+## Ključni fajlovi za razumijevanje sistema
 
-1. Otvori `claude` u terminalu (ili web interface)
-2. Paste-aj: "Pročitaj `STATE.md` u repu pa idi na sljedeći korak."
-3. Claude treba pročitati ovaj fajl i krenuti od prve stavke u tech debtu.
+```
+packages/backend/src/
+  lib/scoped-prisma.ts              # Tenant scope engine — čitati prvo
+  middleware/auth.middleware.ts     # requireAuth + scopedPrisma getter
+  middleware/scope.middleware.ts    # Lazy getter koji se zakači na req
+  config/approval-thresholds.ts    # €1000/€3000 pragovi
+  services/
+    auth/                          # Login, session, demo gate
+    ticket/                        # Glavna poslovna logika ticketa
+    work-order/                    # WO lifecycle + vendor flow
+    invoice-batch/                 # Vendor invoice batching + PDF
+    admin/                         # CRUD za usere, stores, assets
+    audit/audit-service.ts         # writeTicketAudit/writeWorkOrderAudit helperi
+
+packages/backend/tests/
+  scoped-prisma.test.ts            # 81 testova za tenant scope engine
+  work-order-service.scope.test.ts # Multi-tenant scope za WO
+  ticket-service.scope.test.ts     # Multi-tenant scope za tickete
+
+packages/backend/prisma/schema.prisma  # Cijeli data model
+
+MAINTRIX_TECHNICAL_DEBT.md         # Lessons learned + bug paterni
+```
+
+---
+
+## Prompt za novu sesiju
+
+Paste ovo na početku novog chata:
+
+```
+Nastavljam rad na Maintrix projektu (CMMS za retail lance).
+Pročitaj STATE.md u C:\code\maintrix — tu je sve što trebaš znati o stanju projekta, arhitekturi i tehničkom dugu.
+
+Kratki kontekst:
+- Main grana je čista, CI zelen, 30 PR-ova mergano
+- Demo je live na domeni, fokus je bio na nalasku prvog klijenta
+- Sljedeće na redu: [UPIŠI ŠTO TREBAŠ — npr. "Better Auth implementacija" ili "novi feature X" ili "bug u Y"]
+
+Repo: C:\code\maintrix
+Backend: packages/backend (Node/Express/Prisma)
+Frontend: packages/frontend (React/Vite)
+```
