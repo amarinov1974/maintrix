@@ -9,6 +9,7 @@ Ovaj dokument služi kao "checkpoint" za nastavak rada u novoj Claude Code sesij
 ## Trenutno stanje main grane
 
 Posljednji merge: **PR #29** (phase 2 — nested-relation scope + asset route migration).
+Otvoren PR za merge: **refactor/auth-middleware-phase-3** (phase 3 — vendor-side invoice batch).
 
 Mergani PR-ovi u ovoj seriji rada (PR #6 → #29):
 
@@ -35,9 +36,10 @@ Mergani PR-ovi u ovoj seriji rada (PR #6 → #29):
 | 26 | docs: discovery + 3-phase plan for centralized auth middleware | Plan za centralizirani auth middleware |
 | 27 | docs: STATE.md checkpoint for new-session handoff | Session checkpoint |
 | 28 | refactor(backend): phase 1 — adopt scopedPrisma in route handlers | Faza 1: route layer (admin, asset, store, pm) |
-| 29 | refactor(backend): phase 2 — nested-relation scope + asset route migration | **Faza 2: nested scope + asset migracija** |
+| 29 | refactor(backend): phase 2 — nested-relation scope + asset route migration | Faza 2: nested scope + asset migracija |
+| ~30~ | refactor(backend): phase 3 — vendor-side scopedPrisma in invoice-batch | **Faza 3: vendor invoice-batch (PR otvoren)** |
 
-Statistika testova: backend 12 → 77 testova, frontend 0 → 9 testova.
+Statistika testova: backend 12 → 81 testova, frontend 0 → 9 testova.
 
 ---
 
@@ -69,38 +71,40 @@ Statistika testova: backend 12 → 77 testova, frontend 0 → 9 testova.
 
 ---
 
-## Sljedeći korak: Faza 3 centraliziranog auth middleware-a
+## Centralized auth middleware — status
 
-**Faza 1 i Faza 2 završene.** Scope mapa sada pokriva i flat i nested-relation modele.
+Sve tri faze su završene (branch otvoren za merge):
 
-### Što je mergano:
-- **Faza 1 (PR #28):** Route layer (admin, asset/categories, store, pm routes) — flat INTERNAL scope
-- **Faza 2 (PR #29):** `scoped-prisma.ts` proširen s nested scope; `asset` potpuno migriran u admin + asset routes
+| Faza | PR | Što |
+|------|-----|-----|
+| Faza 1 ✅ | #28 | Route layer flat scope: admin, asset/categories, store, pm |
+| Faza 2 ✅ | #29 | Nested scope + asset route kompletna migracija |
+| Faza 3 ✅ | ~#30~ (otvoren) | Vendor-side: invoice-batch service + routes |
 
 ### Što je OSTALO na globalnom prisma (namjerno):
 
 - **`auth-service.ts` + `auth/routes.ts` demo dropdowns** — pre-auth, mora vidjeti sve tenante
 - **`admin/routes.ts` vendorUser/vendorCompany** — cross-company by design
-- **Service layer** (`ticket-service.ts`, `work-order-service.ts`, `preventive-maintenance-service.ts`) — primaju `companyId` kao parametar, nemaju `req`. Reads su zaštićeni companyId parametrom koji dolazi iz sessiona; writes (ticketComment.create, approvalRecord.create) su zaštićeni FK lancima.
-
-### Faza 3 — vendor-side modeli + audit log
-
-Vidi `docs/auth-middleware-discovery.md`. Vendor user vidi WO iz S1/S2/S3 hierarchy. Treba pažljivo provjeriti `workOrder.vendorCompanyId` scenarije.
+- **Service layer** (`ticket-service.ts`, `work-order-service.ts`, `preventive-maintenance-service.ts`) — primaju `companyId` kao parametar; preuredba zahtijeva signature promjene u ~3000 redaka koda → poseban PR
+- **`invoice-batch-service.ts` callback transaction** — `prisma.$transaction(async tx => {...})` ostaje unscoped (design limitation); explicit `vendorCompanyId` u `updateMany` where čuva ispravnost
+- **AuditLog scope** — dual-path OR logika (ticketId OR workOrderId) nije podržana jednostavnim `withNestedWhere` → deferred
+- **QR service** — SM (INTERNAL) čita workOrder koji je u VENDOR_SCOPE; mora ostati na globalnom prisma
 
 ---
 
-## Otvoreni tech debt nakon ove sesije
+## Otvoreni tech debt
 
 Vidi `MAINTRIX_TECHNICAL_DEBT.md` u repu za potpuni popis. Glavne stavke:
 
 **Visoki:**
-- Centralized auth middleware — Faza 1 ✅, Faza 2 ✅, **Faza 3 sljedeća** (vendor-side + audit log)
+- Service layer scopedPrisma (`ticket-service.ts`, `work-order-service.ts`) — veliki zahvat, poseban PR
 - CI/CD pipeline (već postoji, eventualno proširenje)
 - Better Auth (massive — pravi per-user login, nakon prvog ugovora)
 - Pagination svuda
 
 **Srednji:**
 - Admin endpointi i invoice batch download — preostali test coverage gap
+- AuditLog tenant scope (OR logika)
 
 **Niski:**
 - Drafts: delete endpoint za DRAFT (DELETE /api/tickets/:id ili WITHDRAW transition iz DRAFT)
@@ -116,13 +120,5 @@ Vidi `MAINTRIX_TECHNICAL_DEBT.md` u repu za potpuni popis. Glavne stavke:
 ## Kako otvoriti novi chat za nastavak
 
 1. Otvori `claude` u terminalu (ili web interface)
-2. Paste-aj prvo: "Pročitaj `STATE.md` u repu pa idi na sljedeći korak (Faza 1 centralized auth middleware-a)."
-3. Claude treba pročitati ovaj fajl + `docs/auth-middleware-discovery.md` i krenuti.
-
-Ili kraće: "Nastavljam rad na Maintrix tech debtu. Sljedeći korak je Faza 1 centraliziranog auth middleware-a — vidi `docs/auth-middleware-discovery.md` i `STATE.md`."
-
----
-
-## Otvorene grane na GitHub-u (mogu se obrisati)
-
-Sve mergane grane se mogu obrisati. GitHub UI: https://github.com/amarinov1974/maintrix/branches → klik na kantu pored svake grane.
+2. Paste-aj: "Pročitaj `STATE.md` u repu pa idi na sljedeći korak."
+3. Claude treba pročitati ovaj fajl i krenuti od prve stavke u tech debtu.
