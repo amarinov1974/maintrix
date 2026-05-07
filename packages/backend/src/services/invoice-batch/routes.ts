@@ -23,7 +23,8 @@ router.post('/', async (req, res) => {
     const result = await invoiceBatchService.createBatch(
       workOrderIds,
       req.session.companyId,
-      req.session.userId
+      req.session.userId,
+      req.scopedPrisma!
     );
     res.status(201).json({ batch: result, pdfUrl: result.pdfUrl });
   } catch (error: unknown) {
@@ -43,7 +44,7 @@ router.get('/:id/pdf', async (req, res) => {
       res.status(400).json({ error: 'Invalid batch id' });
       return;
     }
-    const batch = await invoiceBatchService.getBatchForVendor(id, req.session.companyId);
+    const batch = await invoiceBatchService.getBatchForVendor(id, req.session.companyId, req.scopedPrisma!);
     if (!batch?.pdfPath) {
       res.status(404).json({ error: 'Batch not found or PDF not available' });
       return;
