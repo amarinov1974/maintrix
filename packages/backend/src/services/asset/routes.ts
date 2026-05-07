@@ -126,8 +126,8 @@ router.get('/', async (req, res) => {
  */
 router.get('/categories', async (req, res) => {
   try {
-    const categories = await prisma.assetCategory.findMany({
-      where: { companyId: req.session!.companyId, active: true },
+    const categories = await req.scopedPrisma!.assetCategory.findMany({
+      where: { active: true },
       orderBy: { name: 'asc' },
     });
     res.json({ categories });

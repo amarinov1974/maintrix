@@ -24,8 +24,7 @@ router.use((req, res, next) => {
 
 router.get('/users/internal', async (req, res) => {
   try {
-    const users = await prisma.internalUser.findMany({
-      where: { companyId: req.session!.companyId },
+    const users = await req.scopedPrisma!.internalUser.findMany({
       include: { store: true, region: true },
       orderBy: { name: 'asc' },
     });
@@ -42,7 +41,7 @@ router.post('/users/internal', async (req, res) => {
       res.status(400).json({ error: 'Name and role are required' });
       return;
     }
-    const user = await prisma.internalUser.create({
+    const user = await req.scopedPrisma!.internalUser.create({
       data: {
         name,
         email: email || null,
@@ -64,17 +63,17 @@ router.put('/users/internal/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     const { name, email, role, storeId, regionId, active } = req.body;
-    
-    // Verify user belongs to same company
-    const existing = await prisma.internalUser.findFirst({
-      where: { id, companyId: req.session!.companyId },
+
+    // Guard: ensures 404 instead of relying on scope-based mismatch
+    const existing = await req.scopedPrisma!.internalUser.findFirst({
+      where: { id },
     });
     if (!existing) {
       res.status(404).json({ error: 'User not found' });
       return;
     }
 
-    const user = await prisma.internalUser.update({
+    const user = await req.scopedPrisma!.internalUser.update({
       where: { id },
       data: {
         ...(name && { name }),
@@ -95,10 +94,9 @@ router.put('/users/internal/:id', async (req, res) => {
 router.delete('/users/internal/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    
-    // Verify user belongs to same company
-    const existing = await prisma.internalUser.findFirst({
-      where: { id, companyId: req.session!.companyId },
+
+    const existing = await req.scopedPrisma!.internalUser.findFirst({
+      where: { id },
     });
     if (!existing) {
       res.status(404).json({ error: 'User not found' });
@@ -106,7 +104,7 @@ router.delete('/users/internal/:id', async (req, res) => {
     }
 
     // Soft delete — deactivate instead of delete
-    await prisma.internalUser.update({
+    await req.scopedPrisma!.internalUser.update({
       where: { id },
       data: { active: false },
     });
@@ -195,8 +193,7 @@ router.delete('/users/vendor/:id', async (req, res) => {
 
 router.get('/stores', async (req, res) => {
   try {
-    const stores = await prisma.store.findMany({
-      where: { companyId: req.session!.companyId },
+    const stores = await req.scopedPrisma!.store.findMany({
       include: { region: true },
       orderBy: { name: 'asc' },
     });
@@ -213,7 +210,7 @@ router.post('/stores', async (req, res) => {
       res.status(400).json({ error: 'Name and region are required' });
       return;
     }
-    const store = await prisma.store.create({
+    const store = await req.scopedPrisma!.store.create({
       data: {
         name,
         address: address || null,
@@ -234,15 +231,15 @@ router.put('/stores/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const { name, address, regionId, active } = req.body;
 
-    const existing = await prisma.store.findFirst({
-      where: { id, companyId: req.session!.companyId },
+    const existing = await req.scopedPrisma!.store.findFirst({
+      where: { id },
     });
     if (!existing) {
       res.status(404).json({ error: 'Store not found' });
       return;
     }
 
-    const store = await prisma.store.update({
+    const store = await req.scopedPrisma!.store.update({
       where: { id },
       data: {
         ...(name && { name }),
@@ -262,15 +259,15 @@ router.delete('/stores/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
 
-    const existing = await prisma.store.findFirst({
-      where: { id, companyId: req.session!.companyId },
+    const existing = await req.scopedPrisma!.store.findFirst({
+      where: { id },
     });
     if (!existing) {
       res.status(404).json({ error: 'Store not found' });
       return;
     }
 
-    await prisma.store.update({
+    await req.scopedPrisma!.store.update({
       where: { id },
       data: { active: false },
     });
@@ -294,8 +291,7 @@ router.get('/vendor-companies', async (req, res) => {
 
 router.get('/regions', async (req, res) => {
   try {
-    const regions = await prisma.region.findMany({
-      where: { companyId: req.session!.companyId },
+    const regions = await req.scopedPrisma!.region.findMany({
       orderBy: { name: 'asc' },
     });
     res.json({ regions });
@@ -306,8 +302,8 @@ router.get('/regions', async (req, res) => {
 
 router.get('/asset-categories', async (req, res) => {
   try {
-    const categories = await prisma.assetCategory.findMany({
-      where: { companyId: req.session!.companyId, active: true },
+    const categories = await req.scopedPrisma!.assetCategory.findMany({
+      where: { active: true },
       orderBy: { name: 'asc' },
     });
     res.json({ categories });
@@ -337,11 +333,10 @@ router.get('/assets', async (req, res) => {
 
 router.post('/assets', async (req, res) => {
   try {
-    const companyId = req.session!.companyId;
     const { name, storeId, categoryId, serialNumber, manufacturer, model,
             purchaseDate, warrantyExpiry, purchaseValue, status, notes } = req.body;
     // Provjeri da store pripada toj kompaniji
-    const store = await prisma.store.findFirst({ where: { id: Number(storeId), companyId } });
+    const store = await req.scopedPrisma!.store.findFirst({ where: { id: Number(storeId) } });
     if (!store) { res.status(400).json({ error: 'Invalid store' }); return; }
     const asset = await prisma.asset.create({
       data: {

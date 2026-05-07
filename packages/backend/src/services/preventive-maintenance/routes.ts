@@ -8,7 +8,6 @@ import { Router } from 'express';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
 import { InternalRoles } from '../../types/roles.js';
 import * as pmService from './preventive-maintenance-service.js';
-import { prisma } from '../../config/database.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -122,8 +121,7 @@ router.get('/plans', async (req, res) => {
       return;
     }
 
-    const plans = await prisma.preventiveMaintenancePlan.findMany({
-      where: { companyId: session.companyId },
+    const plans = await req.scopedPrisma!.preventiveMaintenancePlan.findMany({
       include: {
         asset: { select: { id: true, description: true, storeId: true } },
         store: { select: { id: true, name: true } },
