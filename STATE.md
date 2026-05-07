@@ -1,6 +1,6 @@
 # Maintrix — Sažetak sesije i nastavak rada
 
-*Spremljeno: 2026-05-04 (kraj sesije, prebacujem se na novi chat)*
+*Spremljeno: 2026-05-07 (kraj sesije)*
 
 Ovaj dokument služi kao "checkpoint" za nastavak rada u novoj Claude Code sesiji. Paste-aj ga (ili samo putanju do njega) u novi chat da se Claude brzo orijentira.
 
@@ -8,9 +8,9 @@ Ovaj dokument služi kao "checkpoint" za nastavak rada u novoj Claude Code sesij
 
 ## Trenutno stanje main grane
 
-Posljednji merge: **PR #26** (doc: discovery + 3-phase plan for centralized auth middleware).
+Posljednji merge: **PR #29** (phase 2 — nested-relation scope + asset route migration).
 
-Mergani PR-ovi u ovoj seriji rada (PR #6 → #26):
+Mergani PR-ovi u ovoj seriji rada (PR #6 → #29):
 
 | # | Naslov | Što |
 |---|---|---|
@@ -34,9 +34,10 @@ Mergani PR-ovi u ovoj seriji rada (PR #6 → #26):
 | 25 | fix(frontend): use aria-describedby on AMM archive button instead of div title | A11y |
 | 26 | docs: discovery + 3-phase plan for centralized auth middleware | Plan za centralizirani auth middleware |
 | 27 | docs: STATE.md checkpoint for new-session handoff | Session checkpoint |
-| 28 | refactor(backend): phase 1 — adopt scopedPrisma in route handlers | **Faza 1 auth middleware mergana** |
+| 28 | refactor(backend): phase 1 — adopt scopedPrisma in route handlers | Faza 1: route layer (admin, asset, store, pm) |
+| 29 | refactor(backend): phase 2 — nested-relation scope + asset route migration | **Faza 2: nested scope + asset migracija** |
 
-Statistika testova: backend 12 → 69 testova, frontend 0 → 9 testova.
+Statistika testova: backend 12 → 77 testova, frontend 0 → 9 testova.
 
 ---
 
@@ -68,19 +69,23 @@ Statistika testova: backend 12 → 69 testova, frontend 0 → 9 testova.
 
 ---
 
-## Sljedeći korak: Faza 2 centraliziranog auth middleware-a
+## Sljedeći korak: Faza 3 centraliziranog auth middleware-a
 
-**Faza 1 je završena (PR #28, mergano 2026-05-07).** Route layer (admin, asset, store, preventive-maintenance routes) migriran na `req.scopedPrisma`.
+**Faza 1 i Faza 2 završene.** Scope mapa sada pokriva i flat i nested-relation modele.
+
+### Što je mergano:
+- **Faza 1 (PR #28):** Route layer (admin, asset/categories, store, pm routes) — flat INTERNAL scope
+- **Faza 2 (PR #29):** `scoped-prisma.ts` proširen s nested scope; `asset` potpuno migriran u admin + asset routes
 
 ### Što je OSTALO na globalnom prisma (namjerno):
 
 - **`auth-service.ts` + `auth/routes.ts` demo dropdowns** — pre-auth, mora vidjeti sve tenante
-- **`admin/routes.ts` vendorUser/vendorCompany** — cross-company by design, nije u INTERNAL scope mapi
-- **Service layer** (`ticket-service.ts`, `work-order-service.ts`, `preventive-maintenance-service.ts`, itd.) — primaju `companyId` kao parametar, nemaju `req`. Ovo je prirodni kandidat za zaseban refactor (proslijediti `scopedPrisma` kao parametar, ili drugačiji pristup).
+- **`admin/routes.ts` vendorUser/vendorCompany** — cross-company by design
+- **Service layer** (`ticket-service.ts`, `work-order-service.ts`, `preventive-maintenance-service.ts`) — primaju `companyId` kao parametar, nemaju `req`. Reads su zaštićeni companyId parametrom koji dolazi iz sessiona; writes (ticketComment.create, approvalRecord.create) su zaštićeni FK lancima.
 
-### Faza 2 — nested-relation scope (asset, attachment, costEstimation, comment)
+### Faza 3 — vendor-side modeli + audit log
 
-Vidi `docs/auth-middleware-discovery.md` za detalje. Treba proširiti `scoped-prisma.ts` s `nestedScope` konceptom za modele gdje scope ide kroz relation (`asset.store.companyId` umjesto direktnog `asset.companyId`).
+Vidi `docs/auth-middleware-discovery.md`. Vendor user vidi WO iz S1/S2/S3 hierarchy. Treba pažljivo provjeriti `workOrder.vendorCompanyId` scenarije.
 
 ---
 
@@ -89,7 +94,7 @@ Vidi `docs/auth-middleware-discovery.md` za detalje. Treba proširiti `scoped-pr
 Vidi `MAINTRIX_TECHNICAL_DEBT.md` u repu za potpuni popis. Glavne stavke:
 
 **Visoki:**
-- Centralized auth middleware — Faza 1 ✅, **Faza 2 sljedeća** (nested-relation scope + service layer)
+- Centralized auth middleware — Faza 1 ✅, Faza 2 ✅, **Faza 3 sljedeća** (vendor-side + audit log)
 - CI/CD pipeline (već postoji, eventualno proširenje)
 - Better Auth (massive — pravi per-user login, nakon prvog ugovora)
 - Pagination svuda
