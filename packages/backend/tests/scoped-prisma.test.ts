@@ -252,6 +252,32 @@ describe('createScopedPrisma — VENDOR', () => {
     await db.invoiceBatch.update({ where: { id: 1 }, data: { status: 'PAID' } });
     expect(getCaptured()['invoiceBatch.update']).toMatchObject({ where: { vendorCompanyId: 99, id: 1 } });
   });
+
+  it('scopes invoiceBatch.findFirst by vendorCompanyId', async () => {
+    const db = createScopedPrisma(vendorSession) as unknown as AnyClient;
+    await db.invoiceBatch.findFirst({ where: { id: 5 } });
+    expect(getCaptured()['invoiceBatch.findFirst']).toMatchObject({ where: { vendorCompanyId: 99, id: 5 } });
+  });
+
+  it('scopes invoiceBatch.count by vendorCompanyId', async () => {
+    const db = createScopedPrisma(vendorSession) as unknown as AnyClient;
+    await db.invoiceBatch.count({});
+    expect(getCaptured()['invoiceBatch.count']).toMatchObject({ where: { vendorCompanyId: 99 } });
+  });
+
+  it('scopes workOrder.findMany — filters out cross-vendor WOs by vendorCompanyId injection', async () => {
+    const db = createScopedPrisma(vendorSession) as unknown as AnyClient;
+    // Caller passes no vendorCompanyId — scoped client injects it automatically
+    await db.workOrder.findMany({});
+    const captured = getCaptured()['workOrder.findMany'] as { where: Record<string, unknown> };
+    expect(captured.where.vendorCompanyId).toBe(99);
+  });
+
+  it('overrides caller-supplied vendorCompanyId in workOrder create data', async () => {
+    const db = createScopedPrisma(vendorSession) as unknown as AnyClient;
+    await db.workOrder.create({ data: { vendorCompanyId: 1, title: 'evil' } });
+    expect(getCaptured()['workOrder.create']).toMatchObject({ data: { vendorCompanyId: 99 } });
+  });
 });
 
 // ---------------------------------------------------------------------------

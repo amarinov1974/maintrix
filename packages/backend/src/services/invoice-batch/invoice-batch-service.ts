@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '../../config/database.js';
+import type { ScopedPrisma } from '../../lib/scoped-prisma.js';
 import { generateBatchRecapPdf, type BatchLineItem, type BatchPdfData } from './invoice-batch-pdf.js';
 import path from 'path';
 import fs from 'fs';
@@ -32,7 +33,8 @@ export interface CreateBatchResult {
 export async function createBatch(
   workOrderIds: number[],
   vendorCompanyId: number,
-  createdByVendorUserId: number
+  createdByVendorUserId: number,
+  db: ScopedPrisma
 ): Promise<CreateBatchResult> {
   if (workOrderIds.length === 0) {
     throw new Error('At least one work order is required');
@@ -40,7 +42,8 @@ export async function createBatch(
 
   const distinctIds = [...new Set(workOrderIds)];
 
-  const workOrders = await prisma.workOrder.findMany({
+  // Scoped client auto-adds vendorCompanyId — WOs from other vendors simply won't be found
+  const workOrders = await db.workOrder.findMany({
     where: { id: { in: distinctIds } },
     include: {
       vendorCompany: true,
@@ -54,6 +57,7 @@ export async function createBatch(
   }
 
   for (const wo of workOrders) {
+    // Belt-and-suspenders: scoped client already filtered, but keep explicit check
     if (wo.vendorCompanyId !== vendorCompanyId) {
       throw new Error(`Work order ${wo.id} does not belong to your company`);
     }
@@ -65,13 +69,13 @@ export async function createBatch(
     }
   }
 
-  const createdBy = await prisma.vendorUser.findUnique({
+  const createdBy = await db.vendorUser.findUnique({
     where: { id: createdByVendorUserId },
     select: { name: true },
   });
   const createdByName = createdBy?.name ?? 'Unknown';
 
-  const batchNumber = await getNextBatchNumber(vendorCompanyId);
+  const batchNumber = await getNextBatchNumber(db, vendorCompanyId);
   let totalAmount = 0;
   const lineItems: BatchLineItem[] = [];
 
@@ -116,8 +120,10 @@ export async function createBatch(
       })),
     });
 
+    // Explicit vendorCompanyId in where — callback tx is unscoped (Prisma extension
+    // only applies to array-form transactions). Belt-and-suspenders with the guard above.
     await tx.workOrder.updateMany({
-      where: { id: { in: distinctIds } },
+      where: { id: { in: distinctIds }, vendorCompanyId },
       data: { invoiceBatchId: batchRecord.id },
     });
 
@@ -158,11 +164,10 @@ export async function createBatch(
   };
 }
 
-async function getNextBatchNumber(vendorCompanyId: number): Promise<string> {
+async function getNextBatchNumber(db: ScopedPrisma, vendorCompanyId: number): Promise<string> {
   const year = new Date().getFullYear();
-  const count = await prisma.invoiceBatch.count({
-    where: { vendorCompanyId },
-  });
+  // Scoped client auto-filters by vendorCompanyId
+  const count = await db.invoiceBatch.count({});
   const seq = String(count + 1).padStart(4, '0');
   // Include vendorCompanyId so batch_number is globally unique (DB unique constraint)
   return `BATCH-${year}-${vendorCompanyId}-${seq}`;
@@ -173,10 +178,12 @@ async function getNextBatchNumber(vendorCompanyId: number): Promise<string> {
  */
 export async function getBatchForVendor(
   batchId: number,
-  vendorCompanyId: number
+  vendorCompanyId: number,
+  db: ScopedPrisma
 ): Promise<{ pdfPath: string } | null> {
-  const batch = await prisma.invoiceBatch.findFirst({
-    where: { id: batchId, vendorCompanyId },
+  // Scoped client auto-adds vendorCompanyId to where
+  const batch = await db.invoiceBatch.findFirst({
+    where: { id: batchId },
     select: { pdfPath: true },
   });
   return batch?.pdfPath ? { pdfPath: batch.pdfPath } : null;
