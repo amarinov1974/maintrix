@@ -25,9 +25,13 @@ const { prismaMock } = vi.hoisted(() => {
   }
 
   const allModels = [
+    // flat INTERNAL
     'ticket', 'store', 'region', 'internalUser', 'assetCategory',
-    'preventiveMaintenancePlan', 'workOrder', 'invoiceBatch',
-    'vendorUser', 'vendorPriceListItem',
+    'preventiveMaintenancePlan',
+    // flat VENDOR
+    'workOrder', 'invoiceBatch', 'vendorUser', 'vendorPriceListItem',
+    // nested INTERNAL
+    'asset', 'costEstimation', 'approvalRecord', 'ticketComment',
   ];
 
   const baseClient: Record<string, unknown> = { _captured: captured };
@@ -273,6 +277,74 @@ describe('non-scoped model access throws (Vuln 2 fix)', () => {
   it('does NOT throw on $-prefixed Prisma internals', () => {
     const db = createScopedPrisma(internalSession) as unknown as Record<string, unknown>;
     expect(() => db.$extends).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// INTERNAL — nested-scope models (asset, costEstimation, approvalRecord, ticketComment)
+// ---------------------------------------------------------------------------
+
+describe('createScopedPrisma — INTERNAL nested scope reads', () => {
+  it('scopes asset.findMany via store.companyId', async () => {
+    const db = createScopedPrisma(internalSession) as unknown as AnyClient;
+    await db.asset.findMany({ where: { active: true } });
+    expect(getCaptured()['asset.findMany']).toMatchObject({
+      where: { store: { companyId: 42 }, active: true },
+    });
+  });
+
+  it('merges existing store filter when scoping asset', async () => {
+    const db = createScopedPrisma(internalSession) as unknown as AnyClient;
+    await db.asset.findMany({ where: { store: { name: 'Foo' } } });
+    expect(getCaptured()['asset.findMany']).toMatchObject({
+      where: { store: { name: 'Foo', companyId: 42 } },
+    });
+  });
+
+  it('scopes costEstimation.findMany via ticket.companyId', async () => {
+    const db = createScopedPrisma(internalSession) as unknown as AnyClient;
+    await db.costEstimation.findMany({});
+    expect(getCaptured()['costEstimation.findMany']).toMatchObject({
+      where: { ticket: { companyId: 42 } },
+    });
+  });
+
+  it('scopes approvalRecord.findMany via ticket.companyId', async () => {
+    const db = createScopedPrisma(internalSession) as unknown as AnyClient;
+    await db.approvalRecord.findMany({ where: { decision: 'APPROVED' } });
+    expect(getCaptured()['approvalRecord.findMany']).toMatchObject({
+      where: { ticket: { companyId: 42 }, decision: 'APPROVED' },
+    });
+  });
+
+  it('scopes ticketComment.findMany via ticket.companyId', async () => {
+    const db = createScopedPrisma(internalSession) as unknown as AnyClient;
+    await db.ticketComment.findMany({});
+    expect(getCaptured()['ticketComment.findMany']).toMatchObject({
+      where: { ticket: { companyId: 42 } },
+    });
+  });
+
+  it('scopes asset.update where via store.companyId', async () => {
+    const db = createScopedPrisma(internalSession) as unknown as AnyClient;
+    await db.asset.update({ where: { id: 7 }, data: { active: false } });
+    expect(getCaptured()['asset.update']).toMatchObject({
+      where: { store: { companyId: 42 }, id: 7 },
+    });
+  });
+
+  it('nested-scoped models are accessible to INTERNAL', () => {
+    const db = createScopedPrisma(internalSession) as unknown as Record<string, unknown>;
+    expect(() => db.asset).not.toThrow();
+    expect(() => db.costEstimation).not.toThrow();
+    expect(() => db.approvalRecord).not.toThrow();
+    expect(() => db.ticketComment).not.toThrow();
+  });
+
+  it('nested-scoped models are blocked for VENDOR', () => {
+    const db = createScopedPrisma(vendorSession) as unknown as Record<string, unknown>;
+    expect(() => db.asset).toThrow(/not tenant-scoped for VENDOR/);
+    expect(() => db.ticketComment).toThrow(/not tenant-scoped for VENDOR/);
   });
 });
 
