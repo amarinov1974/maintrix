@@ -6,7 +6,6 @@ import path from 'path';
 import fs from 'fs';
 import multer from 'multer';
 import { requireAuth } from '../../middleware/auth.middleware.js';
-import { prisma } from '../../config/database.js';
 import { addAssetAttachment } from '../attachment/attachment-service.js';
 
 const uploadsDir = process.env.UPLOADS_DIR ?? path.join(process.cwd(), 'uploads');
@@ -61,14 +60,13 @@ router.use((req, res, next) => {
 router.get('/', async (req, res) => {
   try {
     const { storeId, categoryId, status, search, page, limit } = req.query;
-    const companyId = req.session!.companyId;
 
     const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 50));
     const skip = (pageNum - 1) * limitNum;
 
+    const db = req.scopedPrisma!;
     const where = {
-      store: { companyId },
       active: true,
       ...(storeId ? { storeId: parseInt(storeId as string, 10) } : {}),
       ...(categoryId ? { categoryId: parseInt(categoryId as string, 10) } : {}),
@@ -82,8 +80,8 @@ router.get('/', async (req, res) => {
       } : {}),
     };
 
-    const [assets, total] = await prisma.$transaction([
-      prisma.asset.findMany({
+    const [assets, total] = await db.$transaction([
+      db.asset.findMany({
         where,
         include: {
           store: { select: { id: true, name: true } },
@@ -93,7 +91,7 @@ router.get('/', async (req, res) => {
         skip,
         take: limitNum,
       }),
-      prisma.asset.count({ where }),
+      db.asset.count({ where }),
     ]);
 
     const assetsWithValue = assets.map((asset) => {
@@ -145,8 +143,8 @@ router.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (Number.isNaN(id)) { res.status(404).json({ error: 'Asset not found' }); return; }
 
-    const asset = await prisma.asset.findFirst({
-      where: { id, store: { companyId: req.session!.companyId } },
+    const asset = await req.scopedPrisma!.asset.findFirst({
+      where: { id },
       include: {
         store: { select: { id: true, name: true } },
         category: { select: { id: true, name: true, depreciationYears: true, depreciationRate: true } },

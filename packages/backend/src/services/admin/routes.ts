@@ -316,9 +316,7 @@ router.get('/asset-categories', async (req, res) => {
 
 router.get('/assets', async (req, res) => {
   try {
-    const companyId = req.session!.companyId;
-    const assets = await prisma.asset.findMany({
-      where: { store: { companyId } },
+    const assets = await req.scopedPrisma!.asset.findMany({
       include: {
         store: { select: { id: true, name: true } },
         category: { select: { id: true, name: true } },
@@ -335,10 +333,10 @@ router.post('/assets', async (req, res) => {
   try {
     const { name, storeId, categoryId, serialNumber, manufacturer, model,
             purchaseDate, warrantyExpiry, purchaseValue, status, notes } = req.body;
-    // Provjeri da store pripada toj kompaniji
+    // Guard: confirms store belongs to session company before creating asset
     const store = await req.scopedPrisma!.store.findFirst({ where: { id: Number(storeId) } });
     if (!store) { res.status(400).json({ error: 'Invalid store' }); return; }
-    const asset = await prisma.asset.create({
+    const asset = await req.scopedPrisma!.asset.create({
       data: {
         name, storeId: Number(storeId),
         categoryId: categoryId ? Number(categoryId) : null,
@@ -364,14 +362,12 @@ router.post('/assets', async (req, res) => {
 
 router.put('/assets/:id', async (req, res) => {
   try {
-    const companyId = req.session!.companyId;
     const id = parseInt(req.params.id, 10);
     const { name, storeId, categoryId, serialNumber, manufacturer, model,
             purchaseDate, warrantyExpiry, purchaseValue, status, notes, active } = req.body;
-    // Provjeri da asset pripada toj kompaniji
-    const existing = await prisma.asset.findFirst({ where: { id, store: { companyId } } });
+    const existing = await req.scopedPrisma!.asset.findFirst({ where: { id } });
     if (!existing) { res.status(404).json({ error: 'Asset not found' }); return; }
-    const asset = await prisma.asset.update({
+    const asset = await req.scopedPrisma!.asset.update({
       where: { id },
       data: {
         ...(name != null && { name }),
@@ -400,11 +396,10 @@ router.put('/assets/:id', async (req, res) => {
 
 router.delete('/assets/:id', async (req, res) => {
   try {
-    const companyId = req.session!.companyId;
     const id = parseInt(req.params.id, 10);
-    const existing = await prisma.asset.findFirst({ where: { id, store: { companyId } } });
+    const existing = await req.scopedPrisma!.asset.findFirst({ where: { id } });
     if (!existing) { res.status(404).json({ error: 'Asset not found' }); return; }
-    await prisma.asset.update({ where: { id }, data: { active: false } });
+    await req.scopedPrisma!.asset.update({ where: { id }, data: { active: false } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to deactivate asset' });
