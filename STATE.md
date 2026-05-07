@@ -32,7 +32,9 @@ Mergani PR-ovi u ovoj seriji rada (PR #6 → #26):
 | 23 | fix: GET /api/auth/session returns 200 with null instead of 401 | Login screen 401 noise |
 | 24 | fix(frontend): AMM WO modal — review-then-decide ordering | Akcije ispod cost proposal review |
 | 25 | fix(frontend): use aria-describedby on AMM archive button instead of div title | A11y |
-| 26 | docs: discovery + 3-phase plan for centralized auth middleware | **Trenutno mergano, sljedeći korak Faza 1** |
+| 26 | docs: discovery + 3-phase plan for centralized auth middleware | Plan za centralizirani auth middleware |
+| 27 | docs: STATE.md checkpoint for new-session handoff | Session checkpoint |
+| 28 | refactor(backend): phase 1 — adopt scopedPrisma in route handlers | **Faza 1 auth middleware mergana** |
 
 Statistika testova: backend 12 → 69 testova, frontend 0 → 9 testova.
 
@@ -66,47 +68,19 @@ Statistika testova: backend 12 → 69 testova, frontend 0 → 9 testova.
 
 ---
 
-## Sljedeći korak: Faza 1 centraliziranog auth middleware-a
+## Sljedeći korak: Faza 2 centraliziranog auth middleware-a
 
-**Pročitaj prvo:** `docs/auth-middleware-discovery.md` u repu (mergano u PR-u #26).
+**Faza 1 je završena (PR #28, mergano 2026-05-07).** Route layer (admin, asset, store, preventive-maintenance routes) migriran na `req.scopedPrisma`.
 
-### Što napraviti u Fazi 1
+### Što je OSTALO na globalnom prisma (namjerno):
 
-Migrirati call sitove koji koriste **trenutnu scope mapu** (6 INTERNAL + 5 VENDOR modela koji su već u `scoped-prisma.ts`):
+- **`auth-service.ts` + `auth/routes.ts` demo dropdowns** — pre-auth, mora vidjeti sve tenante
+- **`admin/routes.ts` vendorUser/vendorCompany** — cross-company by design, nije u INTERNAL scope mapi
+- **Service layer** (`ticket-service.ts`, `work-order-service.ts`, `preventive-maintenance-service.ts`, itd.) — primaju `companyId` kao parametar, nemaju `req`. Ovo je prirodni kandidat za zaseban refactor (proslijediti `scopedPrisma` kao parametar, ili drugačiji pristup).
 
-INTERNAL: `ticket`, `store`, `region`, `internalUser`, `assetCategory`, `preventiveMaintenancePlan`
-VENDOR: `workOrder`, `invoiceBatch`, `vendorUser`, `vendorPriceListItem`, `preventiveMaintenancePlan`
+### Faza 2 — nested-relation scope (asset, attachment, costEstimation, comment)
 
-Primjer migracije (admin routes — najvjerojatniji početak):
-
-```ts
-// PRIJE
-const stores = await prisma.store.findMany({
-  where: { companyId: req.session!.companyId },
-});
-
-// POSLIJE
-const stores = await req.scopedPrisma!.store.findMany({});
-```
-
-`!` jer `req.scopedPrisma` je optional (undefined ako nema sessiona); na rutama nakon `requireAuth` siguran je.
-
-### Konkretni call sitovi za Fazu 1
-
-Glavni kandidati:
-- `services/admin/routes.ts` — 16 manual filtera (najdiraktnija dobit)
-- `services/auth/auth-service.ts` — pažljivo, neki MORAJU ostati global (login mora vidjeti sve users-e da provjeri credentials)
-- Dijelovi `ticket-service.ts` i `work-order-service.ts`
-
-### Procjena
-
-3-4 sata.
-
-### Bitne napomene
-
-1. **Auth flow je iznimka** — `auth-service.ts` legitimno mora pre-auth čitati `internalUser`/`vendorUser` BEZ scope-a. Ti pozivi MORAJU ostati na globalnom `prisma`. Treba jasno označiti gdje je pre-auth, gdje post-auth.
-2. **`prisma.$transaction([...])`** — Prisma extension RADI unutar transactiona, ali samo ako je transaction stvoren preko **scoped klijenta**. Migracija transactiona zahtjeva i prebacivanje `prisma.$transaction(...)` na `req.scopedPrisma!.$transaction(...)`.
-3. **Asset / attachment / cost estimation / comments NISU u scope mapi** — ovi modeli ostaju u Fazi 2 (treba nested-relation scoping). Ne pokušavati ih migrirati u Fazi 1.
+Vidi `docs/auth-middleware-discovery.md` za detalje. Treba proširiti `scoped-prisma.ts` s `nestedScope` konceptom za modele gdje scope ide kroz relation (`asset.store.companyId` umjesto direktnog `asset.companyId`).
 
 ---
 
@@ -115,7 +89,7 @@ Glavni kandidati:
 Vidi `MAINTRIX_TECHNICAL_DEBT.md` u repu za potpuni popis. Glavne stavke:
 
 **Visoki:**
-- Centralized auth middleware **(Faza 1 sljedeća)**
+- Centralized auth middleware — Faza 1 ✅, **Faza 2 sljedeća** (nested-relation scope + service layer)
 - CI/CD pipeline (već postoji, eventualno proširenje)
 - Better Auth (massive — pravi per-user login, nakon prvog ugovora)
 - Pagination svuda
