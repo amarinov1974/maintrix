@@ -1,0 +1,12 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+/**
+ * Layout Component
+ * Header: screen title (optional), user name, role, company, store/region, logout, back (optional)
+ */
+import { Link } from 'react-router-dom';
+import { useSession } from '../../contexts/SessionContext';
+import { MaintrixLogo } from './MaintrixLogo';
+export function Layout({ children, screenTitle, backLink, backLabel = 'Natrag', }) {
+    const { session, logout } = useSession();
+    return (_jsxs("div", { className: "min-h-screen", style: { backgroundColor: 'var(--color-bg)' }, children: [_jsx("header", { style: { backgroundColor: 'var(--color-header)', borderBottom: '1px solid rgba(255,255,255,0.08)' }, children: _jsxs("div", { className: "max-w-6xl mx-auto px-6 py-0 flex justify-between items-center", style: { height: '56px' }, children: [_jsxs("div", { className: "flex items-center gap-4", children: [_jsx(MaintrixLogo, { size: "sm", variant: "light" }), _jsx("div", { style: { width: '1px', height: '20px', backgroundColor: 'rgba(255,255,255,0.15)' } }), screenTitle != null && (_jsx("span", { className: "text-sm font-medium", style: { color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.01em' }, children: screenTitle }))] }), _jsxs("div", { className: "flex items-center gap-1", children: [session != null && (_jsxs("span", { className: "text-xs mr-3", style: { color: 'rgba(255,255,255,0.5)' }, children: [session.userName, session.storeName != null ? ` · ${session.storeName}` : '', session.regionName != null ? ` · ${session.regionName}` : ''] })), backLink != null && (_jsxs(Link, { to: backLink, className: "text-sm px-3 py-1.5 rounded-md transition-all", style: { color: 'rgba(255,255,255,0.7)', backgroundColor: 'transparent' }, onMouseEnter: e => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'), onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'), children: ["\u2190 ", backLabel] })), _jsx("button", { type: "button", onClick: logout, className: "text-sm px-3 py-1.5 rounded-md transition-all", style: { color: 'rgba(255,255,255,0.7)', backgroundColor: 'transparent' }, onMouseEnter: e => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'), onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'), children: "Odjava" })] })] }) }), _jsx("main", { className: "max-w-6xl mx-auto px-6 py-8", children: children })] }));
+}

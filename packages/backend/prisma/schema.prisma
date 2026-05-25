@@ -59,6 +59,62 @@ model Region {
   @@map("regions")
 }
 
+enum OwnershipType {
+  OWNED
+  LEASED
+}
+
+enum BuildingType {
+  STANDALONE
+  SHOPPING_MALL
+  ROW
+}
+
+enum HeatingType {
+  GAS
+  HEAT_PUMP
+  DISTRICT
+  ELECTRIC
+}
+
+enum CoolingType {
+  VRF
+  SPLIT
+  CHILLER
+  OTHER
+}
+
+enum MeterPurpose {
+  GENERAL
+  HVAC
+  REFRIGERATION
+  EV_CHARGING
+  LIGHTING
+  OTHER
+}
+
+enum VoltageLevel {
+  LV
+  MV
+}
+
+enum TariffModel {
+  SINGLE
+  DUAL
+  MULTI
+}
+
+enum MeterPhases {
+  SINGLE_PHASE
+  THREE_PHASE
+}
+
+enum EnergyTariff {
+  VT
+  NT
+  SINGLE
+}
+
 model Store {
   id        Int      @id @default(autoincrement())
   companyId Int      @map("company_id")
@@ -68,16 +124,87 @@ model Store {
   active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
 
+  internalCode          String?         @map("internal_code")
+  city                  String?
+  postalCode            String?         @map("postal_code")
+  latitude              Float?
+  longitude             Float?
+  ownershipType         OwnershipType?  @map("ownership_type")
+  ownerName             String?         @map("owner_name")
+  leaseStartDate        DateTime?       @map("lease_start_date")
+  leaseEndDate          DateTime?       @map("lease_end_date")
+  grossArea             Float?          @map("gross_area")
+  salesArea             Float?          @map("sales_area")
+  storageArea           Float?          @map("storage_area")
+  floors                Int?
+  buildYear             Int?            @map("build_year")
+  renovationYear        Int?            @map("renovation_year")
+  buildingType          BuildingType?   @map("building_type")
+  workingHours          Json?           @map("working_hours")
+  facilityContactName   String?         @map("facility_contact_name")
+  facilityContactPhone  String?         @map("facility_contact_phone")
+  ownerContactName      String?         @map("owner_contact_name")
+  ownerContactPhone     String?         @map("owner_contact_phone")
+  hasSolar              Boolean         @default(false) @map("has_solar")
+  solarCapacityKwp      Float?          @map("solar_capacity_kwp")
+  hasEvChargers         Boolean         @default(false) @map("has_ev_chargers")
+  evChargerCount        Int?            @map("ev_charger_count")
+  evChargerPowerKw      Float?          @map("ev_charger_power_kw")
+  heatingType           HeatingType?    @map("heating_type")
+  coolingType           CoolingType?    @map("cooling_type")
+
   company       Company        @relation(fields: [companyId], references: [id])
   region        Region         @relation(fields: [regionId], references: [id])
   tickets       Ticket[]
   assets        Asset[]
   internalUsers InternalUser[]
   preventiveMaintenancePlans PreventiveMaintenancePlan[]
+  energyMeters  EnergyMeter[]
 
   @@index([companyId])
   @@index([regionId])
   @@map("stores")
+}
+
+model EnergyMeter {
+  id                Int           @id @default(autoincrement())
+  storeId           Int           @map("store_id")
+  store             Store         @relation(fields: [storeId], references: [id])
+  ommId             String        @map("omm_id")
+  eanNumber         String?       @map("ean_number")
+  meterName         String        @map("meter_name")
+  meterPurpose      MeterPurpose  @default(GENERAL) @map("meter_purpose")
+  isMainMeter       Boolean       @default(false) @map("is_main_meter")
+  distributor       String?
+  supplier          String?
+  contractedPower   Float?        @map("contracted_power")
+  voltageLevel      VoltageLevel? @map("voltage_level")
+  tariffModel       TariffModel?  @map("tariff_model")
+  meterPhases       MeterPhases?  @map("meter_phases")
+  meterSerialNumber String?       @map("meter_serial_number")
+  active            Boolean       @default(true)
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  readings          EnergyReading[]
+
+  @@index([storeId])
+  @@map("energy_meters")
+}
+
+model EnergyReading {
+  id                  Int           @id @default(autoincrement())
+  energyMeterId       Int           @map("energy_meter_id")
+  energyMeter         EnergyMeter   @relation(fields: [energyMeterId], references: [id])
+  intervalStart       DateTime      @map("interval_start")
+  activeEnergyKwh     Float         @map("active_energy_kwh")
+  reactiveEnergyKvarh Float?        @map("reactive_energy_kvarh")
+  peakPowerKw         Float?        @map("peak_power_kw")
+  tariff              EnergyTariff?
+  createdAt           DateTime      @default(now()) @map("created_at")
+
+  @@index([energyMeterId, intervalStart])
+  @@unique([energyMeterId, intervalStart])
+  @@map("energy_readings")
 }
 
 // ============================================================================

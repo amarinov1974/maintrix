@@ -27,6 +27,8 @@ import { S3MyWorkOrdersPage } from './pages/vendor/s3/S3MyWorkOrdersPage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AssetListPage } from './pages/assets/AssetListPage';
 import { AssetDetailPage } from './pages/assets/AssetDetailPage';
+import { EnergyStoreListPage } from './pages/energy/EnergyStoreListPage';
+import { EnergyStorePage } from './pages/energy/EnergyStorePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -190,6 +192,22 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['ADMIN']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/energy/stores"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <EnergyStoreListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/energy/stores/:id"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <EnergyStorePage />
                 </ProtectedRoute>
               }
             />

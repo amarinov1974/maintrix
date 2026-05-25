@@ -4,6 +4,7 @@
  */
 
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Layout } from '../../components/shared/Layout';
 import { AlertModal, ConfirmModal, Toast } from '../../components/shared';
@@ -493,9 +494,17 @@ export function AdminDashboard() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin panel</h1>
-          <p className="text-gray-600">Upravljanje korisnicima i postavkama sustava</p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Admin panel</h1>
+            <p className="text-gray-600">Upravljanje korisnicima i postavkama sustava</p>
+          </div>
+          <Link
+            to="/energy/stores"
+            className="text-sm font-medium text-blue-600 hover:text-blue-800 border border-blue-200 rounded-lg px-4 py-2 bg-blue-50 hover:bg-blue-100 transition"
+          >
+            Energetika →
+          </Link>
         </div>
 
         <div className="border-b border-gray-200">

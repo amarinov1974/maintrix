@@ -1,0 +1,13 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Layout } from '../../components/shared/Layout';
+import { energyAPI } from '../../api/energy';
+export function EnergyStoreListPage() {
+    const navigate = useNavigate();
+    const { data: stores, isLoading, isError } = useQuery({
+        queryKey: ['energy-stores'],
+        queryFn: energyAPI.getEnergyStores,
+    });
+    return (_jsx(Layout, { screenTitle: "Energetika", backLink: "/admin", backLabel: "Admin panel", children: _jsxs("div", { className: "space-y-6", children: [_jsxs("div", { children: [_jsx("h1", { className: "text-2xl font-bold text-gray-900", children: "Poslovnice \u2014 energetika" }), _jsx("p", { className: "text-gray-600", children: "Pregled poslovnica i brojila potro\u0161nje energije" })] }), isLoading && (_jsx("p", { className: "text-gray-500 text-sm", children: "U\u010Ditavanje..." })), isError && (_jsx("p", { className: "text-red-600 text-sm", children: "Gre\u0161ka pri u\u010Ditavanju poslovnica." })), !isLoading && !isError && (_jsxs("div", { className: "bg-white rounded-lg border border-gray-200 overflow-hidden", children: [_jsxs("table", { className: "min-w-full text-sm", children: [_jsx("thead", { className: "bg-gray-50 text-left text-gray-600", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 font-medium", children: "Naziv" }), _jsx("th", { className: "px-4 py-3 font-medium", children: "\u0160ifra" }), _jsx("th", { className: "px-4 py-3 font-medium", children: "Grad" }), _jsx("th", { className: "px-4 py-3 font-medium", children: "Regija" }), _jsx("th", { className: "px-4 py-3 font-medium text-right", children: "Brojila" })] }) }), _jsx("tbody", { className: "divide-y divide-gray-100", children: (stores ?? []).map((store) => (_jsxs("tr", { onClick: () => navigate(`/energy/stores/${store.id}`), className: "hover:bg-blue-50 cursor-pointer transition", children: [_jsx("td", { className: "px-4 py-3 font-medium text-gray-900", children: store.name }), _jsx("td", { className: "px-4 py-3 text-gray-600", children: store.internalCode ?? '—' }), _jsx("td", { className: "px-4 py-3 text-gray-600", children: store.city ?? '—' }), _jsx("td", { className: "px-4 py-3 text-gray-600", children: store.region?.name ?? '—' }), _jsx("td", { className: "px-4 py-3 text-right text-gray-700", children: store.energyMeters.length })] }, store.id))) })] }), (stores ?? []).length === 0 && (_jsx("p", { className: "px-4 py-8 text-center text-gray-500 text-sm", children: "Nema poslovnica." }))] }))] }) }));
+}

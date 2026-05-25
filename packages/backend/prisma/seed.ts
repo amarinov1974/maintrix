@@ -34,6 +34,8 @@ async function main() {
   await prisma.ticketComment.deleteMany();
   await prisma.ticket.deleteMany();
   await prisma.preventiveMaintenancePlan.deleteMany();
+  await prisma.energyReading.deleteMany();
+  await prisma.energyMeter.deleteMany();
   await prisma.internalUser.deleteMany();
   await prisma.vendorUser.deleteMany();
   await prisma.vendorPriceListItem.deleteMany();
@@ -513,6 +515,343 @@ async function main() {
     ]);
   }
 
+  console.log('Seeding energy module data...');
+
+  type EnergyMeterSeed = {
+    meterName: string;
+    meterPurpose: 'GENERAL' | 'REFRIGERATION';
+    isMainMeter: boolean;
+    ommSuffix: string;
+    eanSuffix: string;
+    contractedPower: number;
+  };
+
+  async function seedStoreEnergy(
+    store: { id: number },
+    storeData: {
+      internalCode: string;
+      city: string;
+      postalCode: string;
+      latitude: number;
+      longitude: number;
+      ownershipType: 'OWNED' | 'LEASED';
+      ownerName: string | null;
+      leaseStartDate: Date | null;
+      leaseEndDate: Date | null;
+      grossArea: number;
+      salesArea: number;
+      storageArea: number;
+      floors: number;
+      buildYear: number;
+      renovationYear: number | null;
+      buildingType: 'STANDALONE' | 'SHOPPING_MALL';
+      workingHours: Record<string, string>;
+      facilityContactName: string;
+      facilityContactPhone: string;
+      heatingType: 'GAS' | 'HEAT_PUMP';
+      coolingType: 'VRF' | 'SPLIT';
+      hasSolar: boolean;
+      solarCapacityKwp?: number;
+      hasEvChargers: boolean;
+      evChargerCount?: number;
+      evChargerPowerKw?: number;
+    },
+    meters: EnergyMeterSeed[]
+  ) {
+    await prisma.store.update({
+      where: { id: store.id },
+      data: storeData,
+    });
+    for (const m of meters) {
+      await prisma.energyMeter.create({
+        data: {
+          storeId: store.id,
+          ommId: `HR-OMM-${store.id}-${m.ommSuffix}`,
+          eanNumber: `830200000${String(store.id).padStart(3, '0')}${m.eanSuffix}`,
+          meterName: m.meterName,
+          meterPurpose: m.meterPurpose,
+          isMainMeter: m.isMainMeter,
+          distributor: 'HEP Distribucija d.o.o.',
+          supplier: 'HEP Opskrba d.o.o.',
+          contractedPower: m.contractedPower,
+          voltageLevel: 'LV',
+          tariffModel: 'DUAL',
+          meterPhases: 'THREE_PHASE',
+        },
+      });
+    }
+  }
+
+  await seedStoreEnergy(
+    store1North,
+    {
+      internalCode: 'PS-SJ-001',
+      city: 'Čakovec',
+      postalCode: '40000',
+      latitude: 46.3833,
+      longitude: 16.4333,
+      ownershipType: 'LEASED',
+      ownerName: 'Čakovec Nekretnine d.o.o.',
+      leaseStartDate: new Date('2018-01-01'),
+      leaseEndDate: new Date('2028-01-01'),
+      grossArea: 1850,
+      salesArea: 1200,
+      storageArea: 350,
+      floors: 1,
+      buildYear: 2017,
+      renovationYear: null,
+      buildingType: 'STANDALONE',
+      workingHours: { 'mon-sat': '07:00-22:00', sun: '08:00-20:00' },
+      facilityContactName: 'Ivana Petrović',
+      facilityContactPhone: '+385 40 123 456',
+      heatingType: 'HEAT_PUMP',
+      coolingType: 'VRF',
+      hasSolar: true,
+      solarCapacityKwp: 50,
+      hasEvChargers: true,
+      evChargerCount: 4,
+      evChargerPowerKw: 22,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 80 },
+      { meterName: 'Rashladni uređaji', meterPurpose: 'REFRIGERATION', isMainMeter: false, ommSuffix: '002', eanSuffix: '002', contractedPower: 40 },
+    ]
+  );
+
+  await seedStoreEnergy(
+    store2North,
+    {
+      internalCode: 'PS-SJ-002',
+      city: 'Varaždin',
+      postalCode: '42000',
+      latitude: 46.3044,
+      longitude: 16.3378,
+      ownershipType: 'LEASED',
+      ownerName: 'Varaždin Retail Park d.o.o.',
+      leaseStartDate: new Date('2019-03-01'),
+      leaseEndDate: new Date('2029-03-01'),
+      grossArea: 2200,
+      salesArea: 1500,
+      storageArea: 420,
+      floors: 1,
+      buildYear: 2019,
+      renovationYear: null,
+      buildingType: 'SHOPPING_MALL',
+      workingHours: { 'mon-sat': '08:00-21:00', sun: '09:00-20:00' },
+      facilityContactName: 'Tomislav Knežević',
+      facilityContactPhone: '+385 42 234 567',
+      heatingType: 'GAS',
+      coolingType: 'SPLIT',
+      hasSolar: false,
+      hasEvChargers: false,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 100 },
+    ]
+  );
+
+  await seedStoreEnergy(
+    store3North,
+    {
+      internalCode: 'PS-SJ-003',
+      city: 'Koprivnica',
+      postalCode: '48000',
+      latitude: 46.1631,
+      longitude: 16.8268,
+      ownershipType: 'OWNED',
+      ownerName: null,
+      leaseStartDate: null,
+      leaseEndDate: null,
+      grossArea: 1600,
+      salesArea: 1050,
+      storageArea: 300,
+      floors: 1,
+      buildYear: 2016,
+      renovationYear: 2022,
+      buildingType: 'STANDALONE',
+      workingHours: { 'mon-sat': '07:00-21:00', sun: '08:00-20:00' },
+      facilityContactName: 'Martina Jurić',
+      facilityContactPhone: '+385 48 345 678',
+      heatingType: 'HEAT_PUMP',
+      coolingType: 'VRF',
+      hasSolar: true,
+      solarCapacityKwp: 35,
+      hasEvChargers: false,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 63 },
+    ]
+  );
+
+  await seedStoreEnergy(
+    store4North,
+    {
+      internalCode: 'PS-SJ-004',
+      city: 'Bjelovar',
+      postalCode: '43000',
+      latitude: 45.8989,
+      longitude: 16.8478,
+      ownershipType: 'LEASED',
+      ownerName: 'Bjelovar Centar d.o.o.',
+      leaseStartDate: new Date('2020-06-01'),
+      leaseEndDate: new Date('2030-06-01'),
+      grossArea: 1400,
+      salesArea: 900,
+      storageArea: 280,
+      floors: 1,
+      buildYear: 2020,
+      renovationYear: null,
+      buildingType: 'STANDALONE',
+      workingHours: { 'mon-sat': '07:00-21:00', sun: '08:00-20:00' },
+      facilityContactName: 'Davor Šimić',
+      facilityContactPhone: '+385 43 456 789',
+      heatingType: 'GAS',
+      coolingType: 'SPLIT',
+      hasSolar: false,
+      hasEvChargers: true,
+      evChargerCount: 2,
+      evChargerPowerKw: 22,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 63 },
+    ]
+  );
+
+  await seedStoreEnergy(
+    store5South,
+    {
+      internalCode: 'PS-JG-001',
+      city: 'Split',
+      postalCode: '21000',
+      latitude: 43.5081,
+      longitude: 16.4402,
+      ownershipType: 'LEASED',
+      ownerName: 'Split Retail d.o.o.',
+      leaseStartDate: new Date('2018-09-01'),
+      leaseEndDate: new Date('2028-09-01'),
+      grossArea: 2400,
+      salesArea: 1650,
+      storageArea: 480,
+      floors: 2,
+      buildYear: 2018,
+      renovationYear: null,
+      buildingType: 'SHOPPING_MALL',
+      workingHours: { 'mon-sat': '08:00-22:00', sun: '09:00-21:00' },
+      facilityContactName: 'Kristina Kovačić',
+      facilityContactPhone: '+385 21 567 890',
+      heatingType: 'HEAT_PUMP',
+      coolingType: 'VRF',
+      hasSolar: true,
+      solarCapacityKwp: 80,
+      hasEvChargers: true,
+      evChargerCount: 6,
+      evChargerPowerKw: 22,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 160 },
+      { meterName: 'Rashladni uređaji', meterPurpose: 'REFRIGERATION', isMainMeter: false, ommSuffix: '002', eanSuffix: '002', contractedPower: 60 },
+    ]
+  );
+
+  await seedStoreEnergy(
+    store6South,
+    {
+      internalCode: 'PS-JG-002',
+      city: 'Zadar',
+      postalCode: '23000',
+      latitude: 44.1194,
+      longitude: 15.2314,
+      ownershipType: 'OWNED',
+      ownerName: null,
+      leaseStartDate: null,
+      leaseEndDate: null,
+      grossArea: 1750,
+      salesArea: 1150,
+      storageArea: 340,
+      floors: 1,
+      buildYear: 2017,
+      renovationYear: 2021,
+      buildingType: 'STANDALONE',
+      workingHours: { 'mon-sat': '07:00-21:00', sun: '08:00-20:00' },
+      facilityContactName: 'Matej Babić',
+      facilityContactPhone: '+385 23 678 901',
+      heatingType: 'HEAT_PUMP',
+      coolingType: 'VRF',
+      hasSolar: true,
+      solarCapacityKwp: 45,
+      hasEvChargers: false,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 80 },
+    ]
+  );
+
+  await seedStoreEnergy(
+    store7South,
+    {
+      internalCode: 'PS-JG-003',
+      city: 'Dubrovnik',
+      postalCode: '20000',
+      latitude: 42.6507,
+      longitude: 18.0944,
+      ownershipType: 'LEASED',
+      ownerName: 'Dubrovnik Property d.o.o.',
+      leaseStartDate: new Date('2019-06-01'),
+      leaseEndDate: new Date('2029-06-01'),
+      grossArea: 1500,
+      salesArea: 980,
+      storageArea: 260,
+      floors: 1,
+      buildYear: 2019,
+      renovationYear: null,
+      buildingType: 'STANDALONE',
+      workingHours: { 'mon-sat': '08:00-22:00', sun: '09:00-21:00' },
+      facilityContactName: 'Ana Horvat',
+      facilityContactPhone: '+385 20 789 012',
+      heatingType: 'HEAT_PUMP',
+      coolingType: 'SPLIT',
+      hasSolar: false,
+      hasEvChargers: false,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 63 },
+    ]
+  );
+
+  await seedStoreEnergy(
+    store8South,
+    {
+      internalCode: 'PS-JG-004',
+      city: 'Šibenik',
+      postalCode: '22000',
+      latitude: 43.735,
+      longitude: 15.8952,
+      ownershipType: 'LEASED',
+      ownerName: 'Šibenik Centar d.o.o.',
+      leaseStartDate: new Date('2021-01-01'),
+      leaseEndDate: new Date('2031-01-01'),
+      grossArea: 1300,
+      salesArea: 850,
+      storageArea: 250,
+      floors: 1,
+      buildYear: 2020,
+      renovationYear: null,
+      buildingType: 'STANDALONE',
+      workingHours: { 'mon-sat': '07:00-21:00', sun: '08:00-20:00' },
+      facilityContactName: 'Nikola Božić',
+      facilityContactPhone: '+385 22 890 123',
+      heatingType: 'GAS',
+      coolingType: 'SPLIT',
+      hasSolar: false,
+      hasEvChargers: true,
+      evChargerCount: 2,
+      evChargerPowerKw: 22,
+    },
+    [
+      { meterName: 'Opća potrošnja', meterPurpose: 'GENERAL', isMainMeter: true, ommSuffix: '001', eanSuffix: '001', contractedPower: 50 },
+    ]
+  );
+
   console.log('Seed completed successfully.');
   console.log('Summary:');
   console.log('  Companies: 1 (Retail A only)');
@@ -523,6 +862,7 @@ async function main() {
   console.log('  Vendor users: 7');
   console.log('  Asset categories: 12');
   console.log('  Assets: created (60 per store for first 4 stores = 240 total)');
+  console.log('  Energy: 8 stores with energy profiles, 11 meters');
 }
 
 main()

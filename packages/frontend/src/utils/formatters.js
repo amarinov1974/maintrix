@@ -1,0 +1,156 @@
+import { TicketStatus, WorkOrderStatus } from '../types/statuses';
+export function formatCategory(value) {
+    const map = {
+        ELECTRICAL_INSTALLATIONS: 'Elektroinstalacije',
+        HEATING_VENTILATION_AIR_CONDITIONING: 'Grijanje, ventilacija i klima',
+        REFRIGERATION: 'Rashlađivanje',
+        KITCHEN_EQUIPMENT: 'Kuhinjska oprema',
+        ELEVATORS: 'Liftovi',
+        AUTOMATIC_DOORS: 'Automatska vrata',
+        FIRE_PROTECTION_SYSTEM: 'Zaštita od požara',
+        WATER_AND_SEWAGE: 'Vodoopskrba i kanalizacija',
+        CONSTRUCTION_WORKS: 'Građevinski radovi',
+        HYGIENE: 'Higijena',
+        ENVIRONMENTAL: 'Okoliš',
+        OTHER: 'Ostalo',
+    };
+    return map[value] ?? value.replace(/_/g, ' ');
+}
+export function formatHistoryAction(value) {
+    const map = {
+        // Ticket lifecycle
+        CREATE: 'Kreirano',
+        SUBMIT: 'Prijavljeno',
+        SUBMIT_UPDATED: 'Ponovno prijavljeno',
+        WITHDRAW: 'Povučeno',
+        REQUEST_CLARIFICATION: 'Traženo pojašnjenje',
+        PROVIDE_CLARIFICATION: 'Pojašnjenje dano',
+        APPROVE_FOR_ESTIMATION: 'Odobreno za procjenu',
+        REQUEST_APPROVAL: 'Poslano na odobrenje',
+        ESCALATE: 'Eskalirano',
+        APPROVE: 'Odobreno',
+        APPROVE_COST: 'Trošak odobren',
+        REJECT: 'Odbijeno',
+        RETURN: 'Vraćeno',
+        RETURN_TO_AMM: 'Vraćeno voditelju održavanja',
+        RETURN_FOR_CLARIFICATION: 'Vraćeno na pojašnjenje',
+        CREATE_WORK_ORDER: 'Kreiran radni nalog',
+        ARCHIVE: 'Arhivirano',
+        // Work order lifecycle
+        CREATE_WO_FROM_PM: 'Kreiran iz plana održavanja',
+        RESEND_TO_VENDOR: 'Vraćeno izvođaču',
+        ASSIGN_TECHNICIAN: 'Dodijeljen tehničar',
+        RETURN_FOR_TECH_COUNT: 'Vraćeno radi broja tehničara',
+        QR_GENERATED: 'QR kod generiran',
+        CHECKIN: 'Dolazak na lokaciju',
+        CHECKOUT_FIXED: 'Odjava — popravljeno',
+        CHECKOUT_FOLLOW_UP: 'Odjava — potreban dodatni posjet',
+        CHECKOUT_NEW_WO_NEEDED: 'Odjava — potreban novi radni nalog',
+        CHECKOUT_UNSUCCESSFUL: 'Odjava — neuspjeli popravak',
+        SUBMIT_COST_PROPOSAL: 'Ponuda troška predana',
+        RESUBMIT_COST_PROPOSAL: 'Revidirana ponuda troška predana',
+        REQUEST_REVISION: 'Zatražena revizija troška',
+        CLOSE_WITHOUT_COST: 'Zatvoreno bez troška',
+    };
+    return map[value] ?? value.replace(/_/g, ' ');
+}
+export function formatAssetStatus(value) {
+    const map = {
+        ACTIVE: 'Aktivno',
+        FAULTY: 'Kvar',
+        IN_SERVICE: 'Na servisu',
+        DECOMMISSIONED: 'Otpisano',
+    };
+    return map[value] ?? value;
+}
+export function formatStatus(value) {
+    const map = {
+        Draft: 'Nacrt',
+        'Ticket Submitted': 'Prijava podnesena',
+        'Ticket Withdrawn': 'Prijava povučena',
+        'Ticket Archived': 'Prijava arhivirana',
+        'Ticket Rejected': 'Prijava odbijena',
+        'Awaiting Ticket Creator Response': 'Čeka odgovor podnositelja',
+        'Updated Ticket Submitted': 'Ažurirana prijava podnesena',
+        'Cost Estimation Needed': 'Potrebna procjena troška',
+        'Cost Estimation Approval Needed': 'Odobrenje procjene troška',
+        'Ticket Cost Estimation Approved': 'Procjena troška odobrena',
+        'Work Order In Progress': 'Radni nalog u tijeku',
+        'Awaiting Service Provider': 'Čeka izvođača',
+        'Service Visit Scheduled': 'Zakazan posjet servisera',
+        'Service In Progress': 'Servis u tijeku',
+        'Work In Progress': 'Rad u tijeku',
+        'Service Completed': 'Servis završen',
+        'Follow-Up Visit Requested': 'Zatražen dodatni posjet',
+        'New Work Order Needed': 'Potreban novi radni nalog',
+        'Repair Unsuccessful': 'Neuspjeli popravak',
+        'Cost Proposal Prepared': 'Ponuda troška pripremljena',
+        'Cost Proposal Submitted': 'Ponuda troška predana',
+        'Cost Proposal Approved': 'Ponuda troška odobrena',
+        'Cost Revision Requested': 'Zatražena revizija troška',
+        'Cost Proposal Revision Requested': 'Zatražena revizija ponude',
+        'Work Completed': 'Rad završen',
+        'Closed With Cost': 'Zatvoreno s troškom',
+        'Closed Without Cost': 'Zatvoreno bez troška',
+        'Work Order Rejected': 'Radni nalog odbijen',
+        'Follow Up Needed': 'Potreban follow-up',
+        'Rejected By Provider': 'Odbijeno od izvođača',
+        'Returned By Provider': 'Vraćeno od izvođača',
+    };
+    return map[value] ?? value;
+}
+const STATUS_ENUM_KEY_TO_DISPLAY = {
+    ...Object.fromEntries(Object.entries(TicketStatus).map(([k, v]) => [k, v])),
+    ...Object.fromEntries(Object.entries(WorkOrderStatus).map(([k, v]) => [k, v])),
+};
+/**
+ * Format a status value that may arrive as either an enum KEY
+ * (e.g. "ACCEPTED_TECHNICIAN_ASSIGNED" — Prisma column) or a display
+ * string (e.g. "Service In Progress" — state machine output).
+ * Returns the Croatian translation in both cases.
+ */
+export function formatStatusAny(value) {
+    if (value == null || value === '')
+        return '';
+    return formatStatus(STATUS_ENUM_KEY_TO_DISPLAY[value] ?? value);
+}
+const SUCCESS_STATUSES = [
+    TicketStatus.COST_ESTIMATION_APPROVED,
+    WorkOrderStatus.COST_PROPOSAL_APPROVED,
+];
+const DANGER_STATUSES = [
+    TicketStatus.REJECTED,
+    TicketStatus.WITHDRAWN,
+    WorkOrderStatus.REJECTED,
+];
+const WARNING_STATUSES = [
+    TicketStatus.SUBMITTED,
+    TicketStatus.UPDATED_SUBMITTED,
+    TicketStatus.AWAITING_CREATOR_RESPONSE,
+];
+function classifyStatus(status) {
+    if (status === TicketStatus.DRAFT)
+        return 'default';
+    if (SUCCESS_STATUSES.includes(status))
+        return 'success';
+    if (DANGER_STATUSES.includes(status))
+        return 'danger';
+    if (WARNING_STATUSES.includes(status))
+        return 'warning';
+    return null;
+}
+/**
+ * Badge variant for pages that show terminal / fully-resolved tickets and WOs.
+ * Anything not categorized falls back to neutral 'default'.
+ */
+export function getStatusBadgeVariant(status) {
+    return classifyStatus(status) ?? 'default';
+}
+/**
+ * Badge variant for pages that primarily list in-flight items (cost
+ * proposal review, follow-up WOs, etc.). Uncategorized in-flight
+ * statuses get 'warning' to signal "needs attention".
+ */
+export function getInFlightStatusBadgeVariant(status) {
+    return classifyStatus(status) ?? 'warning';
+}
