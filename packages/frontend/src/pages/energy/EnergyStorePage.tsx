@@ -1,6 +1,15 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { Layout } from '../../components/shared/Layout';
 import { energyAPI, type EnergyStore } from '../../api/energy';
 
@@ -47,6 +56,31 @@ function formatDate(value: string | null | undefined): string {
 function formatNumber(value: number | null | undefined, suffix = ''): string {
   if (value == null) return '—';
   return `${value.toLocaleString('hr-HR')}${suffix}`;
+}
+
+function todayISO(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function formatIntervalTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function SummaryCard({ label, value, unit }: { label: string; value: string; unit: string }) {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4">
+      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-gray-900">
+        {value}
+        <span className="text-sm font-normal text-gray-500 ml-1">{unit}</span>
+      </p>
+    </div>
+  );
 }
 
 function FieldRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -116,12 +150,36 @@ function GeneralTab({ store }: { store: EnergyStore }) {
 }
 
 function EnergyTab({ store }: { store: EnergyStore }) {
+  const [selectedDate, setSelectedDate] = useState(() => todayISO());
+  const hasMainMeter = store.energyMeters.some((m) => m.isMainMeter);
+
+  const {
+    data: readingsData,
+    isLoading: readingsLoading,
+    isError: readingsError,
+  } = useQuery({
+    queryKey: ['energy-readings', store.id, selectedDate],
+    queryFn: () => energyAPI.getEnergyReadings(store.id, selectedDate),
+    enabled: hasMainMeter,
+  });
+
+  const chartData = useMemo(
+    () =>
+      (readingsData?.readings ?? []).map((r) => ({
+        time: formatIntervalTime(r.intervalStart),
+        kwh: r.activeEnergyKwh,
+      })),
+    [readingsData]
+  );
+
   if (store.energyMeters.length === 0) {
     return <p className="text-gray-500 text-sm">Nema registriranih brojila.</p>;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900">Brojila</h2>
       {store.energyMeters.map((meter) => (
         <div
           key={meter.id}
@@ -182,6 +240,110 @@ function EnergyTab({ store }: { store: EnergyStore }) {
           </dl>
         </div>
       ))}
+      </div>
+
+      {hasMainMeter && (
+        <div className="space-y-6 border-t border-gray-200 pt-8">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Potrošnja po intervalima</h2>
+              {readingsData != null && (
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {readingsData.meterName} · {readingsData.date}
+                </p>
+              )}
+            </div>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium text-gray-700">Datum</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </label>
+          </div>
+
+          {readingsLoading && (
+            <p className="text-gray-500 text-sm">Učitavanje očitanja...</p>
+          )}
+
+          {readingsError && (
+            <p className="text-red-600 text-sm">Greška pri učitavanju očitanja.</p>
+          )}
+
+          {readingsData != null && !readingsLoading && (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <SummaryCard
+                  label="Ukupna potrošnja"
+                  value={readingsData.summary.totalKwh.toLocaleString('hr-HR')}
+                  unit="kWh"
+                />
+                <SummaryCard
+                  label="Vršna snaga"
+                  value={readingsData.summary.peakKw.toLocaleString('hr-HR')}
+                  unit="kW"
+                />
+                <SummaryCard
+                  label="VT potrošnja"
+                  value={readingsData.summary.vtKwh.toLocaleString('hr-HR')}
+                  unit="kWh"
+                />
+                <SummaryCard
+                  label="NT potrošnja"
+                  value={readingsData.summary.ntKwh.toLocaleString('hr-HR')}
+                  unit="kWh"
+                />
+              </div>
+
+              {chartData.length > 0 ? (
+                <div className="w-full h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis
+                        dataKey="time"
+                        tick={{ fontSize: 11, fill: '#6b7280' }}
+                        interval={7}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: '#6b7280' }}
+                        unit=" kWh"
+                        width={56}
+                      />
+                      <Tooltip
+                        formatter={(value) => {
+                          const n = typeof value === 'number' ? value : Number(value);
+                          return [`${n.toLocaleString('hr-HR')} kWh`, 'Potrošnja'];
+                        }}
+                        labelFormatter={(label) => `Vrijeme: ${label}`}
+                        contentStyle={{
+                          borderRadius: '8px',
+                          border: '1px solid #e5e7eb',
+                          fontSize: '13px',
+                        }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="kwh"
+                        stroke="#2563eb"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm text-center py-8">
+                  Nema očitanja za odabrani datum.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

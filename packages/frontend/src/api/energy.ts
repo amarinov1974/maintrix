@@ -61,6 +61,32 @@ export interface EnergyStore {
   energyMeters: EnergyMeter[];
 }
 
+export interface EnergyReading {
+  id: number;
+  energyMeterId: number;
+  intervalStart: string;
+  activeEnergyKwh: number;
+  reactiveEnergyKvarh: number | null;
+  peakPowerKw: number | null;
+  tariff: string | null;
+  createdAt: string;
+}
+
+export interface EnergyReadingsSummary {
+  totalKwh: number;
+  peakKw: number;
+  vtKwh: number;
+  ntKwh: number;
+}
+
+export interface EnergyReadingsResponse {
+  date: string;
+  meterId: number;
+  meterName: string;
+  readings: EnergyReading[];
+  summary: EnergyReadingsSummary;
+}
+
 export const energyAPI = {
   getEnergyStores: async () => {
     const { data } = await apiClient.get<{ stores: EnergyStore[] }>('/energy/stores');
@@ -70,5 +96,13 @@ export const energyAPI = {
   getEnergyStore: async (id: number) => {
     const { data } = await apiClient.get<{ store: EnergyStore }>(`/energy/stores/${id}`);
     return data.store;
+  },
+
+  getEnergyReadings: async (storeId: number, date: string) => {
+    const { data } = await apiClient.get<EnergyReadingsResponse>(
+      `/energy/stores/${storeId}/readings`,
+      { params: { date } }
+    );
+    return data;
   },
 };

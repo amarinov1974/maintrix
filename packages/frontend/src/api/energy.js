@@ -11,4 +11,8 @@ export const energyAPI = {
         const { data } = await apiClient.get(`/energy/stores/${id}`);
         return data.store;
     },
+    getEnergyReadings: async (storeId, date) => {
+        const { data } = await apiClient.get(`/energy/stores/${storeId}/readings`, { params: { date } });
+        return data;
+    },
 };
